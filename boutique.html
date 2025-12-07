@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boutique • Drive Prime Luxury Car Rentals</title>
+    <meta name="description" content="Drive Prime – All our luxury vehicles available for rental">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand: #F5C542;
+            --ink: #111319;
+            --ink-2: #1c1f27;
+            --muted: #6b7280;
+            --bg: #ffffff;
+            --dark: #0c0d11;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+            color: var(--ink);
+            background: #fff;
+            line-height: 1.45;
+            padding-top: var(--safe-top, 0);
+            padding-bottom: var(--safe-bottom, 0);
+            -webkit-text-size-adjust: 100%;
+            text-rendering: optimizeLegibility;
+        }
+        
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        
+        img {
+            max-width: 100%;
+            display: block;
+        }
+        
+        .container {
+            width: min(1200px, 92%);
+            margin-inline: auto;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            border: 0;
+            border-radius: 999px;
+            background: var(--ink);
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: .02em;
+            padding: .9rem 1.4rem;
+            cursor: pointer;
+            font-size: clamp(.95rem, 2.4vw, 1rem);
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn.yellow {
+            background: var(--brand);
+            color: #111;
+        }
+        
+        .btn.ghost {
+            background: transparent;
+            border: 2px solid var(--brand);
+            color: var(--brand);
+        }
+        
+        .badge {
+            display: inline-block;
+            background: var(--brand);
+            color: #111;
+            padding: .35rem .7rem;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: .75rem;
+        }
+        
+        .section {
+            padding: clamp(48px, 8vw, 72px) 0;
+            scroll-margin-top: 84px;
+        }
+        
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+        
+        .shadow {
+            box-shadow: 0 10px 30px rgba(17,19,25,.12);
+        }
+        
+        .card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+        }
+        
+        .title {
+            font-size: clamp(26px, 5vw, 44px);
+            line-height: 1.12;
+            margin: 0 0 12px;
+            font-weight: 900;
+        }
+        
+        .subtitle {
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .16em;
+            font-weight: 700;
+            font-size: clamp(.7rem, 1.6vw, .8rem);
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: var(--ink-2);
+            color: #fff;
+        }
+        
+        .head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-weight: 900;
+        }
+        
+        .brand img {
+            width: 52px;
+            height: 52px;
+            border-radius: 999px;
+            object-fit: cover;
+            border: 3px solid var(--brand);
+            background: #000;
+        }
+        
+        nav ul {
+            display: flex;
+            gap: 18px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        nav a {
+            color: #fff;
+            opacity: .92;
+            font-weight: 700;
+            transition: color 0.3s ease;
+        }
+        
+        nav a:hover, nav a:focus {
+            color: var(--brand);
+            outline: none;
+        }
+        
+        .burger {
+            display: none;
+            background: transparent;
+            border: 0;
+            color: #fff;
+            font-size: 30px;
+            line-height: 1;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 960px) {
+            nav ul {
+                display: none;
+            }
+            
+            .burger {
+                display: inline-flex;
+            }
+            
+            .mobile {
+                display: none;
+                padding: 6px 0 14px;
+                border-top: 1px solid #2a2d37;
+            }
+            
+            .mobile a {
+                display: block;
+                padding: 12px 2px;
+                color: #fff;
+            }
+            
+            .mobile a:hover {
+                color: var(--brand);
+            }
+        }
+
+        .wa {
+            position: fixed;
+            left: 18px;
+            bottom: calc(18px + var(--safe-bottom, 0));
+            z-index: 60;
+            display: inline-grid;
+            place-items: center;
+            width: 58px;
+            height: 58px;
+            border-radius: 999px;
+            background: #25D366;
+            color: #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .wa:hover {
+            transform: scale(1.1);
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .boutique-hero {
+            background: linear-gradient(135deg, #f7f7f8 0%, #eaeaea 100%);
+            text-align: center;
+            padding: 60px 0 40px;
+        }
+        
+        .boutique-filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .boutique-filters select, .boutique-filters input {
+            min-height: 46px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 10px 12px;
+            font-weight: 600;
+            background: #fff;
+            color: #111;
+            font-family: inherit;
+        }
+        
+        .boutique-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .boutique-item {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(17,19,25,.12);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .boutique-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(17,19,25,.2);
+        }
+        
+        .boutique-item img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .boutique-item-content {
+            padding: 20px;
+        }
+        
+        .boutique-item h3 {
+            margin: 0 0 8px;
+            font-size: 1.3rem;
+        }
+        
+        .boutique-item-price {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--brand);
+            margin: 0 0 16px;
+        }
+        
+        .boutique-item-specs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        
+        .boutique-item-spec {
+            font-size: .8rem;
+            opacity: .95;
+            background: #1f2937;
+            color: #fff;
+            border: 1px solid #374151;
+            padding: .2rem .45rem;
+            border-radius: 999px;
+        }
+        
+        .boutique-item-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .boutique-item-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .cart-notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--brand);
+            color: #111;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        footer {
+            background: #0b0d12;
+            color: #9ca3af;
+            padding: 26px 0;
+        }
+        
+        .social a {
+            display: inline-grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: var(--brand);
+            color: #111;
+            font-weight: 900;
+            transition: transform 0.3s ease;
+        }
+        
+        .social a:hover {
+            transform: scale(1.1);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--muted);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+    <script>
+      if(window.emailjs){emailjs.init('PUBLIC_KEY_REPLACE_ME')}
+    </script>
+</head>
+<body>
+    <a class="wa" aria-label="WhatsApp" href="https://wa.me/212661627339" target="_blank" rel="noopener">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M20.52 3.48A11.87 11.87 0 0 0 12.06 0C5.46 0 .12 5.34.12 11.94a11.8 11.8 0 0 0 1.6 5.96L0 24l6.28-1.64a11.9 11.9 0 0 0 5.8 1.52h.01c6.6 0 11.94-5.34 11.94-11.94a11.9 11.9 0 0 0-3.51-8.46Zm-8.46 19.3a9.8 9.8 0 0 1-4.99-1.37l-.36-.21-3.72.97.99-3.63-.24-.37a9.83 9.83 0 0 1-1.53-5.28c0-5.43 4.42-9.85 9.86-9.85a9.8 9.8 0 0 1 6.96 2.88 9.82 9.82 0 0 1 2.88 6.97c0 5.44-4.42 9.86-9.85 9.86Zm5.6-7.35c-.3-.15-1.78-.88-2.06-.98-.27-.1-.47-.15-.67.15-.2.3-.77.98-.95 1.18-.18.2-.35.22-.65.07a8.02 8.02 0 0 1-2.36-1.45 8.81 8.81 0 0 1-1.63-2.02c-.17-.3 0-.46.13-.61.14-.14.3-.35.44-.52.15-.17.2-.3.3-.5.1-.2.05-.38-.02-.53-.07-.15-.67-1.6-.92-2.2-.24-.58-.49-.5-.67-.5h-.57c-.2 0-.52.08-.79.38-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.07 2.88 1.22 3.08.15.2 2.1 3.2 5.08 4.49.71.31 1.26.50 1.69.64.71.23 1.36.20 1.87.12.57-.08 1.78-.73 2.03-1.44.25-.71.25-1.32.18-1.44-.07-.12-.27-.20-.57-.35Z"/>
+        </svg>
+    </a>
+
+    <header>
+        <div class="container head">
+            <a href="index.html" class="brand">
+                <img src="logo.jpeg" alt="Drive Prime logo" />
+                <div>
+                    <div style="font-size:1rem" class="subtitle" aria-hidden="true">DRIVE PRIME</div>
+                    <div style="font-size:1.2rem;font-weight:900">Luxury Car Rentals</div>
+                </div>
+            </a>
+            <nav aria-label="Primary">
+                <button class="burger" id="burger" aria-expanded="false" aria-controls="mobile" aria-label="Menu">☰</button>
+                <ul id="menu">
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="boutique.html" style="color:var(--brand)">Boutique</a></li>
+                    <li><a href="index.html#models">Vehicle Models</a></li>
+                    <li><a href="index.html#booking">Booking</a></li>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="index.html#about">About</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="container mobile" id="mobile" role="dialog" aria-modal="true" aria-label="Mobile menu"></div>
+    </header>
+
+    <section class="boutique-hero">
+        <div class="container">
+            <div class="badge">OUR COLLECTION</div>
+            <h1 class="title">Drive Prime Boutique</h1>
+            <p class="subtitle" style="margin-bottom:24px">Discover all our vehicles available for rental</p>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="boutique-filters">
+                <div>
+                    <label for="sort" class="sr-only">Sort by</label>
+                    <select id="sort">
+                        <option value="default">Sort by default</option>
+                        <option value="popularity">Sort by popularity</option>
+                        <option value="latest">Sort by latest</option>
+                        <option value="low">Sort by price: low to high</option>
+                        <option value="high">Sort by price: high to low</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="search" class="sr-only">Search</label>
+                    <input type="text" id="search" placeholder="Search for a vehicle...">
+                </div>
+            </div>
+            
+            <div class="boutique-grid" id="boutique-grid"></div>
+        </div>
+    </section>
+
+    <section class="section" style="background: var(--brand); text-align: center;">
+        <div class="container">
+            <h2 class="title" style="color: #111;">Ready to book?</h2>
+            <p style="margin-bottom: 24px; font-size: 1.1rem;">Contact us to reserve your favorite vehicle</p>
+            <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                <a href="https://wa.me/212661627339" class="btn" target="_blank">Book via WhatsApp</a>
+                <a href="index.html#booking" class="btn ghost">Booking form</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap">
+            <div>© <span id="year"></span> DRIVE PRIME. All rights reserved.</div>
+            <div class="social" style="display:flex;gap:10px">
+                <a aria-label="Instagram" href="https://www.instagram.com/location_drive_prime_/" target="_blank" rel="noopener" title="Instagram">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M7 2C4.243 2 2 4.243 2 7v10c0 2.757 2.243 5 5 5h10c2.757 0 5-2.243 5-5V7c0-2.757-2.243-5-5-5H7zm0 2h10c1.654 0 3 1.346 3 3v10c0 1.654-1.346 3-3 3H7c-1.654 0-3-1.346-3-3V7c0-1.654 1.346-3 3-3zm5 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6zm6.5-.75a1.25 1.25 0 11-2.5 0 1.25 1.25 0 012.5 0z"/>
+                    </svg>
+                </a>
+                <a aria-label="TikTok" href="https://www.tiktok.com/@drive.prime" target="_blank" rel="noopener" title="TikTok">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M21 8.5a7.5 7.5 0 01-5.3-2.2v8.32A6.38 6.38 0 019.4 21C6.4 21 4 18.6 4 15.6s2.4-5.4 5.4-5.4c.5 0 1 .06 1.46.18v2.54a3.04 3.04 0 00-1.46-.37A2.71 2.71 0 007.7 15.6c0 1.5 1.22 2.7 2.7 2.7a2.71 2.71 0 002.7-2.7V3h2.9a7.49 7.49 0 005 2v3.5z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal" id="reservationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin:0">Book this vehicle</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <form id="reservationForm">
+                <div class="form-group">
+                    <label for="vehicleName">Vehicle</label>
+                    <input type="text" id="vehicleName" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="vehiclePrice">Price</label>
+                    <input type="text" id="vehiclePrice" readonly>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First name *</label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last name *</label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone *</label>
+                    <input type="tel" id="phone" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pickupDate">Pickup date *</label>
+                        <input type="date" id="pickupDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="returnDate">Return date *</label>
+                        <input type="date" id="returnDate" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="message">Message (optional)</label>
+                    <textarea id="message" placeholder="Additional information..."></textarea>
+                </div>
+                <div style="text-align:center;margin-top:20px">
+                    <button type="submit" class="btn yellow" style="width:100%">
+                        <span id="submitText">Send request</span>
+                        <span id="submitLoading" class="loading" style="display:none"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function lockScroll(lock) { 
+            document.documentElement.style.overflow = lock ? 'hidden' : ''; 
+            document.body.style.overflow = lock ? 'hidden' : ''; 
+        }
+
+        const burger = document.getElementById('burger');
+        const menu = document.getElementById('menu');
+        const mobile = document.getElementById('mobile');
+        
+        if (burger) {
+            burger.addEventListener('click', () => {
+                const isOpen = mobile.style.display === 'block';
+                if (isOpen) { 
+                    mobile.style.display = 'none'; 
+                    burger.setAttribute('aria-expanded', 'false'); 
+                    lockScroll(false); 
+                    mobile.innerHTML = ''; 
+                } else { 
+                    mobile.style.display = 'block'; 
+                    burger.setAttribute('aria-expanded', 'true'); 
+                    lockScroll(true); 
+                    mobile.innerHTML = menu.outerHTML; 
+                }
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('#mobile a')) { 
+                mobile.style.display = 'none'; 
+                burger.setAttribute('aria-expanded', 'false'); 
+                lockScroll(false); 
+            }
+        }, {passive: true});
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const boutiqueVehicles = [
+            {name: 'Renault Clio 5', price: '€40/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Porsche Panamera', price: '€450/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Hyundai Tucson', price: '€60/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1621004368144-6d8c68794605?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Hyundai Accent', price: '€30/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1621007947387-b7e0d2c11412?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Renault Megane', price: '€60/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1621004368076-b3624a3797ce?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Lamborghini Urus', price: '€2000/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Audi RS3', price: '€400/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1592407925221-9812b71de9cf?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Jeep Cherokee', price: '€100/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Hyundai i30', price: '€30/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1621004367901-278d0e37b8c0?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Dacia Duster', price: '€45/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1590362891991-f776e747a588?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Dacia Logan', price: '€35/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1621004367821-f642c53fd8f1?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Volkswagen Golf 8', price: '€100/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Porsche Boxster 718', price: '€400/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Cupra Leon', price: '€100/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Hyundai i20', price: '€30/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1621004367901-278d0e37b8c0?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Mercedes C220d', price: '€200/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Audi Q3', price: '€120/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1592407925221-9812b71de9cf?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Porsche Macan T', price: '€230/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Porsche Macan S', price: '€250/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Porsche Macan GTS', price: '€300/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Mercedes Vito', price: '€300/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Audi Q8', price: '€230/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1592407925221-9812b71de9cf?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Audi A3', price: '€100/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1592407925221-9812b71de9cf?w=600&auto=format&fit=crop&q=60'},
+            {name: 'BMW 1 Series', price: '€100/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1549921296-3c1957f216b7?w=600&auto=format&fit=crop&q=60'},
+            {name: 'BMW 8 Series', price: '€500/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1549921296-3c1957f216b7?w=600&auto=format&fit=crop&q=60'},
+            {name: 'BMW 4 Series Convertible', price: '€230/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1549921296-3c1957f216b7?w=600&auto=format&fit=crop&q=60'},
+            {name: 'BMW 3 Series', price: '€100/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1549921296-3c1957f216b7?w=600&auto=format&fit=crop&q=60'},
+            {name: 'BMW X5', price: '€200/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1549921296-3c1957f216b7?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Fiat 500', price: '€45/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1550355291-bbee04a92027?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Maserati Levante', price: '€200/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1621004367821-f642c53fd8f1?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Maserati Ghibli', price: '€200/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1621004367821-f642c53fd8f1?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Mercedes A-Class', price: '€130/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Mercedes S-Class', price: '€100/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Mercedes CLA', price: '€130/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Mercedes G63', price: '€900/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Mercedes E-Class', price: '€150/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1542362567-b07e54358753?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Porsche Cayenne', price: '€400/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1619767886557-6fefc3aa21e8?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Porsche Macan', price: '€230/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Range Rover Sport', price: '€350/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1511390429074-c2b7d84bd1df?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Range Rover Velar', price: '€150/day', fuel: 'ESSENCE', img: 'https://images.unsplash.com/photo-1511390429074-c2b7d84bd1df?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Range Rover Evoque', price: '€130/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1511390429074-c2b7d84bd1df?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Range Rover Vogue', price: '€500/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1511390429074-c2b7d84bd1df?w=600&auto=format&fit=crop&q=60'},
+            {name: 'Volkswagen Touareg', price: '€150/day', fuel: 'DIESEL', img: 'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=600&auto=format&fit=crop&q=60'}
+        ];
+
+        function buildBoutiqueGrid(vehicles = boutiqueVehicles) {
+            const grid = document.getElementById('boutique-grid');
+            grid.innerHTML = '';
+            
+            if (vehicles.length === 0) {
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><h3>No vehicles found</h3><p>Try adjusting your search criteria</p></div>';
+                return;
+            }
+            
+            vehicles.forEach(vehicle => {
+                const item = document.createElement('div');
+                item.className = 'boutique-item';
+                item.innerHTML = `
+                    <img src="${vehicle.img}" alt="${vehicle.name}" loading="lazy">
+                    <div class="boutique-item-content">
+                        <h3>${vehicle.name}</h3>
+                        <div class="boutique-item-price">${vehicle.price}</div>
+                        <div class="boutique-item-specs">
+                            <span class="boutique-item-spec">Transmission: AUTO</span>
+                            <span class="boutique-item-spec">Fuel: ${vehicle.fuel}</span>
+                        </div>
+                        <div class="boutique-item-actions">
+                            <button class="btn yellow add-to-cart" data-name="${vehicle.name}" data-price="${vehicle.price}">Add to cart</button>
+                            <button class="btn ghost reserve-btn" data-name="${vehicle.name}" data-price="${vehicle.price}">Reserve</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+            
+            document.querySelectorAll('.add-to-cart').forEach(button => {
+                button.addEventListener('click', function() {
+                    const name = this.getAttribute('data-name');
+                    const price = this.getAttribute('data-price');
+                    addToCart(name, price);
+                });
+            });
+            
+            document.querySelectorAll('.reserve-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const name = this.getAttribute('data-name');
+                    const price = this.getAttribute('data-price');
+                    openReservationModal(name, price);
+                });
+            });
+        }
+
+        let cart = [];
+        
+        function addToCart(name, price) {
+            cart.push({name, price});
+            updateCartUI();
+            showCartNotification(name);
+        }
+        
+        function updateCartUI() {
+            const cartCount = document.querySelector('.cart-count');
+            if (cartCount) {
+                cartCount.textContent = cart.length;
+            }
+        }
+        
+        function showCartNotification(name) {
+            const existingNotification = document.querySelector('.cart-notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = 'cart-notification';
+            notification.textContent = `"${name}" has been added to your cart`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+
+        const sortSelect = document.getElementById('sort');
+        const searchInput = document.getElementById('search');
+        
+        sortSelect.addEventListener('change', filterAndSortVehicles);
+        searchInput.addEventListener('input', filterAndSortVehicles);
+        
+        function filterAndSortVehicles() {
+            const sortValue = sortSelect.value;
+            const searchValue = searchInput.value.toLowerCase();
+            
+            let filteredVehicles = boutiqueVehicles.filter(vehicle => 
+                vehicle.name.toLowerCase().includes(searchValue)
+            );
+            
+            switch(sortValue) {
+                case 'popularity':
+                    filteredVehicles.sort((a, b) => b.popular - a.popular);
+                    break;
+                case 'latest':
+                    filteredVehicles.sort((a, b) => b.featured - a.featured);
+                    break;
+                case 'low':
+                    filteredVehicles.sort((a, b) => parseFloat(a.price.replace(/[^\d.]/g, '')) - parseFloat(b.price.replace(/[^\d.]/g, '')));
+                    break;
+                case 'high':
+                    filteredVehicles.sort((a, b) => parseFloat(b.price.replace(/[^\d.]/g, '')) - parseFloat(a.price.replace(/[^\d.]/g, '')));
+                    break;
+                default:
+                    filteredVehicles.sort((a, b) => a.name.localeCompare(b.name));
+            }
+            
+            buildBoutiqueGrid(filteredVehicles);
+        }
+
+        const reservationModal = document.getElementById('reservationModal');
+        const modalClose = document.getElementById('modalClose');
+        const reservationForm = document.getElementById('reservationForm');
+        const submitText = document.getElementById('submitText');
+        const submitLoading = document.getElementById('submitLoading');
+        
+        function openReservationModal(name, price) {
+            document.getElementById('vehicleName').value = name;
+            document.getElementById('vehiclePrice').value = price;
+            reservationModal.classList.add('active');
+            lockScroll(true);
+        }
+        
+        modalClose.addEventListener('click', () => {
+            reservationModal.classList.remove('active');
+            lockScroll(false);
+        });
+        
+        reservationModal.addEventListener('click', (e) => {
+            if (e.target === reservationModal) {
+                reservationModal.classList.remove('active');
+                lockScroll(false);
+            }
+        });
+
+        const TEAM_EMAIL='Contact.drive.prime@gmail.com';
+        const SERVICE_ID='SERVICE_ID_REPLACE_ME';
+        const TEMPLATE_ID='TEMPLATE_ID_REPLACE_ME';
+        
+        reservationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            submitText.style.display = 'none';
+            submitLoading.style.display = 'inline-block';
+            
+            const formData = {
+                vehicle: document.getElementById('vehicleName').value,
+                price: document.getElementById('vehiclePrice').value,
+                firstName: document.getElementById('firstName').value.trim(),
+                lastName: document.getElementById('lastName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                pickupDate: document.getElementById('pickupDate').value,
+                returnDate: document.getElementById('returnDate').value,
+                message: document.getElementById('message').value.trim()
+            };
+
+            const mailMessage =
+`New booking request (Boutique)
+
+Vehicle: ${formData.vehicle}
+Price: ${formData.price}
+
+Client: ${formData.firstName} ${formData.lastName}
+Phone: ${formData.phone}
+Email: ${formData.email}
+
+Pickup: ${formData.pickupDate}
+Return: ${formData.returnDate}
+
+Message:
+${formData.message || '—'}
+
+Direct WhatsApp link:
+https://wa.me/212661627339?text=${encodeURIComponent('Boutique reservation: '+formData.vehicle+' - '+formData.firstName+' '+formData.lastName+' ('+formData.phone+')')}
+`;
+
+            const payload = {
+              to_email: TEAM_EMAIL,
+              client_email: formData.email,
+              subject: `New boutique reservation — ${formData.firstName} ${formData.lastName}`,
+              message: mailMessage
+            };
+
+            try{
+              if(window.emailjs){
+                await emailjs.send(SERVICE_ID, TEMPLATE_ID, payload);
+                if(formData.email){
+                  await emailjs.send(SERVICE_ID, TEMPLATE_ID, {
+                    ...payload,
+                    to_email: formData.email,
+                    subject: 'Confirmation of your Drive Prime reservation',
+                    message: `Thank you for your reservation with Drive Prime.\n\nHere is the summary:\n\n${mailMessage}`
+                  });
+                }
+              }
+              alert('Your reservation request has been sent by email. You will receive a confirmation soon.');
+            }catch(err){
+              window.open(
+                'https://wa.me/212661627339?text='+encodeURIComponent(
+`Boutique reservation:
+Vehicle: ${formData.vehicle} (${formData.price})
+Client: ${formData.firstName} ${formData.lastName}
+Phone: ${formData.phone}
+Email: ${formData.email}
+Pickup: ${formData.pickupDate}
+Return: ${formData.returnDate}
+Message: ${formData.message || '—'}`
+                ),
+                '_blank'
+              );
+            }finally{
+              submitText.style.display = 'inline-block';
+              submitLoading.style.display = 'none';
+              reservationModal.classList.remove('active');
+              lockScroll(false);
+              reservationForm.reset();
+            }
+        });
+
+        buildBoutiqueGrid();
+    </script>
+</body>
+</html>
