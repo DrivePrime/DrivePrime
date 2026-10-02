@@ -1,0 +1,197 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+  Drive Prime — "night showroom".
+  Warm graphite ground, bone text, brass reserved for the primary action.
+  The car photography is the light source; everything else recedes.
+*/
+:root {
+  --background: 30 5% 7.5%; /* #141312 asphalt */
+  --foreground: 40 22% 91%; /* #EDE9E1 bone */
+
+  --card: 40 4% 10.5%; /* #1C1B19 graphite */
+  --card-foreground: 40 22% 91%;
+
+  --popover: 40 4% 10.5%;
+  --popover-foreground: 40 22% 91%;
+
+  --primary: 39 50% 57%; /* #C9A45C brass */
+  --primary-foreground: 30 8% 8%;
+
+  --secondary: 40 4% 13%;
+  --secondary-foreground: 40 22% 91%;
+
+  --muted: 40 4% 13%;
+  --muted-foreground: 38 6% 61%; /* #A39E95 */
+
+  --accent: 40 4% 15%;
+  --accent-foreground: 40 22% 91%;
+
+  --destructive: 4 70% 62%;
+  --destructive-foreground: 0 0% 100%;
+
+  --border: 30 4% 16%; /* #2A2826 */
+  --input: 30 4% 22%;
+  --ring: 39 50% 57%;
+
+  --radius: 0.25rem;
+
+  --gold: 39 50% 57%;
+  --gold-light: 40 55% 68%;
+  --gold-dark: 39 45% 45%;
+
+  --whatsapp: 142 70% 41%;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-variation-settings: "wdth" 100;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 3px;
+  }
+
+  input,
+  select,
+  textarea {
+    caret-color: hsl(var(--primary));
+  }
+
+  /* Native date pickers: keep the calendar glyph readable on dark fields */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.8);
+    opacity: 0.7;
+    cursor: pointer;
+  }
+
+  * {
+    scrollbar-color: hsl(var(--input)) transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Fluid page container: 1360px of content max, gutter grows with the viewport */
+  .container {
+    --gutter: 1.25rem;
+    width: 100%;
+    max-width: calc(1360px + 2 * var(--gutter));
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  @media (min-width: 640px) {
+    .container {
+      --gutter: 1.5rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .container {
+      --gutter: 2.5rem;
+    }
+  }
+
+  /* Display type: Archivo pushed wide, echoing the logo's extended lettering */
+  .type-display {
+    font-variation-settings: "wdth" 112;
+    letter-spacing: -0.025em;
+    line-height: 1.02;
+  }
+
+  .type-wide {
+    font-variation-settings: "wdth" 108;
+    letter-spacing: -0.01em;
+  }
+
+  .field {
+    @apply block w-full h-12 rounded-sm bg-background border border-input px-3.5 text-[15px] text-foreground
+      placeholder:text-muted-foreground/70 transition-colors duration-200
+      hover:border-muted-foreground/50 focus:outline-none focus:border-primary focus-visible:outline-none;
+  }
+
+  textarea.field {
+    @apply h-auto py-3 leading-relaxed;
+  }
+
+  .field-label {
+    @apply block text-[13px] font-medium text-muted-foreground mb-2;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 h-12 px-6 rounded-sm text-[15px] font-semibold
+      transition-[background-color,color,border-color,transform] duration-200 active:scale-[0.98]
+      disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-primary text-primary-foreground hover:bg-gold-light;
+  }
+
+  .btn-ghost {
+    @apply btn border border-foreground/25 text-foreground hover:border-foreground/60 hover:bg-foreground/5;
+  }
+
+  .link-underline {
+    @apply underline decoration-foreground/30 underline-offset-4 transition-colors hover:decoration-primary;
+  }
+}
+
+@layer utilities {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
