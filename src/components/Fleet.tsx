@@ -11,7 +11,7 @@ import VehicleCard from "./VehicleCard";
   model of the category. Hidden cards stay in the DOM, so all vehicle links remain crawlable.
 */
 const INITIAL_MOBILE = 6;
-const INITIAL = 9;
+const INITIAL = 8; // four full rows of two
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -19,6 +19,8 @@ const prefersReducedMotion = () =>
 export default function Fleet() {
   const [active, setActive] = useState<VehicleCategory>("Tous");
   const [expanded, setExpanded] = useState(false);
+  // Cards only animate in after a visitor action (filter, show more), never on first paint.
+  const [interacted, setInteracted] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
 
@@ -34,6 +36,7 @@ export default function Fleet() {
 
   const selectCategory = (category: VehicleCategory) => {
     setActive(category);
+    setInteracted(true);
     setExpanded(false);
     // Deep in a long list, a shorter result set would leave the visitor in empty space.
     const grid = gridRef.current;
@@ -102,14 +105,21 @@ export default function Fleet() {
           id="fleet-grid"
           ref={gridRef}
           key={active}
-          className="anim-fade mt-10 scroll-mt-40 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-14"
+          className={cn(
+            "mt-12 scroll-mt-40 grid gap-y-14 md:grid-cols-2 md:gap-x-10 lg:gap-x-14 lg:gap-y-20",
+            interacted && "fleet-enter",
+          )}
         >
           {filtered.map((vehicle, i) => (
             <VehicleCard
               key={vehicle.id}
               vehicle={vehicle}
               priority={i < 3}
-              className={cn(collapsed && (i >= INITIAL ? "hidden" : i >= INITIAL_MOBILE && "max-sm:hidden"))}
+              className={cn(
+                collapsed && (i >= INITIAL ? "hidden" : i >= INITIAL_MOBILE && "max-sm:hidden"),
+                // only the cards revealed by "show more" animate in
+                expanded && active === "Tous" && (i >= INITIAL ? "anim-card" : i >= INITIAL_MOBILE && "max-sm:anim-card"),
+              )}
             />
           ))}
         </div>

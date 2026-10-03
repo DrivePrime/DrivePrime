@@ -1,11 +1,13 @@
 import { useId, useState, FormEvent } from "react";
-import { vehicles, locations } from "@/data/vehicles";
+import { vehicles } from "@/data/vehicles";
+import { cityName, findLocation, pickupLocations } from "@/data/locations";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { openWhatsApp, confirmed } from "@/config/business";
 import { cn } from "@/lib/utils";
+import { dateToIso } from "@/lib/dates";
 import { WhatsAppIcon } from "./icons";
 import DateField from "./DateField";
-import { dateToIso } from "@/lib/dates";
+import LocationField from "./LocationField";
 
 interface BookingFormProps {
   /** "bar" = one row on desktop (hero); "stack" = vertical (vehicle page) */
@@ -19,13 +21,19 @@ const today = () => dateToIso(new Date());
 const formatDate = (iso: string) => (iso ? iso.split("-").reverse().join("/") : "");
 
 export default function BookingForm({ layout = "bar", vehicleName, className }: BookingFormProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const id = useId();
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
-  const [location, setLocation] = useState(confirmed.pickupLocations ? locations[0] : "");
+  // Same default as the original site: the first location of its list (Marrakech airport).
+  const [location, setLocation] = useState(confirmed.pickupLocations ? pickupLocations[0].id : "");
   const [vehicle, setVehicle] = useState(vehicleName ?? "");
   const [error, setError] = useState("");
+
+  const locationText = () => {
+    const loc = findLocation(location);
+    return loc ? `${cityName(loc.city, language)} – ${t.locations[loc.kind]}` : location.trim();
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -38,7 +46,7 @@ export default function BookingForm({ layout = "bar", vehicleName, className }: 
     const lines = [
       w.request,
       `${w.vehicle_}: ${vehicle || w.any}`,
-      `${w.location}: ${location.trim() || w.any}`,
+      `${w.location}: ${locationText() || w.any}`,
       `${w.start}: ${formatDate(start) || w.any}`,
       `${w.end}: ${formatDate(end) || w.any}`,
     ];
@@ -54,11 +62,29 @@ export default function BookingForm({ layout = "bar", vehicleName, className }: 
       className={cn(
         "grid gap-4",
         bar
-          ? "sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1.25fr_1.25fr_auto] lg:items-end lg:gap-3"
+          ? "sm:grid-cols-2 lg:grid-cols-[1.35fr_1fr_1fr_1.25fr_auto] lg:items-end lg:gap-3"
           : "grid-cols-2 gap-x-3",
         className,
       )}
     >
+      <div className={cn(bar ? "sm:col-span-2 lg:col-span-1" : "col-span-2")}>
+        <label htmlFor={`${id}-location`} className="field-label">
+          {t.booking.location}
+        </label>
+        {confirmed.pickupLocations ? (
+          <LocationField id={`${id}-location`} value={location} onChange={setLocation} />
+        ) : (
+          <input
+            id={`${id}-location`}
+            type="text"
+            autoComplete="off"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder={t.booking.locationPlaceholder}
+            className="field"
+          />
+        )}
+      </div>
       <div>
         <label htmlFor={`${id}-start`} className="field-label">
           {t.booking.startDate}
@@ -90,37 +116,8 @@ export default function BookingForm({ layout = "bar", vehicleName, className }: 
           describedBy={error ? `${id}-error` : undefined}
         />
       </div>
-      <div className={cn(!bar && "col-span-2")}>
-        <label htmlFor={`${id}-location`} className="field-label">
-          {t.booking.location}
-        </label>
-        {confirmed.pickupLocations ? (
-          <select
-            id={`${id}-location`}
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="field"
-          >
-            {locations.map((loc) => (
-              <option key={loc} value={loc}>
-                {loc}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <input
-            id={`${id}-location`}
-            type="text"
-            autoComplete="off"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            placeholder={t.booking.locationPlaceholder}
-            className="field"
-          />
-        )}
-      </div>
       {!vehicleName && (
-        <div>
+        <div className={cn(bar && "sm:col-span-2 lg:col-span-1")}>
           <label htmlFor={`${id}-vehicle`} className="field-label">
             {t.booking.vehicle}
           </label>

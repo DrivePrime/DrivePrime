@@ -26,8 +26,11 @@ export const confirmed = {
     longTermDegressive: false,
     support24h: false,
   },
-  /** The list of 24 pick-up locations across Morocco (src/data/vehicles.ts). */
-  pickupLocations: false,
+  /**
+   * The original site's list of 24 pick-up locations (src/data/vehicles.ts).
+   * Shown again at the owner's request; actual delivery coverage is still to be confirmed.
+   */
+  pickupLocations: true,
 };
 
 export type ServiceKey = keyof typeof confirmed.services;

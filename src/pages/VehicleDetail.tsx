@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Phone } from "lucide-react";
-import { vehicles } from "@/data/vehicles";
+import { vehicles, vehiclePhotos } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCurrency } from "@/i18n/CurrencyContext";
 import { business, whatsappUrl, SITE_URL } from "@/config/business";
@@ -10,6 +10,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BookingForm from "@/components/BookingForm";
 import VehicleCard from "@/components/VehicleCard";
+import VehicleGallery from "@/components/VehicleGallery";
+import { stageZoom } from "@/data/stage";
 import { WhatsAppIcon } from "@/components/icons";
 import { vehicleLabel } from "@/i18n/vehicle-label";
 
@@ -109,18 +111,7 @@ export default function VehicleDetail() {
 
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
             <div key={vehicle.id} className="anim-settle lg:col-span-7 xl:col-span-8">
-              <div className="aspect-[3/2] overflow-hidden rounded-md bg-card">
-                <img
-                  src={vehicle.image}
-                  srcSet={`${vehicle.thumb} 768w, ${vehicle.image} 1536w`}
-                  sizes="(min-width: 1024px) 62vw, 100vw"
-                  alt={`${label} – Drive Prime Marrakech`}
-                  width={1536}
-                  height={1024}
-                  {...{ fetchpriority: "high" }}
-                  className="h-full w-full object-cover"
-                />
-              </div>
+              <VehicleGallery photos={vehiclePhotos(vehicle)} label={label} zoom={stageZoom(vehicle.id) - 0.04} />
             </div>
 
             <div className="lg:col-span-5 xl:col-span-4">
@@ -138,19 +129,16 @@ export default function VehicleDetail() {
                 </p>
 
                 <h2 className="sr-only">{d.specs}</h2>
-                <dl className="mt-8 grid grid-cols-2 border-t border-border">
-                  {specs.map((s, i) => (
-                    <div
-                      key={s.label}
-                      className={`border-b border-border py-4 ${i % 2 === 0 ? "pe-4" : "ps-4 border-s"}`}
-                    >
+                <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-border pt-6">
+                  {specs.map((s) => (
+                    <div key={s.label}>
                       <dt className="text-[13px] text-muted-foreground">{s.label}</dt>
                       <dd className="mt-1 text-[16px] font-medium text-foreground">{s.value}</dd>
                     </div>
                   ))}
                 </dl>
 
-                <div className="mt-8 rounded-md border border-border bg-card p-5 sm:p-6">
+                <div className="mt-9 rounded-md border border-border bg-card p-5 sm:p-6">
                   <h2 className="type-wide text-lg font-semibold text-foreground">{d.bookTitle}</h2>
                   <BookingForm layout="stack" vehicleName={fullName} className="mt-5" />
                   <a
@@ -166,13 +154,13 @@ export default function VehicleDetail() {
           </div>
 
           {similar.length > 0 && (
-            <section aria-labelledby="similar-title" className="mt-24 border-t border-border pt-14 pb-24 lg:mt-32">
+            <section aria-labelledby="similar-title" className="mt-24 pb-24 lg:mt-32">
               <h2 id="similar-title" className="type-display text-3xl sm:text-4xl font-semibold text-foreground">
                 {d.similar}
               </h2>
-              <div className="mt-10 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8">
+              <div className="mt-10 grid gap-y-14 md:grid-cols-2 md:gap-x-10 lg:grid-cols-3 lg:gap-x-10">
                 {similar.map((v) => (
-                  <VehicleCard key={v.id} vehicle={v} />
+                  <VehicleCard key={v.id} vehicle={v} sizes="(min-width: 1024px) 31vw, (min-width: 768px) 48vw, 100vw" />
                 ))}
               </div>
             </section>

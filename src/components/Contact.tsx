@@ -38,7 +38,7 @@ export default function Contact() {
   ];
 
   return (
-    <section id="contact" aria-labelledby="contact-title" className="border-t border-border py-24 lg:py-32">
+    <section id="contact" aria-labelledby="contact-title" className="py-24 lg:py-32">
       <div className="container grid gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <h2 id="contact-title" className="type-display text-4xl sm:text-5xl font-semibold text-foreground">

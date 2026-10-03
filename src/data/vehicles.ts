@@ -35,7 +35,15 @@ export interface Vehicle {
   image: string;
   /** 768px photo for cards */
   thumb: string;
+  /**
+   * Extra real photos of this exact car (same 768/1536 pairs as above), shown in the
+   * vehicle page gallery after the main photo. None are available yet.
+   */
+  gallery?: { thumb: string; image: string }[];
 }
+
+/** Main photo first, then any gallery photos. */
+export const vehiclePhotos = (v: Vehicle) => [{ thumb: v.thumb, image: v.image }, ...(v.gallery ?? [])];
 
 export const vehicles: Vehicle[] = [
   {

@@ -84,11 +84,11 @@ export default function Header({ overlay = false, mobileCta = true }: { overlay?
           href={whatsappUrl(t.whatsapp.general)}
           target="_blank"
           rel="noopener noreferrer"
-          className={cn("btn-primary h-10 px-4 text-[14px] ms-auto lg:ms-0", !mobileCta && "hidden lg:inline-flex")}
+          className={cn("btn-primary h-10 px-4 text-[14px] ms-auto max-sm:w-10 max-sm:rounded-full max-sm:px-0 lg:ms-0", !mobileCta && "hidden lg:inline-flex")}
         >
           <WhatsAppIcon className="h-4 w-4" />
           <span className="hidden sm:inline">{t.nav.book}</span>
-          <span className="sm:hidden">{t.nav.whatsapp}</span>
+          <span className="sr-only sm:hidden">{t.nav.whatsapp}</span>
         </a>
 
         <button

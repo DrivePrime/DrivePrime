@@ -44,6 +44,13 @@ const fr = {
     endBeforeStart: "La date de retour doit suivre la date de départ.",
     pickDate: "Choisir",
   },
+  locations: {
+    airport: "Aéroport",
+    city: "Ville",
+    placeholder: "Choisir un lieu",
+    search: "Rechercher une ville",
+    empty: "Aucun lieu ne correspond.",
+  },
   fleet: {
     title: "Choisissez votre véhicule",
     description:
@@ -166,6 +173,13 @@ const fr = {
     pageNotFound: "Page introuvable",
     notFoundDescription: "Ce véhicule n'est plus dans notre flotte ou l'adresse est incorrecte.",
   },
+  gallery: {
+    enlarge: "Agrandir la photo",
+    close: "Fermer",
+    prev: "Photo précédente",
+    next: "Photo suivante",
+    photo: (i: number, n: number) => `Photo ${i} sur ${n}`,
+  },
   whatsapp: {
     general: "Bonjour Drive Prime, je souhaite louer un véhicule à Marrakech.",
     vehicle: (name: string) =>
@@ -227,6 +241,13 @@ const en: Translations = {
     note: "You will be redirected to WhatsApp with your request pre-filled.",
     endBeforeStart: "The return date must be after the pick-up date.",
     pickDate: "Select",
+  },
+  locations: {
+    airport: "Airport",
+    city: "City",
+    placeholder: "Choose a location",
+    search: "Search a city",
+    empty: "No matching location.",
   },
   fleet: {
     title: "Choose your vehicle",
@@ -348,6 +369,13 @@ const en: Translations = {
     pageNotFound: "Page not found",
     notFoundDescription: "This vehicle is no longer in our fleet or the address is incorrect.",
   },
+  gallery: {
+    enlarge: "Enlarge photo",
+    close: "Close",
+    prev: "Previous photo",
+    next: "Next photo",
+    photo: (i: number, n: number) => `Photo ${i} of ${n}`,
+  },
   whatsapp: {
     general: "Hello Drive Prime, I would like to rent a car in Marrakech.",
     vehicle: (name: string) => `Hello Drive Prime, I would like to rent the ${name}. Is it available?`,
@@ -406,6 +434,13 @@ const ar: Translations = {
     note: "سيتم تحويلك إلى واتساب مع طلبك جاهزاً.",
     endBeforeStart: "يجب أن يكون تاريخ الإرجاع بعد تاريخ الاستلام.",
     pickDate: "اختر",
+  },
+  locations: {
+    airport: "المطار",
+    city: "المدينة",
+    placeholder: "اختر المكان",
+    search: "ابحث عن مدينة",
+    empty: "لا يوجد مكان مطابق.",
   },
   fleet: {
     title: "اختر سيارتك",
@@ -524,6 +559,13 @@ const ar: Translations = {
     notFound: "السيارة غير موجودة",
     pageNotFound: "الصفحة غير موجودة",
     notFoundDescription: "هذه السيارة لم تعد ضمن أسطولنا أو أن العنوان غير صحيح.",
+  },
+  gallery: {
+    enlarge: "تكبير الصورة",
+    close: "إغلاق",
+    prev: "الصورة السابقة",
+    next: "الصورة التالية",
+    photo: (i: number, n: number) => `الصورة ${i} من ${n}`,
   },
   whatsapp: {
     general: "مرحباً Drive Prime، أرغب في استئجار سيارة في مراكش.",
