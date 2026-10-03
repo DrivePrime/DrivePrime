@@ -69,6 +69,14 @@ for (const table of ["reservations", "vehicules", "admin_users"]) {
   results.push({ ok, line: `${ok ? "OK   " : "ÉCHEC"} ${"appel is_admin() en anonyme".padEnd(36)} → HTTP ${res.status}${res.status === 404 ? " (fonction absente : migration non appliquée)" : ""}` });
 }
 
+{
+  // Public, read-only auth settings: anyone could otherwise create an account.
+  const res = await fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } });
+  const settings = await res.json();
+  const ok = settings.disable_signup === true;
+  results.push({ ok, line: `${ok ? "OK   " : "ÉCHEC"} ${"inscriptions publiques".padEnd(36)} → ${ok ? "fermées" : "OUVERTES (Allow new users to sign up)"}` });
+}
+
 console.log(`Vérification des accès anonymes — ${new URL(url).host}\n`);
 for (const r of results) console.log(r.line);
 const failed = results.filter((r) => !r.ok).length;
