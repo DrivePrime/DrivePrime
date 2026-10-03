@@ -26,19 +26,28 @@
 
     <!-- Self-hosted fonts (src/fonts.css); preload the Latin face used above the fold -->
     <link rel="preload" href="/fonts/archivo-latin-400-700.woff2" as="font" type="font/woff2" crossorigin />
+    <style>
+      /* Hide prerendered French markup until the app renders the visitor's saved language/currency */
+      .csr #root { visibility: hidden; }
+    </style>
     <script>
-      // Returning Arabic visitors: set direction and fetch the Arabic faces before the app
-      // renders, so text does not reflow when the font arrives (layout shift).
+      // Runs before the app: apply a saved language/currency preference early.
       try {
-        if (localStorage.getItem("language") === "ar") {
+        var lang = localStorage.getItem("language");
+        var cur = localStorage.getItem("currency");
+        if ((lang && lang !== "fr") || cur === "MAD") document.documentElement.classList.add("csr");
+        if (lang === "ar") {
           document.documentElement.lang = "ar";
           document.documentElement.dir = "rtl";
+          // Fetch the Arabic faces now so text does not reflow when they arrive.
           ["400", "600"].forEach(function (w) {
             var l = document.createElement("link");
             l.rel = "preload"; l.as = "font"; l.type = "font/woff2"; l.crossOrigin = "anonymous";
             l.href = "/fonts/ibm-plex-sans-arabic-arabic-" + w + ".woff2";
             document.head.appendChild(l);
           });
+        } else if (lang === "en") {
+          document.documentElement.lang = "en";
         }
       } catch (e) {}
     </script>

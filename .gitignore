@@ -34,3 +34,6 @@ dist-ssr
 .vercel
 supabase/.temp
 supabase/.branches
+
+# Build-time prerender bundle
+dist-server

@@ -1,18 +1,25 @@
-// Post-build step: writes one HTML file per vehicle with route-specific <head> tags,
-// plus a real 404 page. Crawlers and link previews (WhatsApp, Facebook…) that do not
-// run JavaScript then see the correct title, canonical and image for each URL.
-// The page body is still rendered by the React app.
+// Post-build step (static prerender). For the home page, every vehicle page and a real
+// 404 page it writes HTML that already contains:
+//  - route-specific <head> tags (title, description, canonical, Open Graph, LCP preload);
+//  - the page content rendered at build time by src/entry-server.tsx (French, EUR),
+//    which the browser app then hydrates (see src/main.tsx).
+// Visitors see content before JavaScript runs; crawlers and link previews get real pages.
 //
 // Texts mirror `meta` (fr) in src/i18n/translations.ts — keep both in sync.
 import fs from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
 const SITE = "https://driveprimecar.com";
 
 const template = fs.readFileSync(path.join(dist, "index.html"), "utf8");
+const { render } = await import(pathToFileURL(path.join(root, "dist-server", "entry-server.js")).href);
+
+const ROOT_EMPTY = '<div id="root"></div>';
+if (!template.includes(ROOT_EMPTY)) throw new Error("prerender: empty #root not found in dist/index.html");
+const withBody = (html, url) => html.replace(ROOT_EMPTY, `<div id="root">${render(url)}</div>`);
 const source = fs.readFileSync(path.join(root, "src/data/vehicles.ts"), "utf8");
 const assets = fs.readdirSync(path.join(dist, "assets"));
 
@@ -21,7 +28,7 @@ const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g
 const vehicles = [...source.matchAll(/\{\s*id: "([^"]+)",\s*name: "([^"]+)",[\s\S]*?transmission: "([^"]+)",[\s\S]*?pricePerDay: (\d+),\s*\.\.\.photo\("([^"]+)"\)/g)].map(
   ([, id, name, transmission, price, photo]) => ({ id, name, transmission, price: Number(price), photo }),
 );
-if (vehicles.length === 0) throw new Error("prerender-meta: no vehicles parsed from src/data/vehicles.ts");
+if (vehicles.length === 0) throw new Error("prerender: no vehicles parsed from src/data/vehicles.ts");
 
 const counts = vehicles.reduce((m, v) => m.set(v.name, (m.get(v.name) ?? 0) + 1), new Map());
 const gearbox = { "Manu.": "Manuelle", "Auto.": "Automatique" };
@@ -29,7 +36,7 @@ const label = (v) => (counts.get(v.name) > 1 ? `${v.name} ${gearbox[v.transmissi
 
 function setHead(html, { title, description, url, image, width, height, robots }) {
   const rep = (re, value) => {
-    if (!re.test(html)) throw new Error(`prerender-meta: tag not found ${re}`);
+    if (!re.test(html)) throw new Error(`prerender: tag not found ${re}`);
     html = html.replace(re, value);
   };
   rep(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`);
@@ -53,7 +60,7 @@ function setHead(html, { title, description, url, image, width, height, robots }
 // Preload the LCP image so it starts downloading before the JS bundle has run.
 const asset = (prefix) => {
   const file = assets.find((a) => a.startsWith(prefix) && a.endsWith(".webp"));
-  if (!file) throw new Error(`prerender-meta: missing asset ${prefix}`);
+  if (!file) throw new Error(`prerender: missing asset ${prefix}`);
   return `/assets/${file}`;
 };
 const preload = (html, srcset, sizes) =>
@@ -65,7 +72,7 @@ const preload = (html, srcset, sizes) =>
 fs.mkdirSync(path.join(dist, "vehicule"), { recursive: true });
 for (const v of vehicles) {
   const file = assets.find((a) => a.startsWith(`${v.photo}-1536-`) && a.endsWith(".webp"));
-  if (!file) throw new Error(`prerender-meta: missing 1536px image for ${v.id}`);
+  if (!file) throw new Error(`prerender: missing 1536px image for ${v.id}`);
   const name = label(v);
   const html = preload(setHead(template, {
     title: `Location ${name} à Marrakech | Drive Prime`,
@@ -75,12 +82,13 @@ for (const v of vehicles) {
     width: 1536,
     height: 1024,
   }), `${asset(`${v.photo}-768-`)} 768w, ${asset(`${v.photo}-1536-`)} 1536w`, "(min-width: 1024px) 62vw, 100vw");
-  fs.writeFileSync(path.join(dist, "vehicule", `${v.id}.html`), html);
+  fs.writeFileSync(path.join(dist, "vehicule", `${v.id}.html`), withBody(html, `/vehicule/${v.id}`));
 }
 
 fs.writeFileSync(
   path.join(dist, "404.html"),
-  setHead(template, {
+  withBody(
+    setHead(template, {
     title: "Page introuvable | Drive Prime",
     description: "Cette page n'existe pas ou n'est plus disponible.",
     url: null,
@@ -88,13 +96,23 @@ fs.writeFileSync(
     width: 1200,
     height: 630,
     robots: "noindex",
-  }),
+    }),
+    "/404",
+  ),
+);
+
+// Admin: an empty client-rendered shell (no prerendered public page to hydrate), never indexed.
+fs.writeFileSync(
+  path.join(dist, "admin.html"),
+  template
+    .replace(/<title>[^<]*<\/title>/, "<title>Administration | Drive Prime</title>")
+    .replace('<meta charset="UTF-8" />', '<meta charset="UTF-8" />\n    <meta name="robots" content="noindex, nofollow" />'),
 );
 
 // Home: preload the hero photo (written last, the template above must stay untouched).
 fs.writeFileSync(
   path.join(dist, "index.html"),
-  preload(template, `${asset("hero-960-")} 960w, ${asset("hero-1680-")} 1680w`, "100vw"),
+  withBody(preload(template, `${asset("hero-960-")} 960w, ${asset("hero-1680-")} 1680w`, "100vw"), "/"),
 );
 
-console.log(`prerender-meta: ${vehicles.length} vehicle pages + 404.html`);
+console.log(`prerender: home + ${vehicles.length} vehicle pages + 404.html + admin.html shell`);
