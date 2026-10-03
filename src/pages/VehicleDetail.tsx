@@ -11,6 +11,7 @@ import Footer from "@/components/Footer";
 import BookingForm from "@/components/BookingForm";
 import VehicleCard from "@/components/VehicleCard";
 import VehicleGallery from "@/components/VehicleGallery";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import { stageZoom } from "@/data/stage";
 import { WhatsAppIcon } from "@/components/icons";
 import { vehicleLabel } from "@/i18n/vehicle-label";
@@ -85,7 +86,7 @@ export default function VehicleDetail() {
 
   return (
     <div className="min-h-screen bg-background pb-[calc(73px+env(safe-area-inset-bottom))] lg:pb-0">
-      <Header mobileCta={false} />
+      <Header />
 
       <main className="pt-16 lg:pt-[72px]">
         <div className="container">
@@ -184,6 +185,7 @@ export default function VehicleDetail() {
       </div>
 
       <Footer />
+      <FloatingWhatsApp hideOnMobile />
     </div>
   );
 }

@@ -10,7 +10,9 @@ export default function Footer() {
   const navLinks = [
     { to: "/#flotte", label: t.nav.fleet },
     ...(hasConfirmedServices ? [{ to: "/#services", label: t.nav.services }] : []),
+    { to: "/#pourquoi", label: t.nav.whyUs },
     { to: "/#reserver", label: t.nav.howItWorks },
+    { to: "/#temoignages", label: t.nav.testimonials },
     { to: "/#contact", label: t.nav.contact },
   ];
 

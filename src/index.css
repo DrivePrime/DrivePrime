@@ -329,15 +329,3 @@
     mask-image: linear-gradient(to left, transparent 0%, #000 24%);
   }
 }
-
-/* Booking-steps photograph: mirrors the hero (inner edge melts into the page) */
-@media (min-width: 1024px) {
-  .process-photo {
-    -webkit-mask-image: linear-gradient(to left, transparent 0%, #000 30%);
-    mask-image: linear-gradient(to left, transparent 0%, #000 30%);
-  }
-  [dir="rtl"] .process-photo {
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 30%);
-    mask-image: linear-gradient(to right, transparent 0%, #000 30%);
-  }
-}

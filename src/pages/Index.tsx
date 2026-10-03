@@ -5,6 +5,9 @@ import Hero from "@/components/Hero";
 import Fleet from "@/components/Fleet";
 import Services from "@/components/Services";
 import Process from "@/components/Process";
+import WhyUs from "@/components/WhyUs";
+import Testimonials from "@/components/Testimonials";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -30,10 +33,13 @@ const Index = () => {
         <Hero />
         <Fleet />
         <Services />
+        <WhyUs />
         <Process />
+        <Testimonials />
         <Contact />
       </main>
       <Footer />
+      <FloatingWhatsApp />
     </div>
   );
 };

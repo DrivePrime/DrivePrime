@@ -1,0 +1,3 @@
+Code source du site d'origine (avant refonte), conservé pour référence du contenu.
+Non compilé, non déployé. Les photos d'origine sont dans ../originals/.
+L'ancien espace admin (mot de passe codé en dur, compromis) a été volontairement exclu.

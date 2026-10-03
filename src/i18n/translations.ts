@@ -4,7 +4,7 @@ const fr = {
   meta: {
     homeTitle: "Drive Prime | Location de voitures premium à Marrakech",
     homeDescription:
-      "Location de voitures à Marrakech, de la citadine au Range Rover et au Mercedes Classe G. Tarifs à la journée et réservation directe sur WhatsApp.",
+      "Location de voitures à Marrakech, de la citadine au Mercedes Classe G. Livraison à l'aéroport Marrakech Menara, à l'hôtel ou au riad, assistance 24h/24 et réservation directe sur WhatsApp.",
     vehicleTitle: (name: string) => `Location ${name} à Marrakech | Drive Prime`,
     vehicleDescription: (name: string, price: string) =>
       `Location ${name} à Marrakech à partir de ${price} par jour. Réservation directe sur WhatsApp avec Drive Prime.`,
@@ -13,6 +13,8 @@ const fr = {
     fleet: "La flotte",
     services: "Services",
     howItWorks: "Réservation",
+    whyUs: "Pourquoi nous",
+    testimonials: "Avis clients",
     contact: "Contact",
     book: "Réserver",
     whatsapp: "WhatsApp",
@@ -26,7 +28,7 @@ const fr = {
   hero: {
     title: "Location de voitures premium à Marrakech",
     subtitle: (count: number) =>
-      `${count} véhicules, de la citadine au Mercedes Classe G. Choisissez votre modèle et réservez directement sur WhatsApp.`,
+      `${count} véhicules, de la citadine au Mercedes Classe G, livrés à l'aéroport, à votre hôtel ou à votre riad.`,
     ctaFleet: "Voir la flotte",
     ctaWhatsapp: "Réserver sur WhatsApp",
     photoAlt: "Range Rover noir devant un riad à Marrakech",
@@ -41,6 +43,11 @@ const fr = {
     anyVehicle: "Tous les véhicules",
     submit: "Vérifier la disponibilité",
     note: "Vous serez redirigé vers WhatsApp avec votre demande pré-remplie.",
+    policies: {
+      instantConfirmation: "Confirmation instantanée",
+      freeCancellation24h: "Annulation gratuite 24h",
+      unlimitedMileage: "Kilométrage illimité",
+    },
     endBeforeStart: "La date de retour doit suivre la date de départ.",
     pickDate: "Choisir",
   },
@@ -80,35 +87,76 @@ const fr = {
     showMore: (n: number) => `Afficher les ${n} autres véhicules`,
   },
   services: {
-    title: "Plus qu'une voiture",
+    title: "Nos services",
+    intro:
+      "Une gamme complète de services pour rendre votre expérience de location aussi fluide et agréable que possible.",
+    photoCaption: "Livraison à votre hôtel, riad ou villa, partout à Marrakech.",
     items: [
       {
-        key: "airportDelivery",
-        title: "Transfert aéroport",
-        description: "Transfert depuis et vers l'aéroport Marrakech Menara.",
-      },
-      {
-        key: "hotelDelivery",
-        title: "Livraison à l'hôtel",
-        description: "Nous livrons votre véhicule à votre hôtel, riad ou villa, partout à Marrakech.",
+        key: "longTermDegressive",
+        title: "Location courte & longue durée",
+        description:
+          "Que ce soit pour un jour ou plusieurs mois, nous proposons des formules adaptées à vos besoins avec des tarifs dégressifs.",
       },
       {
         key: "chauffeur",
         title: "Location avec chauffeur",
-        description: "Un chauffeur professionnel pour vos déplacements, transferts et excursions.",
+        description:
+          "Profitez de nos chauffeurs professionnels et expérimentés pour vos déplacements en toute sérénité.",
       },
       {
-        key: "longTermDegressive",
-        title: "Courte et longue durée",
-        description:
-          "D'une journée à plusieurs mois, avec des tarifs dégressifs selon la durée de location.",
+        key: "airportDelivery",
+        title: "Transfert aéroport",
+        description: "Service de transfert depuis et vers l'aéroport Marrakech Menara avec accueil personnalisé.",
+      },
+      {
+        key: "hotelDelivery",
+        title: "Livraison à l'hôtel",
+        description: "Nous livrons votre véhicule directement à votre hôtel, riad ou villa, partout à Marrakech.",
       },
       {
         key: "support24h",
         title: "Assistance 24h/24",
-        description: "Une équipe joignable jour et nuit pendant toute la durée de votre location.",
+        description: "Une équipe dédiée à votre service, disponible jour et nuit pour répondre à toutes vos demandes.",
+      },
+      {
+        key: "quickBooking",
+        title: "Réservation rapide",
+        description: "Réservez en quelques minutes via WhatsApp. Simple, rapide et efficace.",
       },
     ],
+  },
+  whyUs: {
+    title: "Pourquoi nous choisir ?",
+    intro:
+      "Drive Prime s'engage à vous offrir une expérience de location exceptionnelle, alliant qualité, fiabilité et service client irréprochable.",
+    reasons: [
+      {
+        title: "Service premium",
+        description: "Une qualité de service irréprochable avec des véhicules entretenus et préparés avec soin.",
+      },
+      {
+        title: "Meilleurs prix",
+        description: "Les tarifs les plus compétitifs de Marrakech, sans frais cachés ni surprises.",
+      },
+      {
+        title: "Assistance personnalisée",
+        description: "Une équipe dédiée pour vous accompagner et répondre à tous vos besoins.",
+      },
+      {
+        title: "Réservation via WhatsApp",
+        description: "Réservez facilement et rapidement via WhatsApp, sans formalités compliquées.",
+      },
+    ],
+    factVehicles: (n: number) => `${n} véhicules`,
+    factRange: (min: string, max: string) => `de ${min} à ${max} par jour`,
+    factSupport: "Assistance 24h/24",
+    factsLabel: "Drive Prime en bref",
+  },
+  testimonials: {
+    title: "Ce que disent nos clients",
+    intro: "Les avis de nos clients sur leur location avec Drive Prime.",
+    listLabel: "Avis clients",
   },
   process: {
     title: "Réserver en trois étapes",
@@ -124,7 +172,7 @@ const fr = {
       },
       {
         title: "Prenez la route",
-        description: "Récupérez votre véhicule au lieu et à l'heure convenus ensemble.",
+        description: "Récupérez votre véhicule à l'aéroport, à votre hôtel ou à votre riad.",
       },
     ],
   },
@@ -134,6 +182,7 @@ const fr = {
       "Le plus simple est de nous écrire sur WhatsApp. Vous pouvez aussi remplir ce formulaire : il ouvre WhatsApp avec votre message.",
     name: "Nom",
     namePlaceholder: "Votre nom",
+    emailPlaceholder: "votre@email.com",
     startDate: "Départ",
     endDate: "Retour",
     vehicle: "Véhicule",
@@ -186,6 +235,7 @@ const fr = {
       `Bonjour Drive Prime, je suis intéressé par la location du véhicule ${name}. Est-il disponible ?`,
     request: "Bonjour Drive Prime, voici ma demande de location :",
     name: "Nom",
+    email: "Email",
     vehicle_: "Véhicule",
     location: "Lieu",
     start: "Départ",
@@ -202,7 +252,7 @@ const en: Translations = {
   meta: {
     homeTitle: "Drive Prime | Premium car rental in Marrakech",
     homeDescription:
-      "Car rental in Marrakech, from city cars to the Range Rover and Mercedes G-Class. Daily rates and direct booking on WhatsApp.",
+      "Car rental in Marrakech, from city cars to the Mercedes G-Class. Delivery to Marrakech Menara airport, your hotel or riad, 24/7 assistance and direct booking on WhatsApp.",
     vehicleTitle: (name: string) => `${name} rental in Marrakech | Drive Prime`,
     vehicleDescription: (name: string, price: string) =>
       `Rent the ${name} in Marrakech from ${price} per day. Book directly on WhatsApp with Drive Prime.`,
@@ -211,6 +261,8 @@ const en: Translations = {
     fleet: "Fleet",
     services: "Services",
     howItWorks: "How to book",
+    whyUs: "Why us",
+    testimonials: "Reviews",
     contact: "Contact",
     book: "Book",
     whatsapp: "WhatsApp",
@@ -224,7 +276,7 @@ const en: Translations = {
   hero: {
     title: "Premium car rental in Marrakech",
     subtitle: (count: number) =>
-      `${count} vehicles, from city cars to the Mercedes G-Class. Choose your model and book directly on WhatsApp.`,
+      `${count} vehicles, from city cars to the Mercedes G-Class, delivered to the airport, your hotel or your riad.`,
     ctaFleet: "View the fleet",
     ctaWhatsapp: "Book on WhatsApp",
     photoAlt: "Black Range Rover in front of a riad in Marrakech",
@@ -239,6 +291,11 @@ const en: Translations = {
     anyVehicle: "Any vehicle",
     submit: "Check availability",
     note: "You will be redirected to WhatsApp with your request pre-filled.",
+    policies: {
+      instantConfirmation: "Instant confirmation",
+      freeCancellation24h: "Free 24h cancellation",
+      unlimitedMileage: "Unlimited mileage",
+    },
     endBeforeStart: "The return date must be after the pick-up date.",
     pickDate: "Select",
   },
@@ -277,34 +334,74 @@ const en: Translations = {
     showMore: (n: number) => `Show the other ${n} vehicles`,
   },
   services: {
-    title: "More than a car",
+    title: "Our services",
+    intro: "A complete range of services to make your rental as smooth and pleasant as possible.",
+    photoCaption: "Delivery to your hotel, riad or villa, anywhere in Marrakech.",
     items: [
       {
-        key: "airportDelivery",
-        title: "Airport transfer",
-        description: "Transfers to and from Marrakech Menara airport.",
-      },
-      {
-        key: "hotelDelivery",
-        title: "Hotel delivery",
-        description: "We deliver your car to your hotel, riad or villa, anywhere in Marrakech.",
+        key: "longTermDegressive",
+        title: "Short & long-term rental",
+        description:
+          "Whether for one day or several months, we offer packages tailored to your needs, with lower rates for longer rentals.",
       },
       {
         key: "chauffeur",
         title: "Chauffeur service",
-        description: "A professional driver for your journeys, transfers and excursions.",
+        description: "Our professional, experienced drivers take you wherever you need to go, worry-free.",
       },
       {
-        key: "longTermDegressive",
-        title: "Short and long term",
-        description: "From one day to several months, with lower daily rates for longer rentals.",
+        key: "airportDelivery",
+        title: "Airport transfer",
+        description: "Transfers to and from Marrakech Menara airport with a personal welcome.",
+      },
+      {
+        key: "hotelDelivery",
+        title: "Hotel delivery",
+        description: "We deliver your car directly to your hotel, riad or villa, anywhere in Marrakech.",
       },
       {
         key: "support24h",
         title: "24/7 assistance",
-        description: "A team you can reach day and night for the whole length of your rental.",
+        description: "A dedicated team at your service, available day and night for all your requests.",
+      },
+      {
+        key: "quickBooking",
+        title: "Quick booking",
+        description: "Book in a few minutes on WhatsApp. Simple, fast and efficient.",
       },
     ],
+  },
+  whyUs: {
+    title: "Why choose us?",
+    intro:
+      "Drive Prime is committed to an exceptional rental experience, combining quality, reliability and impeccable customer service.",
+    reasons: [
+      {
+        title: "Premium service",
+        description: "Impeccable service with vehicles that are carefully maintained and prepared.",
+      },
+      {
+        title: "Best prices",
+        description: "The most competitive rates in Marrakech, with no hidden fees or surprises.",
+      },
+      {
+        title: "Personal assistance",
+        description: "A dedicated team to support you and answer all your needs.",
+      },
+      {
+        title: "Booking via WhatsApp",
+        description: "Book easily and quickly on WhatsApp, without complicated paperwork.",
+      },
+    ],
+    factVehicles: (n: number) => `${n} vehicles`,
+    factRange: (min: string, max: string) => `from ${min} to ${max} per day`,
+    factSupport: "24/7 assistance",
+    factsLabel: "Drive Prime at a glance",
+  },
+  testimonials: {
+    title: "What our customers say",
+    intro: "Reviews from our customers about renting with Drive Prime.",
+    listLabel: "Customer reviews",
   },
   process: {
     title: "Book in three steps",
@@ -320,7 +417,7 @@ const en: Translations = {
       },
       {
         title: "Hit the road",
-        description: "Collect your car at the place and time agreed together.",
+        description: "Collect your car at the airport, your hotel or your riad.",
       },
     ],
   },
@@ -330,6 +427,7 @@ const en: Translations = {
       "The easiest way is to message us on WhatsApp. You can also fill in this form: it opens WhatsApp with your message.",
     name: "Name",
     namePlaceholder: "Your name",
+    emailPlaceholder: "you@email.com",
     startDate: "Pick-up",
     endDate: "Return",
     vehicle: "Vehicle",
@@ -381,6 +479,7 @@ const en: Translations = {
     vehicle: (name: string) => `Hello Drive Prime, I would like to rent the ${name}. Is it available?`,
     request: "Hello Drive Prime, here is my rental request:",
     name: "Name",
+    email: "Email",
     vehicle_: "Vehicle",
     location: "Location",
     start: "Pick-up",
@@ -404,6 +503,8 @@ const ar: Translations = {
     fleet: "الأسطول",
     services: "الخدمات",
     howItWorks: "الحجز",
+    whyUs: "لماذا نحن",
+    testimonials: "آراء العملاء",
     contact: "اتصل بنا",
     book: "احجز",
     whatsapp: "واتساب",
@@ -417,7 +518,7 @@ const ar: Translations = {
   hero: {
     title: "تأجير سيارات فاخرة في مراكش",
     subtitle: (count: number) =>
-      `${count} سيارة، من السيارات الصغيرة إلى مرسيدس الفئة G. اختر سيارتك واحجز مباشرة عبر واتساب.`,
+      `${count} سيارة، من السيارات الصغيرة إلى مرسيدس الفئة G، نوصلها إلى المطار أو الفندق أو الرياض.`,
     ctaFleet: "تصفح الأسطول",
     ctaWhatsapp: "احجز عبر واتساب",
     photoAlt: "رينج روفر سوداء أمام رياض في مراكش",
@@ -432,6 +533,11 @@ const ar: Translations = {
     anyVehicle: "كل السيارات",
     submit: "تحقق من التوفر",
     note: "سيتم تحويلك إلى واتساب مع طلبك جاهزاً.",
+    policies: {
+      instantConfirmation: "تأكيد فوري",
+      freeCancellation24h: "إلغاء مجاني 24 ساعة",
+      unlimitedMileage: "كيلومترات غير محدودة",
+    },
     endBeforeStart: "يجب أن يكون تاريخ الإرجاع بعد تاريخ الاستلام.",
     pickDate: "اختر",
   },
@@ -470,34 +576,72 @@ const ar: Translations = {
     showMore: (n: number) => `عرض ${n} سيارة أخرى`,
   },
   services: {
-    title: "أكثر من مجرد سيارة",
+    title: "خدماتنا",
+    intro: "مجموعة متكاملة من الخدمات لجعل تجربة الإيجار سلسة وممتعة قدر الإمكان.",
+    photoCaption: "التوصيل إلى فندقك أو رياضك أو الفيلا في أي مكان بمراكش.",
     items: [
+      {
+        key: "longTermDegressive",
+        title: "إيجار قصير وطويل المدة",
+        description: "ليوم واحد أو لعدة أشهر، نقدم عروضاً تناسب احتياجاتك مع أسعار تنازلية حسب المدة.",
+      },
+      {
+        key: "chauffeur",
+        title: "إيجار مع سائق",
+        description: "استفد من سائقينا المحترفين وذوي الخبرة لتنقلاتك براحة تامة.",
+      },
       {
         key: "airportDelivery",
         title: "النقل من وإلى المطار",
-        description: "النقل من وإلى مطار مراكش المنارة.",
+        description: "خدمة النقل من وإلى مطار مراكش المنارة مع استقبال شخصي.",
       },
       {
         key: "hotelDelivery",
         title: "التوصيل إلى الفندق",
-        description: "نوصل سيارتك إلى فندقك أو رياضك أو الفيلا في أي مكان بمراكش.",
-      },
-      {
-        key: "chauffeur",
-        title: "تأجير مع سائق",
-        description: "سائق محترف لتنقلاتك ورحلاتك.",
-      },
-      {
-        key: "longTermDegressive",
-        title: "مدة قصيرة وطويلة",
-        description: "من يوم واحد إلى عدة أشهر، مع أسعار تنازلية حسب المدة.",
+        description: "نوصل سيارتك مباشرة إلى فندقك أو رياضك أو الفيلا في أي مكان بمراكش.",
       },
       {
         key: "support24h",
         title: "مساعدة 24/24",
-        description: "فريق متاح ليلاً ونهاراً طوال مدة الإيجار.",
+        description: "فريق مخصص في خدمتك، متاح ليلاً ونهاراً للرد على جميع طلباتك.",
+      },
+      {
+        key: "quickBooking",
+        title: "حجز سريع",
+        description: "احجز في دقائق عبر واتساب. بسيط وسريع وفعال.",
       },
     ],
+  },
+  whyUs: {
+    title: "لماذا تختارنا؟",
+    intro: "تلتزم Drive Prime بتقديم تجربة إيجار استثنائية تجمع بين الجودة والموثوقية وخدمة عملاء لا تشوبها شائبة.",
+    reasons: [
+      {
+        title: "خدمة متميزة",
+        description: "جودة خدمة لا تشوبها شائبة مع سيارات تتم صيانتها وتجهيزها بعناية.",
+      },
+      {
+        title: "أفضل الأسعار",
+        description: "أكثر الأسعار تنافسية في مراكش، بدون رسوم خفية أو مفاجآت.",
+      },
+      {
+        title: "مساعدة شخصية",
+        description: "فريق مخصص لمرافقتك والاستجابة لجميع احتياجاتك.",
+      },
+      {
+        title: "الحجز عبر واتساب",
+        description: "احجز بسهولة وبسرعة عبر واتساب، دون إجراءات معقدة.",
+      },
+    ],
+    factVehicles: (n: number) => `${n} سيارة`,
+    factRange: (min: string, max: string) => `من ${min} إلى ${max} في اليوم`,
+    factSupport: "مساعدة 24/24",
+    factsLabel: "Drive Prime باختصار",
+  },
+  testimonials: {
+    title: "ماذا يقول عملاؤنا",
+    intro: "آراء عملائنا حول تجربة الإيجار مع Drive Prime.",
+    listLabel: "آراء العملاء",
   },
   process: {
     title: "احجز في ثلاث خطوات",
@@ -512,7 +656,7 @@ const ar: Translations = {
       },
       {
         title: "انطلق",
-        description: "استلم سيارتك في المكان والوقت المتفق عليهما.",
+        description: "استلم سيارتك في المطار أو الفندق أو الرياض.",
       },
     ],
   },
@@ -521,6 +665,7 @@ const ar: Translations = {
     description: "أسهل طريقة هي مراسلتنا عبر واتساب. يمكنك أيضاً ملء هذا النموذج: سيفتح واتساب مع رسالتك.",
     name: "الاسم",
     namePlaceholder: "اسمك",
+    emailPlaceholder: "you@email.com",
     startDate: "الاستلام",
     endDate: "الإرجاع",
     vehicle: "السيارة",
@@ -572,6 +717,7 @@ const ar: Translations = {
     vehicle: (name: string) => `مرحباً Drive Prime، أرغب في استئجار ${name}. هل هي متوفرة؟`,
     request: "مرحباً Drive Prime، هذا طلب الإيجار الخاص بي:",
     name: "الاسم",
+    email: "البريد الإلكتروني",
     vehicle_: "السيارة",
     location: "المكان",
     start: "الاستلام",

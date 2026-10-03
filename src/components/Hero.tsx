@@ -5,6 +5,8 @@ import { vehicles } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useCurrency } from "@/i18n/CurrencyContext";
 import BookingForm from "./BookingForm";
+import { Check } from "lucide-react";
+import { confirmed } from "@/config/business";
 import hero960 from "@/assets/hero-960.webp";
 import hero1680 from "@/assets/hero-1680.webp";
 
@@ -12,6 +14,8 @@ import hero1680 from "@/assets/hero-1680.webp";
 const delay = (ms: number): CSSProperties => ({ animationDelay: `${ms}ms` });
 // Lowest daily rate in the fleet data — a fact from the price list, not a promotion.
 const LOWEST_RATE = Math.min(...vehicles.map((v) => v.pricePerDay));
+// Rental policies from the original hero: listed only once the owner confirms each one.
+const POLICIES = (Object.keys(confirmed.policies) as (keyof typeof confirmed.policies)[]).filter((k) => confirmed.policies[k]);
 
 export default function Hero() {
   const { t } = useLanguage();
@@ -84,6 +88,16 @@ export default function Hero() {
           </div>
           <BookingForm layout="bar" />
           <p className="mt-4 text-[13px] text-muted-foreground md:hidden">{t.booking.note}</p>
+          {POLICIES.length > 0 && (
+            <ul className="mt-5 flex flex-wrap gap-x-7 gap-y-2 border-t border-border pt-4 text-[13px] text-muted-foreground">
+              {POLICIES.map((key) => (
+                <li key={key} className="inline-flex items-center gap-2">
+                  <Check className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                  {t.booking.policies[key]}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
     </section>

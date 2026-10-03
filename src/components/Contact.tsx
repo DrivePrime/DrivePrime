@@ -11,7 +11,7 @@ const formatDate = (iso: string) => (iso ? iso.split("-").reverse().join("/") : 
 export default function Contact() {
   const { t } = useLanguage();
   const c = t.contact;
-  const [form, setForm] = useState({ name: "", start: "", end: "", vehicle: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", start: "", end: "", vehicle: "", message: "" });
 
   const update = (key: keyof typeof form) => (e: { target: { value: string } }) =>
     setForm((f) => ({ ...f, [key]: e.target.value }));
@@ -22,6 +22,7 @@ export default function Contact() {
     const lines = [
       w.request,
       `${w.name}: ${form.name}`,
+      ...(form.email.trim() ? [`${w.email}: ${form.email.trim()}`] : []),
       `${w.vehicle_}: ${form.vehicle || w.any}`,
       `${w.start}: ${formatDate(form.start) || w.any}`,
       `${w.end}: ${formatDate(form.end) || w.any}`,
@@ -38,7 +39,7 @@ export default function Contact() {
   ];
 
   return (
-    <section id="contact" aria-labelledby="contact-title" className="py-24 lg:py-32">
+    <section id="contact" aria-labelledby="contact-title" className="border-t border-border pb-24 pt-20 lg:pb-32 lg:pt-28">
       <div className="container grid gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <h2 id="contact-title" className="type-display text-4xl sm:text-5xl font-semibold text-foreground">
@@ -108,7 +109,7 @@ export default function Contact() {
           onSubmit={handleSubmit}
           className="lg:col-span-7 rounded-md border border-border bg-card p-6 sm:p-8 lg:p-10 grid gap-5 sm:grid-cols-2 self-start"
         >
-          <div className="sm:col-span-2">
+          <div>
             <label htmlFor="contact-name" className="field-label">
               {c.name}
             </label>
@@ -120,6 +121,21 @@ export default function Contact() {
               value={form.name}
               onChange={update("name")}
               placeholder={c.namePlaceholder}
+              className="field"
+            />
+          </div>
+          <div>
+            <label htmlFor="contact-email" className="field-label">
+              {c.email} <span className="font-normal text-muted-foreground/70">({c.optional})</span>
+            </label>
+            <input
+              id="contact-email"
+              type="email"
+              autoComplete="email"
+              inputMode="email"
+              value={form.email}
+              onChange={update("email")}
+              placeholder={c.emailPlaceholder}
               className="field"
             />
           </div>

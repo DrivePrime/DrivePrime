@@ -1,0 +1,234 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 5%;
+  --foreground: 0 0% 98%;
+
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 98%;
+
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 98%;
+
+  --primary: 40 60% 58%;
+  --primary-foreground: 0 0% 5%;
+
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 65%;
+
+  --accent: 40 60% 58%;
+  --accent-foreground: 0 0% 5%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 0 0% 20%;
+  --input: 0 0% 15%;
+  --ring: 40 60% 58%;
+
+  --radius: 0.75rem;
+
+  --gold: 40 60% 58%;
+  --gold-light: 40 65% 68%;
+  --gold-dark: 40 55% 45%;
+
+  --glass-bg: 0 0% 10%;
+  --glass-border: 0 0% 25%;
+
+  --font-display: 'Playfair Display', serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+.dark {
+  --background: 0 0% 5%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 8%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 40 60% 58%;
+  --primary-foreground: 0 0% 5%;
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 15%;
+  --muted-foreground: 0 0% 65%;
+  --accent: 40 60% 58%;
+  --accent-foreground: 0 0% 5%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 20%;
+  --input: 0 0% 15%;
+  --ring: 40 60% 58%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-secondary/80 backdrop-blur-xl border border-border/50 rounded-xl;
+  }
+
+  .glass-input {
+    @apply bg-secondary/60 backdrop-blur-md border border-border/30 rounded-lg;
+  }
+
+  .gold-gradient {
+    background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-light)) 50%, hsl(var(--gold)) 100%);
+  }
+
+  .gold-text {
+    @apply text-primary;
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, hsl(var(--gold)) 0%, hsl(var(--gold-light)) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-overlay {
+    background: linear-gradient(
+      to bottom,
+      hsla(0, 0%, 5%, 0.7) 0%,
+      hsla(0, 0%, 5%, 0.85) 50%,
+      hsla(0, 0%, 5%, 0.95) 100%
+    );
+  }
+
+  .section-gradient {
+    background: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(0, 0%, 8%) 100%);
+  }
+
+  .section-dark {
+    background: hsl(0, 0%, 5%);
+  }
+
+  .section-elevated {
+    background: linear-gradient(180deg, hsl(0, 0%, 7%) 0%, hsl(0, 0%, 9%) 50%, hsl(0, 0%, 7%) 100%);
+  }
+
+  .section-gold-accent {
+    background: linear-gradient(180deg, hsl(0, 0%, 5%) 0%, hsl(40, 15%, 8%) 50%, hsl(0, 0%, 5%) 100%);
+    position: relative;
+  }
+
+  .section-gold-accent::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    max-width: 600px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, hsl(var(--primary) / 0.3) 50%, transparent 100%);
+  }
+
+  .section-divider {
+    position: relative;
+  }
+
+  .section-divider::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    max-width: 800px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, hsl(var(--border) / 0.5) 50%, transparent 100%);
+  }
+
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/10;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-6 py-3 rounded-lg transition-all duration-300;
+  }
+
+  .btn-outline {
+    @apply border border-primary text-primary hover:bg-primary hover:text-primary-foreground font-medium px-6 py-3 rounded-lg transition-all duration-300;
+  }
+
+  .btn-whatsapp {
+    @apply bg-[#25D366] text-white hover:bg-[#20BD5A] font-medium px-6 py-3 rounded-lg transition-all duration-300 flex items-center gap-2;
+  }
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fadeUp 0.6s ease-out forwards;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .delay-100 { animation-delay: 100ms; }
+  .delay-200 { animation-delay: 200ms; }
+  .delay-300 { animation-delay: 300ms; }
+  .delay-400 { animation-delay: 400ms; }
+  .delay-500 { animation-delay: 500ms; }
+}

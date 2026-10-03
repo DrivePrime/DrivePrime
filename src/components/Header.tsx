@@ -10,7 +10,7 @@ import { WhatsAppIcon } from "./icons";
 import logo from "@/assets/logo-160.webp";
 
 /** `overlay` = transparent over the home hero until the page scrolls. */
-export default function Header({ overlay = false, mobileCta = true }: { overlay?: boolean; mobileCta?: boolean }) {
+export default function Header({ overlay = false }: { overlay?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { t } = useLanguage();
@@ -39,7 +39,8 @@ export default function Header({ overlay = false, mobileCta = true }: { overlay?
   const navLinks = [
     { name: t.nav.fleet, to: "/#flotte" },
     ...(hasConfirmedServices ? [{ name: t.nav.services, to: "/#services" }] : []),
-    { name: t.nav.howItWorks, to: "/#reserver" },
+    { name: t.nav.whyUs, to: "/#pourquoi" },
+    { name: t.nav.testimonials, to: "/#temoignages" },
     { name: t.nav.contact, to: "/#contact" },
   ];
 
@@ -84,11 +85,10 @@ export default function Header({ overlay = false, mobileCta = true }: { overlay?
           href={whatsappUrl(t.whatsapp.general)}
           target="_blank"
           rel="noopener noreferrer"
-          className={cn("btn-primary h-10 px-4 text-[14px] ms-auto max-sm:w-10 max-sm:rounded-full max-sm:px-0 lg:ms-0", !mobileCta && "hidden lg:inline-flex")}
+          className="btn-primary hidden h-10 px-4 text-[14px] lg:ms-0 lg:inline-flex"
         >
           <WhatsAppIcon className="h-4 w-4" />
-          <span className="hidden sm:inline">{t.nav.book}</span>
-          <span className="sr-only sm:hidden">{t.nav.whatsapp}</span>
+          {t.nav.book}
         </a>
 
         <button
@@ -97,7 +97,7 @@ export default function Header({ overlay = false, mobileCta = true }: { overlay?
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
           aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu}
-          className={cn("lg:hidden -me-2 grid h-10 w-10 place-items-center text-foreground", !mobileCta && "ms-auto")}
+          className="-me-2 ms-auto grid h-10 w-10 place-items-center text-foreground lg:hidden"
         >
           {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>

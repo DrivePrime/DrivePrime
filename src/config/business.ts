@@ -19,12 +19,23 @@ export const business = {
   Switch a flag to `true` only once the offer is confirmed.
 */
 export const confirmed = {
+  /** Confirmed by the owner on 2026-10-03 (the six services of the original site). */
   services: {
-    airportDelivery: false,
-    hotelDelivery: false,
-    chauffeur: false,
-    longTermDegressive: false,
-    support24h: false,
+    airportDelivery: true,
+    hotelDelivery: true,
+    chauffeur: true,
+    longTermDegressive: true,
+    support24h: true,
+    quickBooking: true,
+  },
+  /**
+   * Rental policies shown on the original site's hero. NOT confirmed yet: kept hidden.
+   * Switch to true only once the owner confirms each policy.
+   */
+  policies: {
+    instantConfirmation: false,
+    freeCancellation24h: false,
+    unlimitedMileage: false,
   },
   /**
    * The original site's list of 24 pick-up locations (src/data/vehicles.ts).
