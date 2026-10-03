@@ -1,7 +1,3 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { CurrencyProvider } from "@/i18n/CurrencyContext";
@@ -19,15 +15,9 @@ const AdminReservations = lazy(() => import("./pages/admin/AdminReservations"));
 const AdminFleet = lazy(() => import("./pages/admin/AdminFleet"));
 const AdminCalendar = lazy(() => import("./pages/admin/AdminCalendar"));
 
-const queryClient = new QueryClient();
-
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
-      <CurrencyProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
+  <LanguageProvider>
+    <CurrencyProvider>
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <Suspense fallback={<div className="min-h-screen bg-background" />}>
             <Routes>
@@ -44,10 +34,8 @@ const App = () => (
             </Routes>
             </Suspense>
           </BrowserRouter>
-        </TooltipProvider>
-      </CurrencyProvider>
-    </LanguageProvider>
-  </QueryClientProvider>
+    </CurrencyProvider>
+  </LanguageProvider>
 );
 
 export default App;

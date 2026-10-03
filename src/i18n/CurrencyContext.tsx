@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
+import { useLanguage } from "./LanguageContext";
 
 export type Currency = "EUR" | "MAD";
 
@@ -13,7 +14,8 @@ interface CurrencyContextType {
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
-const group = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
+const groupFr = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
+const groupEn = new Intl.NumberFormat("en-GB", { maximumFractionDigits: 0 });
 const NBSP = "\u00a0";
 
 function readSaved(): Currency {
@@ -37,10 +39,15 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const formatPrice = (priceInEuro: number): string =>
-    currency === "MAD"
-      ? `${group.format(priceInEuro * MAD_PER_EUR)}${NBSP}DH`
-      : `${group.format(priceInEuro)}${NBSP}€`;
+  const { language } = useLanguage();
+
+  const formatPrice = (priceInEuro: number): string => {
+    const en = language === "en";
+    const n = currency === "MAD" ? priceInEuro * MAD_PER_EUR : priceInEuro;
+    const num = (en ? groupEn : groupFr).format(n);
+    if (currency === "MAD") return `${num}${NBSP}DH`;
+    return en ? `€${num}` : `${num}${NBSP}€`;
+  };
 
   return (
     <CurrencyContext.Provider
@@ -51,6 +58,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- provider + hook pair
 export function useCurrency() {
   const context = useContext(CurrencyContext);
   if (!context) {

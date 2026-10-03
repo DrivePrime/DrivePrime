@@ -4,15 +4,17 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCurrency } from "@/i18n/CurrencyContext";
 import { whatsappUrl } from "@/config/business";
 import { WhatsAppIcon } from "./icons";
+import { cn } from "@/lib/utils";
 import { vehicleLabel } from "@/i18n/vehicle-label";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
   /** Eager-load the first row so the fleet paints immediately. */
   priority?: boolean;
+  className?: string;
 }
 
-export default function VehicleCard({ vehicle, priority = false }: VehicleCardProps) {
+export default function VehicleCard({ vehicle, priority = false, className }: VehicleCardProps) {
   const { t } = useLanguage();
   const { formatPrice } = useCurrency();
   const transmission = t.fleet.transmission[vehicle.transmission];
@@ -20,7 +22,7 @@ export default function VehicleCard({ vehicle, priority = false }: VehicleCardPr
   const fullName = `${vehicle.name} (${transmission})`;
 
   return (
-    <article className="group relative flex flex-col">
+    <article className={cn("group relative flex flex-col", className)}>
       <div className="relative aspect-[3/2] overflow-hidden rounded-md bg-card">
         <img
           src={vehicle.thumb}

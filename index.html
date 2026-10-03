@@ -24,12 +24,24 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://driveprimecar.com/og-image.jpg" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap"
-    />
+    <!-- Self-hosted fonts (src/fonts.css); preload the Latin face used above the fold -->
+    <link rel="preload" href="/fonts/archivo-latin-400-700.woff2" as="font" type="font/woff2" crossorigin />
+    <script>
+      // Returning Arabic visitors: set direction and fetch the Arabic faces before the app
+      // renders, so text does not reflow when the font arrives (layout shift).
+      try {
+        if (localStorage.getItem("language") === "ar") {
+          document.documentElement.lang = "ar";
+          document.documentElement.dir = "rtl";
+          ["400", "600"].forEach(function (w) {
+            var l = document.createElement("link");
+            l.rel = "preload"; l.as = "font"; l.type = "font/woff2"; l.crossOrigin = "anonymous";
+            l.href = "/fonts/ibm-plex-sans-arabic-arabic-" + w + ".woff2";
+            document.head.appendChild(l);
+          });
+        }
+      } catch (e) {}
+    </script>
 
     <script type="application/ld+json">
       {

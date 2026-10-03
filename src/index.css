@@ -1,3 +1,5 @@
+@import "./fonts.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -193,5 +195,47 @@
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+}
+
+/*
+  Entrance motion (CSS only, no animation library on the public site).
+  Text and images stay at full opacity from the first frame so LCP is not delayed.
+  All of it is neutralised by the prefers-reduced-motion rule above.
+*/
+@keyframes dp-photo {
+  from {
+    transform: scale(1.06);
+    opacity: 0.4;
+  }
+}
+@keyframes dp-rise {
+  from {
+    transform: translateY(14px);
+  }
+}
+@keyframes dp-settle {
+  from {
+    transform: scale(0.985);
+  }
+}
+@keyframes dp-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@layer utilities {
+  .anim-photo {
+    animation: dp-photo 1.8s var(--ease-out) both;
+  }
+  .anim-rise {
+    animation: dp-rise 0.9s var(--ease-out) both;
+  }
+  .anim-settle {
+    animation: dp-settle 0.9s var(--ease-out) both;
+  }
+  .anim-fade {
+    animation: dp-fade 0.35s ease-out both;
   }
 }

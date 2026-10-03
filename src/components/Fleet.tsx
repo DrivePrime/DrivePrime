@@ -1,14 +1,26 @@
-import { useMemo, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useMemo, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { vehicles, categories, VehicleCategory } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { cn } from "@/lib/utils";
 import VehicleCard from "./VehicleCard";
 
+/*
+  Long-list strategy: "Tous" opens on a first selection (6 cards on phones, 9 above) with a
+  single button that reveals the whole fleet in place. Category filters always show every
+  model of the category. Hidden cards stay in the DOM, so all vehicle links remain crawlable.
+*/
+const INITIAL_MOBILE = 6;
+const INITIAL = 9;
+
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 export default function Fleet() {
   const [active, setActive] = useState<VehicleCategory>("Tous");
+  const [expanded, setExpanded] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
-  const reduce = useReducedMotion();
 
   const counts = useMemo(() => {
     const c = new Map<VehicleCategory, number>([["Tous", vehicles.length]]);
@@ -18,19 +30,35 @@ export default function Fleet() {
 
   const visibleCategories = categories.filter((c) => (counts.get(c) ?? 0) > 0);
   const filtered = active === "Tous" ? vehicles : vehicles.filter((v) => v.category === active);
+  const collapsed = active === "Tous" && !expanded && filtered.length > INITIAL_MOBILE;
+
+  const selectCategory = (category: VehicleCategory) => {
+    setActive(category);
+    setExpanded(false);
+    // Deep in a long list, a shorter result set would leave the visitor in empty space.
+    const grid = gridRef.current;
+    if (grid && grid.getBoundingClientRect().top < 0) {
+      grid.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+    }
+  };
+
+  const expand = () => {
+    const firstHidden = window.matchMedia("(min-width: 640px)").matches ? INITIAL : INITIAL_MOBILE;
+    setExpanded(true);
+    // Keyboard and screen-reader users continue from the first newly revealed vehicle.
+    requestAnimationFrame(() => {
+      gridRef.current?.querySelectorAll<HTMLAnchorElement>("article h3 a")[firstHidden]?.focus({ preventScroll: true });
+    });
+  };
 
   return (
     <section id="flotte" aria-labelledby="fleet-title" className="pt-20 pb-24 lg:pt-28 lg:pb-32">
       <div className="container">
-        <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-4">
-          <div className="max-w-2xl">
-            <h2 id="fleet-title" className="type-display text-4xl sm:text-5xl font-semibold text-foreground">
-              {t.fleet.title}
-            </h2>
-            <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground">
-              {t.fleet.description}
-            </p>
-          </div>
+        <div className="max-w-2xl">
+          <h2 id="fleet-title" className="type-display text-4xl sm:text-5xl font-semibold text-foreground">
+            {t.fleet.title}
+          </h2>
+          <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground">{t.fleet.description}</p>
           <p className="sr-only" aria-live="polite">
             {t.fleet.count(filtered.length)}
           </p>
@@ -40,7 +68,11 @@ export default function Fleet() {
           <div
             role="group"
             aria-label={t.fleet.filterLabel}
-            className="no-scrollbar -mx-5 flex gap-7 overflow-x-auto px-5 sm:mx-0 sm:px-0"
+            className={cn(
+              "no-scrollbar -mx-5 flex gap-7 overflow-x-auto px-5 sm:mx-0 sm:px-0",
+              // Phones: fade the trailing edge so it is clear more categories scroll into view.
+              "max-sm:[mask-image:linear-gradient(to_right,#000_80%,transparent)] max-sm:rtl:[mask-image:linear-gradient(to_left,#000_80%,transparent)]",
+            )}
           >
             {visibleCategories.map((category) => {
               const selected = active === category;
@@ -49,44 +81,48 @@ export default function Fleet() {
                   key={category}
                   type="button"
                   aria-pressed={selected}
-                  onClick={() => {
-                    setActive(category);
-                    // Deep in a long list, a shorter result set would leave the visitor in empty space.
-                    const grid = document.getElementById("fleet-grid");
-                    if (grid && grid.getBoundingClientRect().top < 0) {
-                      grid.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
-                    }
-                  }}
+                  onClick={() => selectCategory(category)}
                   className={cn(
                     "relative shrink-0 whitespace-nowrap pb-3.5 pt-1 text-[15px] font-medium transition-colors",
-                    "after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:origin-left after:transition-transform after:duration-300",
+                    "after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:origin-center after:transition-transform after:duration-300",
                     selected
                       ? "text-foreground after:scale-x-100 after:bg-primary"
                       : "text-muted-foreground hover:text-foreground after:scale-x-0 after:bg-foreground/40",
                   )}
                 >
                   {t.fleet.categories[category]}
-                  <sup className="tabular ms-1 text-[11px] font-normal text-muted-foreground">
-                    {counts.get(category)}
-                  </sup>
+                  <sup className="tabular ms-1 text-[11px] font-normal text-muted-foreground">{counts.get(category)}</sup>
                 </button>
               );
             })}
           </div>
         </div>
 
-        <motion.div
+        <div
           id="fleet-grid"
+          ref={gridRef}
           key={active}
-          initial={reduce ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.35 }}
-          className="mt-10 scroll-mt-40 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-14"
+          className="anim-fade mt-10 scroll-mt-40 grid gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-14"
         >
           {filtered.map((vehicle, i) => (
-            <VehicleCard key={vehicle.id} vehicle={vehicle} priority={i < 3} />
+            <VehicleCard
+              key={vehicle.id}
+              vehicle={vehicle}
+              priority={i < 3}
+              className={cn(collapsed && (i >= INITIAL ? "hidden" : i >= INITIAL_MOBILE && "max-sm:hidden"))}
+            />
           ))}
-        </motion.div>
+        </div>
+
+        {collapsed && (
+          <div className="mt-14 flex justify-center">
+            <button type="button" onClick={expand} aria-controls="fleet-grid" className="btn-ghost">
+              <span className="sm:hidden">{t.fleet.showMore(filtered.length - INITIAL_MOBILE)}</span>
+              <span className="hidden sm:inline">{t.fleet.showMore(filtered.length - INITIAL)}</span>
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

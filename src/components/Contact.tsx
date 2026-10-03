@@ -3,6 +3,8 @@ import { vehicles } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { business, openWhatsApp, whatsappUrl } from "@/config/business";
 import { WhatsAppIcon, InstagramIcon, TikTokIcon } from "./icons";
+import DateField from "./DateField";
+import { dateToIso } from "@/lib/dates";
 
 const formatDate = (iso: string) => (iso ? iso.split("-").reverse().join("/") : "");
 
@@ -125,19 +127,22 @@ export default function Contact() {
             <label htmlFor="contact-start" className="field-label">
               {c.startDate}
             </label>
-            <input id="contact-start" type="date" value={form.start} onChange={update("start")} className="field tabular" />
+            <DateField
+              id="contact-start"
+              min={dateToIso(new Date())}
+              value={form.start}
+              onChange={(iso) => setForm((f) => ({ ...f, start: iso, end: f.end && f.end < iso ? "" : f.end }))}
+            />
           </div>
           <div>
             <label htmlFor="contact-end" className="field-label">
               {c.endDate}
             </label>
-            <input
+            <DateField
               id="contact-end"
-              type="date"
-              min={form.start || undefined}
+              min={form.start || dateToIso(new Date())}
               value={form.end}
-              onChange={update("end")}
-              className="field tabular"
+              onChange={(iso) => setForm((f) => ({ ...f, end: iso }))}
             />
           </div>
           <div className="sm:col-span-2">

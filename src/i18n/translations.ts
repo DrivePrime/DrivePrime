@@ -42,6 +42,7 @@ const fr = {
     submit: "Vérifier la disponibilité",
     note: "Vous serez redirigé vers WhatsApp avec votre demande pré-remplie.",
     endBeforeStart: "La date de retour doit suivre la date de départ.",
+    pickDate: "Choisir",
   },
   fleet: {
     title: "Choisissez votre véhicule",
@@ -69,6 +70,7 @@ const fr = {
     book: "Réserver",
     details: "Voir la fiche",
     bookAria: (name: string) => `Réserver ${name} sur WhatsApp`,
+    showMore: (n: number) => `Afficher les ${n} autres véhicules`,
   },
   services: {
     title: "Plus qu'une voiture",
@@ -224,6 +226,7 @@ const en: Translations = {
     submit: "Check availability",
     note: "You will be redirected to WhatsApp with your request pre-filled.",
     endBeforeStart: "The return date must be after the pick-up date.",
+    pickDate: "Select",
   },
   fleet: {
     title: "Choose your vehicle",
@@ -250,6 +253,7 @@ const en: Translations = {
     book: "Book",
     details: "View details",
     bookAria: (name: string) => `Book the ${name} on WhatsApp`,
+    showMore: (n: number) => `Show the other ${n} vehicles`,
   },
   services: {
     title: "More than a car",
@@ -401,6 +405,7 @@ const ar: Translations = {
     submit: "تحقق من التوفر",
     note: "سيتم تحويلك إلى واتساب مع طلبك جاهزاً.",
     endBeforeStart: "يجب أن يكون تاريخ الإرجاع بعد تاريخ الاستلام.",
+    pickDate: "اختر",
   },
   fleet: {
     title: "اختر سيارتك",
@@ -427,6 +432,7 @@ const ar: Translations = {
     book: "احجز",
     details: "عرض التفاصيل",
     bookAria: (name: string) => `احجز ${name} عبر واتساب`,
+    showMore: (n: number) => `عرض ${n} سيارة أخرى`,
   },
   services: {
     title: "أكثر من مجرد سيارة",

@@ -1,7 +1,8 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, ClipboardList, Car, Calendar, LogOut } from "lucide-react";
-import { signOutAdmin } from "./AdminAuth";
+import { signOutAdmin } from "./session";
 import { Button } from "@/components/ui/button";
+import { Toaster } from "@/components/ui/sonner";
 
 const links = [
   { to: "/admin", label: "Tableau de bord", icon: LayoutDashboard, end: true },
@@ -19,6 +20,7 @@ export default function AdminLayout() {
 
   return (
     <div className="min-h-screen flex w-full bg-background text-foreground">
+      <Toaster />
       <aside className="w-64 border-r border-border bg-card/50 flex flex-col">
         <div className="p-6 border-b border-border">
           <div className="font-display text-xl font-semibold text-primary">Drive Prime</div>

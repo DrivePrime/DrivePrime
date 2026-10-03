@@ -4,6 +4,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { openWhatsApp, confirmed } from "@/config/business";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./icons";
+import DateField from "./DateField";
+import { dateToIso } from "@/lib/dates";
 
 interface BookingFormProps {
   /** "bar" = one row on desktop (hero); "stack" = vertical (vehicle page) */
@@ -13,7 +15,7 @@ interface BookingFormProps {
   className?: string;
 }
 
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => dateToIso(new Date());
 const formatDate = (iso: string) => (iso ? iso.split("-").reverse().join("/") : "");
 
 export default function BookingForm({ layout = "bar", vehicleName, className }: BookingFormProps) {
@@ -61,34 +63,31 @@ export default function BookingForm({ layout = "bar", vehicleName, className }: 
         <label htmlFor={`${id}-start`} className="field-label">
           {t.booking.startDate}
         </label>
-        <input
+        <DateField
           id={`${id}-start`}
-          type="date"
           min={today()}
           value={start}
-          onChange={(e) => {
-            setStart(e.target.value);
+          onChange={(iso) => {
+            setStart(iso);
+            if (end && end < iso) setEnd("");
             setError("");
           }}
-          className="field tabular"
         />
       </div>
       <div>
         <label htmlFor={`${id}-end`} className="field-label">
           {t.booking.endDate}
         </label>
-        <input
+        <DateField
           id={`${id}-end`}
-          type="date"
           min={start || today()}
           value={end}
-          onChange={(e) => {
-            setEnd(e.target.value);
+          onChange={(iso) => {
+            setEnd(iso);
             setError("");
           }}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${id}-error` : undefined}
-          className={cn("field tabular", error && "border-destructive")}
+          invalid={!!error}
+          describedBy={error ? `${id}-error` : undefined}
         />
       </div>
       <div className={cn(!bar && "col-span-2")}>

@@ -50,6 +50,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- provider + hook pair
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (!context) {

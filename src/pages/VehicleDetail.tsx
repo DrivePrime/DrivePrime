@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
 import { Phone } from "lucide-react";
 import { vehicles } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -14,13 +13,10 @@ import VehicleCard from "@/components/VehicleCard";
 import { WhatsAppIcon } from "@/components/icons";
 import { vehicleLabel } from "@/i18n/vehicle-label";
 
-const ease = [0.16, 1, 0.3, 1] as const;
-
 export default function VehicleDetail() {
   const { id } = useParams<{ id: string }>();
   const { t } = useLanguage();
   const { formatPrice } = useCurrency();
-  const reduce = useReducedMotion();
   const d = t.vehicleDetail;
 
   useEffect(() => {
@@ -112,13 +108,7 @@ export default function VehicleDetail() {
           </nav>
 
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-            <motion.div
-              key={vehicle.id}
-              initial={reduce ? false : { opacity: 0, scale: 0.985 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.9, ease }}
-              className="lg:col-span-7 xl:col-span-8"
-            >
+            <div key={vehicle.id} className="anim-settle lg:col-span-7 xl:col-span-8">
               <div className="aspect-[3/2] overflow-hidden rounded-md bg-card">
                 <img
                   src={vehicle.image}
@@ -131,7 +121,7 @@ export default function VehicleDetail() {
                   className="h-full w-full object-cover"
                 />
               </div>
-            </motion.div>
+            </div>
 
             <div className="lg:col-span-5 xl:col-span-4">
               <div className="lg:sticky lg:top-28">
