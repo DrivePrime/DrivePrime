@@ -63,7 +63,7 @@ const fr = {
   fleet: {
     title: "Choisissez votre véhicule",
     description:
-      "Tarifs indiqués par jour. La disponibilité et le prix final vous sont confirmés sur WhatsApp.",
+      "De la citadine au Mercedes Classe G : choisissez votre modèle, nous le préparons pour vous.",
     count: (n: number) => (n > 1 ? `${n} véhicules` : `${n} véhicule`),
     filterLabel: "Filtrer par catégorie",
     categories: {
@@ -91,6 +91,7 @@ const fr = {
     days: (n: number) => (n > 1 ? `${n} jours` : "1 jour"),
     editSearch: "Modifier",
     datesPending: "Dates à choisir",
+    priceNote: "* Tarif de départ par jour. La disponibilité et le prix final vous sont confirmés sur WhatsApp.",
   },
   services: {
     title: "Nos services",
@@ -327,7 +328,7 @@ const en: Translations = {
   },
   fleet: {
     title: "Choose your vehicle",
-    description: "Daily rates. Availability and final price are confirmed on WhatsApp.",
+    description: "From city cars to the Mercedes G-Class: choose your model, we prepare it for you.",
     count: (n: number) => (n > 1 ? `${n} vehicles` : `${n} vehicle`),
     filterLabel: "Filter by category",
     categories: {
@@ -355,6 +356,7 @@ const en: Translations = {
     days: (n: number) => (n > 1 ? `${n} days` : "1 day"),
     editSearch: "Edit",
     datesPending: "Dates to choose",
+    priceNote: "* Starting daily rate. Availability and final price are confirmed on WhatsApp.",
   },
   services: {
     title: "Our services",
@@ -586,7 +588,7 @@ const ar: Translations = {
   },
   fleet: {
     title: "اختر سيارتك",
-    description: "الأسعار باليوم. نؤكد لك التوفر والسعر النهائي عبر واتساب.",
+    description: "من السيارات الصغيرة إلى مرسيدس الفئة G: اختر سيارتك ونحن نجهزها لك.",
     count: (n: number) => `${n} سيارة`,
     filterLabel: "تصفية حسب الفئة",
     categories: {
@@ -614,6 +616,7 @@ const ar: Translations = {
     days: (n: number) => `${n} يوم`,
     editSearch: "تعديل",
     datesPending: "اختر التواريخ",
+    priceNote: "* السعر الابتدائي لليوم. نؤكد لك التوفر والسعر النهائي عبر واتساب.",
   },
   services: {
     title: "خدماتنا",

@@ -3,13 +3,13 @@ import { useParams, Link } from "react-router-dom";
 import { Phone } from "lucide-react";
 import { vehicles, vehiclePhotos } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useCurrency } from "@/i18n/CurrencyContext";
 import { business, whatsappUrl, SITE_URL } from "@/config/business";
 import { useSeo } from "@/hooks/use-seo";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import BookingForm from "@/components/BookingForm";
 import VehicleCard from "@/components/VehicleCard";
+import PriceTag from "@/components/PriceTag";
 import VehicleGallery from "@/components/VehicleGallery";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import { stageZoom } from "@/data/stage";
@@ -21,7 +21,6 @@ import { bookingRequest } from "@/lib/booking-message";
 export default function VehicleDetail() {
   const { id } = useParams<{ id: string }>();
   const { t, language } = useLanguage();
-  const { formatPrice } = useCurrency();
   const booking = useBooking();
   const d = t.vehicleDetail;
 
@@ -128,13 +127,8 @@ export default function VehicleDetail() {
                   {label}
                 </h1>
 
-                <p className="mt-5 flex items-baseline gap-2">
-                  <span className="text-[14px] text-muted-foreground">{d.from}</span>
-                  <span className="tabular type-wide text-3xl font-semibold text-foreground">
-                    {formatPrice(vehicle.pricePerDay)}
-                  </span>
-                  <span className="text-[15px] text-muted-foreground">{d.perDay}</span>
-                </p>
+                <PriceTag pricePerDay={vehicle.pricePerDay} size="lg" className="mt-6" />
+                <p className="mt-3 max-w-[40ch] text-[12px] leading-relaxed text-muted-foreground">{t.fleet.priceNote}</p>
 
                 <h2 className="sr-only">{d.specs}</h2>
                 <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-border pt-6">
@@ -179,11 +173,7 @@ export default function VehicleDetail() {
       {/* Mobile: price and booking always within thumb reach */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm pb-[env(safe-area-inset-bottom)] lg:hidden">
         <div className="container flex h-[72px] items-center justify-between gap-4">
-          <p className="leading-tight">
-            <span className="block text-[12px] text-muted-foreground">{d.from}</span>
-            <span className="tabular text-lg font-semibold text-foreground">{formatPrice(vehicle.pricePerDay)}</span>
-            <span className="text-[13px] text-muted-foreground"> {d.perDay}</span>
-          </p>
+          <PriceTag pricePerDay={vehicle.pricePerDay} size="sm" />
           <a href={waHref} target="_blank" rel="noopener noreferrer" className="btn-primary">
             <WhatsAppIcon className="h-4 w-4" />
             {t.fleet.book}

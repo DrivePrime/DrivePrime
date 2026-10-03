@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import type { Vehicle } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useCurrency } from "@/i18n/CurrencyContext";
 import { useBooking } from "@/context/BookingContext";
 import { whatsappUrl } from "@/config/business";
 import { bookingRequest } from "@/lib/booking-message";
@@ -11,6 +10,7 @@ import { vehicleLabel } from "@/i18n/vehicle-label";
 import { stageZoom } from "@/data/stage";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./icons";
+import PriceTag from "./PriceTag";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -33,7 +33,6 @@ export default function VehicleCard({
   sizes = "(min-width: 1360px) 650px, (min-width: 768px) 48vw, 100vw",
 }: VehicleCardProps) {
   const { t, language } = useLanguage();
-  const { formatPrice } = useCurrency();
   const booking = useBooking();
   const transmission = t.fleet.transmission[vehicle.transmission];
   const label = vehicleLabel(vehicle, t);
@@ -91,7 +90,7 @@ export default function VehicleCard({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 px-1 pt-1">
+      <div className="flex items-end justify-between gap-x-6 px-1 pt-1">
         <h3 className="type-wide text-xl font-semibold leading-tight text-foreground">
           <Link
             to={`/vehicule/${vehicle.id}`}
@@ -100,11 +99,7 @@ export default function VehicleCard({
             {label}
           </Link>
         </h3>
-        <p className="leading-none">
-          <span className="sr-only">{t.fleet.from} </span>
-          <span className="tabular text-xl font-semibold text-foreground">{formatPrice(vehicle.pricePerDay)}</span>
-          <span className="text-[13px] text-muted-foreground"> {t.fleet.perDay}</span>
-        </p>
+        <PriceTag pricePerDay={vehicle.pricePerDay} size="md" align="end" />
       </div>
 
       <p className="mt-2 px-1 text-[14px] text-muted-foreground">

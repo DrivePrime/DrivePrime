@@ -2,9 +2,9 @@ import type { CSSProperties } from "react";
 import { Check } from "lucide-react";
 import { vehicles } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
-import { useCurrency } from "@/i18n/CurrencyContext";
 import { confirmed } from "@/config/business";
 import BookingForm from "./BookingForm";
+import PriceTag from "./PriceTag";
 import hero960 from "@/assets/hero-960.webp";
 import hero1680 from "@/assets/hero-1680.webp";
 
@@ -24,7 +24,6 @@ const POLICIES = (Object.keys(confirmed.policies) as (keyof typeof confirmed.pol
 */
 export default function Hero() {
   const { t } = useLanguage();
-  const { formatPrice } = useCurrency();
 
   return (
     <section id="accueil" aria-labelledby="hero-title" className="relative bg-background">
@@ -64,11 +63,9 @@ export default function Hero() {
             >
               {t.hero.subtitle(vehicles.length)}
             </p>
-            <p style={delay(380)} className="anim-rise mt-6 text-[14px] text-foreground/70">
-              {t.fleet.from}{" "}
-              <span className="tabular text-lg font-semibold text-foreground">{formatPrice(LOWEST_RATE)}</span>{" "}
-              {t.fleet.perDay}
-            </p>
+            <div style={delay(380)} className="anim-rise mt-6">
+              <PriceTag pricePerDay={LOWEST_RATE} size="sm" layout="inline" />
+            </div>
           </div>
         </div>
       </div>

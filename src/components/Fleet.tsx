@@ -1,7 +1,7 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CalendarDays, ChevronDown, MapPin } from "lucide-react";
-import { vehicles, categories, VehicleCategory, type Vehicle } from "@/data/vehicles";
+import { vehicles, categories, VehicleCategory } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useBooking } from "@/context/BookingContext";
 import { locationText } from "@/lib/booking-message";
@@ -14,11 +14,11 @@ import VehicleCard from "./VehicleCard";
   single button that reveals the whole fleet in place. Category filters always show every
   model of the category. Hidden cards stay in the DOM, so all vehicle links remain crawlable.
 */
+// Layout effect in the browser (no flash of a misplaced underline), plain effect during prerender.
+const useIsoLayoutEffect = typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
 const INITIAL_MOBILE = 6;
 const INITIAL = 8; // four full rows of two
-// Real fleet photos used as the visual of each filter: first car of the category in the list,
-// and a flagship for "all".
-const ALL_VISUAL_ID = "range-rover-sport";
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -63,17 +63,44 @@ export default function Fleet() {
   const [expanded, setExpanded] = useState(false);
   // Cards only animate in after a visitor action (filter, show more), never on first paint.
   const [interacted, setInteracted] = useState(false);
-  const gridRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
+  const gridRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
 
-  const { counts, visuals } = useMemo(() => {
+  // Underline follows the active tab (also on resize and language change); keep it in view.
+  useIsoLayoutEffect(() => {
+    const place = () => {
+      const btn = railRef.current?.querySelector<HTMLButtonElement>(`[data-category="${active}"]`);
+      if (btn) setIndicator({ left: btn.offsetLeft, width: btn.offsetWidth });
+    };
+    place();
+    window.addEventListener("resize", place);
+    document.fonts?.ready.then(place);
+    return () => window.removeEventListener("resize", place);
+  }, [active, t]);
+
+  // Arrow keys move between categories (one tab stop for the whole rail).
+  const onRailKey = (e: React.KeyboardEvent) => {
+    const keys = document.documentElement.dir === "rtl" ? ["ArrowLeft", "ArrowRight"] : ["ArrowRight", "ArrowLeft"];
+    const i = visibleCategories.indexOf(active);
+    let to = i;
+    if (e.key === keys[0]) to = Math.min(i + 1, visibleCategories.length - 1);
+    else if (e.key === keys[1]) to = Math.max(i - 1, 0);
+    else if (e.key === "Home") to = 0;
+    else if (e.key === "End") to = visibleCategories.length - 1;
+    else return;
+    e.preventDefault();
+    selectCategory(visibleCategories[to]);
+    requestAnimationFrame(() =>
+      railRef.current?.querySelector<HTMLButtonElement>(`[data-category="${visibleCategories[to]}"]`)?.focus(),
+    );
+  };
+
+  const counts = useMemo(() => {
     const c = new Map<VehicleCategory, number>([["Tous", vehicles.length]]);
-    const v = new Map<VehicleCategory, Vehicle>([["Tous", vehicles.find((x) => x.id === ALL_VISUAL_ID) ?? vehicles[0]]]);
-    vehicles.forEach((x) => {
-      c.set(x.category, (c.get(x.category) ?? 0) + 1);
-      if (!v.has(x.category)) v.set(x.category, x);
-    });
-    return { counts: c, visuals: v };
+    vehicles.forEach((x) => c.set(x.category, (c.get(x.category) ?? 0) + 1));
+    return c;
   }, []);
 
   const visibleCategories = categories.filter((c) => (counts.get(c) ?? 0) > 0);
@@ -82,6 +109,9 @@ export default function Fleet() {
 
   const selectCategory = (category: VehicleCategory) => {
     setActive(category);
+    railRef.current
+      ?.querySelector(`[data-category="${category}"]`)
+      ?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "nearest", inline: "center" });
     setExpanded(false);
     setInteracted(true);
     // Deep in a long list, a shorter result set would leave the visitor in empty space.
@@ -115,47 +145,47 @@ export default function Fleet() {
 
         <SearchSummary />
 
-        {/* Visual category rail: a real photo of the class on each filter */}
-        <div className="sticky top-16 z-30 -mx-5 mt-10 bg-background/95 px-5 py-3 backdrop-blur-sm sm:mx-0 sm:px-0 lg:top-[72px]">
+        {/* Category filters: typographic tabs, a brass underline slides to the active one */}
+        <div className="sticky top-16 z-30 -mx-5 mt-10 bg-background/95 px-5 backdrop-blur-sm sm:mx-0 sm:px-0 lg:top-[72px]">
           <div
+            ref={railRef}
             role="group"
             aria-label={t.fleet.filterLabel}
-            className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:gap-3 sm:px-0 max-sm:[mask-image:linear-gradient(to_right,#000_82%,transparent)] max-sm:rtl:[mask-image:linear-gradient(to_left,#000_82%,transparent)]"
+            onKeyDown={onRailKey}
+            className="no-scrollbar relative -mx-5 flex gap-7 overflow-x-auto border-b border-border px-5 sm:mx-0 sm:gap-9 sm:px-0 max-sm:[mask-image:linear-gradient(to_right,#000_85%,transparent)] max-sm:rtl:[mask-image:linear-gradient(to_left,#000_85%,transparent)]"
           >
             {visibleCategories.map((category) => {
               const selected = active === category;
-              const visual = visuals.get(category)!;
               return (
                 <button
                   key={category}
                   type="button"
+                  data-category={category}
                   aria-pressed={selected}
+                  tabIndex={selected ? 0 : -1}
                   onClick={() => selectCategory(category)}
                   className={cn(
-                    "flex shrink-0 items-center gap-2.5 rounded-full border py-1.5 pe-4 ps-1.5 text-[14px] font-medium transition-[background-color,border-color,color] duration-200",
-                    selected
-                      ? "border-primary/70 bg-primary/10 text-foreground"
-                      : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
+                    "shrink-0 whitespace-nowrap rounded-sm py-4 text-[15px] transition-colors duration-200 focus-visible:outline-offset-[-3px]",
+                    selected ? "font-semibold text-foreground" : "font-medium text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <span className="chip-photo block h-8 w-12 shrink-0 overflow-hidden rounded-full bg-card">
-                    <img
-                      src={visual.thumb}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      width={96}
-                      height={64}
-                      className="h-full w-full scale-[1.45] object-cover object-[50%_62%]"
-                    />
-                  </span>
-                  <span className="whitespace-nowrap">
-                    {t.fleet.categories[category]}
-                    <span className="tabular ms-1.5 text-[12px] text-muted-foreground">{counts.get(category)}</span>
+                  {t.fleet.categories[category]}
+                  <span
+                    className={cn(
+                      "tabular ms-1.5 align-top text-[11px] font-normal transition-colors",
+                      selected ? "text-primary" : "text-muted-foreground/70",
+                    )}
+                  >
+                    {counts.get(category)}
                   </span>
                 </button>
               );
             })}
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-0 h-0.5 rounded-full bg-primary transition-[left,width] duration-500 [transition-timing-function:var(--ease-out)]"
+              style={{ left: indicator.left, width: indicator.width }}
+            />
           </div>
         </div>
 
@@ -181,6 +211,8 @@ export default function Fleet() {
             />
           ))}
         </div>
+
+        <p className="mt-12 text-[12px] text-muted-foreground">{t.fleet.priceNote}</p>
 
         {collapsed && (
           <div className="mt-14 flex justify-center">
