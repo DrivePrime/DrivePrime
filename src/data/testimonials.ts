@@ -8,6 +8,8 @@ export interface Testimonial {
   location: string;
   text: string;
   lang: "fr" | "en";
+  /** Fleet vehicle named explicitly in the review (only when the exact model is unambiguous). */
+  vehicleId?: string;
 }
 
 export const testimonials: Testimonial[] = [
@@ -40,6 +42,7 @@ export const testimonials: Testimonial[] = [
     location: "Rabat, Maroc",
     text: "J'ai loué une Mercedes Classe C pour mon mariage. Tout était parfait, du début à la fin. Merci à toute l'équipe de Drive Prime !",
     lang: "fr",
+    vehicleId: "mercedes-classe-c",
   },
   {
     name: "Julie Fontaine",

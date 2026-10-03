@@ -1,20 +1,62 @@
 import { useMemo, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { vehicles, categories, VehicleCategory } from "@/data/vehicles";
+import { useNavigate } from "react-router-dom";
+import { CalendarDays, ChevronDown, MapPin } from "lucide-react";
+import { vehicles, categories, VehicleCategory, type Vehicle } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
+import { useBooking } from "@/context/BookingContext";
+import { locationText } from "@/lib/booking-message";
+import { useDateLabel } from "@/lib/dates";
 import { cn } from "@/lib/utils";
 import VehicleCard from "./VehicleCard";
 
 /*
-  Long-list strategy: "Tous" opens on a first selection (6 cards on phones, 9 above) with a
+  Long-list strategy: "Tous" opens on a first selection (6 cards on phones, 8 above) with a
   single button that reveals the whole fleet in place. Category filters always show every
   model of the category. Hidden cards stay in the DOM, so all vehicle links remain crawlable.
 */
 const INITIAL_MOBILE = 6;
 const INITIAL = 8; // four full rows of two
+// Real fleet photos used as the visual of each filter: first car of the category in the list,
+// and a flagship for "all".
+const ALL_VISUAL_ID = "range-rover-sport";
 
 const prefersReducedMotion = () =>
   typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function SearchSummary() {
+  const { t, language } = useLanguage();
+  const booking = useBooking();
+  const navigate = useNavigate();
+  const startLabel = useDateLabel(booking.start);
+  const endLabel = useDateLabel(booking.end);
+  if (!booking.hasDates) return null;
+
+  return (
+    <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2 rounded-md border border-border bg-card/70 px-4 py-3 text-[14px]">
+      <span className="text-muted-foreground">{t.fleet.yourSearch}</span>
+      <span className="inline-flex items-center gap-2 text-foreground">
+        <MapPin className="h-4 w-4 text-primary" aria-hidden="true" />
+        {locationText(booking.location, language, t) || t.whatsapp.any}
+      </span>
+      <span className="tabular inline-flex items-center gap-2 text-foreground">
+        <CalendarDays className="h-4 w-4 text-primary" aria-hidden="true" />
+        {startLabel || t.fleet.datesPending}
+        <span aria-hidden="true" className="text-muted-foreground rtl:rotate-180">
+          →
+        </span>
+        {endLabel || t.fleet.datesPending}
+        {booking.days && <span className="text-muted-foreground">· {t.fleet.days(booking.days)}</span>}
+      </span>
+      <button
+        type="button"
+        onClick={() => navigate("/#accueil")}
+        className="ms-auto text-[14px] font-medium text-primary underline-offset-4 hover:underline"
+      >
+        {t.fleet.editSearch}
+      </button>
+    </div>
+  );
+}
 
 export default function Fleet() {
   const [active, setActive] = useState<VehicleCategory>("Tous");
@@ -24,10 +66,14 @@ export default function Fleet() {
   const gridRef = useRef<HTMLDivElement>(null);
   const { t } = useLanguage();
 
-  const counts = useMemo(() => {
+  const { counts, visuals } = useMemo(() => {
     const c = new Map<VehicleCategory, number>([["Tous", vehicles.length]]);
-    vehicles.forEach((v) => c.set(v.category, (c.get(v.category) ?? 0) + 1));
-    return c;
+    const v = new Map<VehicleCategory, Vehicle>([["Tous", vehicles.find((x) => x.id === ALL_VISUAL_ID) ?? vehicles[0]]]);
+    vehicles.forEach((x) => {
+      c.set(x.category, (c.get(x.category) ?? 0) + 1);
+      if (!v.has(x.category)) v.set(x.category, x);
+    });
+    return { counts: c, visuals: v };
   }, []);
 
   const visibleCategories = categories.filter((c) => (counts.get(c) ?? 0) > 0);
@@ -36,8 +82,8 @@ export default function Fleet() {
 
   const selectCategory = (category: VehicleCategory) => {
     setActive(category);
-    setInteracted(true);
     setExpanded(false);
+    setInteracted(true);
     // Deep in a long list, a shorter result set would leave the visitor in empty space.
     const grid = gridRef.current;
     if (grid && grid.getBoundingClientRect().top < 0) {
@@ -55,30 +101,30 @@ export default function Fleet() {
   };
 
   return (
-    <section id="flotte" aria-labelledby="fleet-title" className="pt-20 pb-24 lg:pt-28 lg:pb-32">
+    <section id="flotte" aria-labelledby="fleet-title" className="pb-24 pt-24 lg:pb-32 lg:pt-32">
       <div className="container">
         <div className="max-w-2xl">
-          <h2 id="fleet-title" className="type-display text-4xl sm:text-5xl font-semibold text-foreground">
+          <h2 id="fleet-title" className="type-display text-4xl font-semibold text-foreground sm:text-5xl">
             {t.fleet.title}
           </h2>
-          <p className="mt-4 text-base sm:text-lg leading-relaxed text-muted-foreground">{t.fleet.description}</p>
+          <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">{t.fleet.description}</p>
           <p className="sr-only" aria-live="polite">
             {t.fleet.count(filtered.length)}
           </p>
         </div>
 
-        <div className="sticky top-16 lg:top-[72px] z-30 -mx-5 mt-10 border-b border-border bg-background/95 px-5 pt-3 backdrop-blur-sm sm:mx-0 sm:px-0">
+        <SearchSummary />
+
+        {/* Visual category rail: a real photo of the class on each filter */}
+        <div className="sticky top-16 z-30 -mx-5 mt-10 bg-background/95 px-5 py-3 backdrop-blur-sm sm:mx-0 sm:px-0 lg:top-[72px]">
           <div
             role="group"
             aria-label={t.fleet.filterLabel}
-            className={cn(
-              "no-scrollbar -mx-5 flex gap-7 overflow-x-auto px-5 sm:mx-0 sm:px-0",
-              // Phones: fade the trailing edge so it is clear more categories scroll into view.
-              "max-sm:[mask-image:linear-gradient(to_right,#000_80%,transparent)] max-sm:rtl:[mask-image:linear-gradient(to_left,#000_80%,transparent)]",
-            )}
+            className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 sm:mx-0 sm:gap-3 sm:px-0 max-sm:[mask-image:linear-gradient(to_right,#000_82%,transparent)] max-sm:rtl:[mask-image:linear-gradient(to_left,#000_82%,transparent)]"
           >
             {visibleCategories.map((category) => {
               const selected = active === category;
+              const visual = visuals.get(category)!;
               return (
                 <button
                   key={category}
@@ -86,15 +132,27 @@ export default function Fleet() {
                   aria-pressed={selected}
                   onClick={() => selectCategory(category)}
                   className={cn(
-                    "relative shrink-0 whitespace-nowrap pb-3.5 pt-1 text-[15px] font-medium transition-colors",
-                    "after:absolute after:inset-x-0 after:-bottom-px after:h-0.5 after:origin-center after:transition-transform after:duration-300",
+                    "flex shrink-0 items-center gap-2.5 rounded-full border py-1.5 pe-4 ps-1.5 text-[14px] font-medium transition-[background-color,border-color,color] duration-200",
                     selected
-                      ? "text-foreground after:scale-x-100 after:bg-primary"
-                      : "text-muted-foreground hover:text-foreground after:scale-x-0 after:bg-foreground/40",
+                      ? "border-primary/70 bg-primary/10 text-foreground"
+                      : "border-border text-muted-foreground hover:border-foreground/30 hover:text-foreground",
                   )}
                 >
-                  {t.fleet.categories[category]}
-                  <sup className="tabular ms-1 text-[11px] font-normal text-muted-foreground">{counts.get(category)}</sup>
+                  <span className="chip-photo block h-8 w-12 shrink-0 overflow-hidden rounded-full bg-card">
+                    <img
+                      src={visual.thumb}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      width={96}
+                      height={64}
+                      className="h-full w-full scale-[1.45] object-cover object-[50%_62%]"
+                    />
+                  </span>
+                  <span className="whitespace-nowrap">
+                    {t.fleet.categories[category]}
+                    <span className="tabular ms-1.5 text-[12px] text-muted-foreground">{counts.get(category)}</span>
+                  </span>
                 </button>
               );
             })}
@@ -106,7 +164,7 @@ export default function Fleet() {
           ref={gridRef}
           key={active}
           className={cn(
-            "mt-12 scroll-mt-40 grid gap-y-14 md:grid-cols-2 md:gap-x-10 lg:gap-x-14 lg:gap-y-20",
+            "mt-10 scroll-mt-40 grid gap-y-14 md:grid-cols-2 md:gap-x-10 lg:gap-x-14 lg:gap-y-20",
             interacted && "fleet-enter",
           )}
         >
@@ -114,7 +172,7 @@ export default function Fleet() {
             <VehicleCard
               key={vehicle.id}
               vehicle={vehicle}
-              priority={i < 3}
+              priority={i < 2}
               className={cn(
                 collapsed && (i >= INITIAL ? "hidden" : i >= INITIAL_MOBILE && "max-sm:hidden"),
                 // only the cards revealed by "show more" animate in

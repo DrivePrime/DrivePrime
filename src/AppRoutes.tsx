@@ -2,6 +2,7 @@ import { lazy, Suspense, type ReactNode } from "react";
 import { Routes, Route } from "react-router-dom";
 import { LanguageProvider } from "@/i18n/LanguageContext";
 import { CurrencyProvider } from "@/i18n/CurrencyContext";
+import { BookingProvider } from "@/context/BookingContext";
 import Index from "./pages/Index";
 import VehicleDetail from "./pages/VehicleDetail";
 import NotFound from "./pages/NotFound";
@@ -19,7 +20,9 @@ const AdminCalendar = lazy(() => import("./pages/admin/AdminCalendar"));
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
     <LanguageProvider>
-      <CurrencyProvider>{children}</CurrencyProvider>
+      <CurrencyProvider>
+        <BookingProvider>{children}</BookingProvider>
+      </CurrencyProvider>
     </LanguageProvider>
   );
 }

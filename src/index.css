@@ -318,14 +318,113 @@
 .fleet-enter > :nth-child(7) { animation-delay: 270ms; }
 .fleet-enter > :nth-child(8) { animation-delay: 315ms; }
 
-/* Hero photograph: its inner edge melts into the copy column (mirrored in Arabic) */
+/* Hero photograph: framed on the car; the copy always sits on the darkened left side
+   (the photo cannot shift enough to free the right side, so Arabic copy stays left, right-aligned) */
+.hero-photo {
+  object-position: 64% 45%;
+}
+.hero-side-scrim {
+  background: linear-gradient(to right, hsl(var(--background) / 0.88) 0%, hsl(var(--background) / 0.55) 34%, transparent 62%);
+}
 @media (min-width: 1024px) {
   .hero-photo {
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 24%);
-    mask-image: linear-gradient(to right, transparent 0%, #000 24%);
+    object-position: 62% 50%;
   }
-  [dir="rtl"] .hero-photo {
-    -webkit-mask-image: linear-gradient(to left, transparent 0%, #000 24%);
-    mask-image: linear-gradient(to left, transparent 0%, #000 24%);
+}
+
+/* Fleet card: actions rise onto the photo on hover / keyboard focus (desktop pointers) */
+.card-actions {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.3s var(--ease-out),
+    transform 0.4s var(--ease-out);
+}
+.group:hover .card-actions,
+.group:focus-within .card-actions {
+  opacity: 1;
+  transform: none;
+}
+
+/* Services showcase: the photograph re-frames smoothly; the caption swaps with a short rise */
+.services-photo {
+  transform: scale(var(--zoom, 1));
+  transition:
+    object-position 1.4s var(--ease-out),
+    transform 1.4s var(--ease-out);
+}
+.service-swap {
+  animation: dp-card-in 0.5s var(--ease-out) both;
+}
+
+/* Daylight surface: the design-system tokens re-declared for a light section */
+.surface-light {
+  --background: 36 20% 91%; /* #ede9e3 bone */
+  --foreground: 216 20% 10%; /* #14181f */
+  --muted-foreground: 216 9% 34%; /* #4f5763 — 6.5:1 on bone */
+  --border: 30 12% 80%;
+  --primary: 39 55% 38%; /* deeper brass: readable on light */
+  --ring: 39 55% 38%;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+.surface-light ::selection {
+  background: hsl(216 20% 10%);
+  color: hsl(36 20% 91%);
+}
+/* The studio photos' own night backdrop, framed on a light page */
+.studio-window {
+  background: radial-gradient(120% 90% at 70% 20%, #2a3542 0%, #141a22 60%, #0d1116 100%);
+  box-shadow: 0 50px 100px -40px rgb(20 24 31 / 0.55);
+}
+
+/*
+  Scroll reveal. Content is only hidden when JavaScript runs and motion is allowed
+  (html.js-motion, set in index.html before paint); without it everything stays visible.
+*/
+.journey-fill {
+  transform-origin: left center;
+  transition: transform 1.4s var(--ease-out) 0.15s;
+}
+[dir="rtl"] .journey-fill {
+  transform-origin: right center;
+}
+.js-motion .reveal:not(.in-view) .journey-fill {
+  transform: scaleX(0);
+}
+.journey-step {
+  transition:
+    opacity 0.7s var(--ease-out),
+    transform 0.8s var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 140ms + 150ms);
+}
+.js-motion .reveal:not(.in-view) .journey-step {
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+/* Reviews: fade with a slight slide in the direction of travel (mirrored in Arabic) */
+@keyframes dp-quote-next {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
   }
+}
+@keyframes dp-quote-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+}
+.quote-in-next {
+  animation: dp-quote-next 0.6s var(--ease-out) both;
+}
+.quote-in-prev {
+  animation: dp-quote-prev 0.6s var(--ease-out) both;
+}
+[dir="rtl"] .quote-in-next {
+  animation-name: dp-quote-prev;
+}
+[dir="rtl"] .quote-in-prev {
+  animation-name: dp-quote-next;
 }

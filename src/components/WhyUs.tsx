@@ -5,7 +5,7 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { useCurrency } from "@/i18n/CurrencyContext";
 import { confirmed } from "@/config/business";
 
-// A flagship of the real fleet anchors the section (its studio photo, nothing staged).
+// A flagship of the real fleet, shown in its own studio photograph.
 const FEATURED_ID = "range-rover-vogue";
 const featured = vehicles.find((v) => v.id === FEATURED_ID) ?? vehicles[0];
 const prices = vehicles.map((v) => v.pricePerDay);
@@ -13,9 +13,9 @@ const LOWEST = Math.min(...prices);
 const HIGHEST = Math.max(...prices);
 
 /*
-  "Pourquoi nous choisir ?" — the original site's four arguments, a studio photo of the
-  fleet, and only facts derived from the data (vehicle count, price range) or confirmed
-  by the owner (24/7 assistance). Unverified figures (years, customers, rating) are not shown.
+  "Pourquoi nous choisir ?" — the page turns to daylight. Four short, legible arguments from
+  the original site on a bone surface; the car sits in a dark "studio window" (its photo's own
+  backdrop) with facts taken only from the data or confirmed by the owner.
 */
 export default function WhyUs() {
   const { t } = useLanguage();
@@ -29,39 +29,31 @@ export default function WhyUs() {
   ];
 
   return (
-    <section id="pourquoi" aria-labelledby="whyus-title" className="relative overflow-hidden bg-card/60 py-20 lg:py-28">
-      <div className="container grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-10">
-        <div className="lg:col-span-6 lg:order-2">
-          <h2 id="whyus-title" className="type-display text-4xl font-semibold text-foreground sm:text-5xl">
+    <section id="pourquoi" aria-labelledby="whyus-title" className="surface-light py-24 lg:py-32">
+      <div className="container grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-16">
+        <div className="lg:col-span-6">
+          <h2 id="whyus-title" className="type-display text-4xl font-semibold text-foreground sm:text-5xl lg:text-[3.5rem]">
             {w.title}
           </h2>
-          <p className="mt-5 max-w-[48ch] text-base leading-relaxed text-muted-foreground sm:text-lg">{w.intro}</p>
+          <p className="mt-6 max-w-[46ch] text-base leading-relaxed text-muted-foreground sm:text-lg">{w.intro}</p>
 
-          <ul className="mt-12 grid gap-x-10 gap-y-9 sm:grid-cols-2">
+          <ul className="mt-14 grid gap-x-12 gap-y-10 sm:grid-cols-2">
             {w.reasons.map((reason) => (
-              <li key={reason.title} className="border-t border-foreground/15 pt-5">
-                <h3 className="type-wide text-lg font-semibold text-foreground">{reason.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-muted-foreground">{reason.description}</p>
-              </li>
-            ))}
-          </ul>
-
-          <ul className="mt-12 flex flex-wrap items-center gap-x-6 gap-y-3 text-[15px]" aria-label={w.factsLabel}>
-            {facts.map((fact, i) => (
-              <li key={fact} className="flex items-center gap-6">
-                {i > 0 && <span aria-hidden="true" className="h-4 w-px bg-foreground/20" />}
-                <span className="tabular font-semibold text-foreground">{fact}</span>
+              <li key={reason.title}>
+                <h3 className="type-wide text-[1.35rem] font-semibold leading-tight text-foreground">{reason.title}</h3>
+                <p className="mt-3 max-w-[34ch] text-[15px] leading-relaxed text-muted-foreground">{reason.description}</p>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="lg:col-span-6 lg:order-1">
+        {/* Studio window: the photo's own night backdrop, framed as an object on the light page */}
+        <figure className="studio-window relative overflow-hidden rounded-xl lg:col-span-6">
           <div className="stage" style={{ "--stage-zoom": stageZoom(featured.id) } as CSSProperties}>
             <img
               src={featured.image}
               srcSet={`${featured.thumb} 768w, ${featured.image} 1536w`}
-              sizes="(min-width: 1024px) 50vw, 100vw"
+              sizes="(min-width: 1024px) 46vw, 100vw"
               alt={featured.name}
               width={1536}
               height={1024}
@@ -69,7 +61,17 @@ export default function WhyUs() {
               decoding="async"
             />
           </div>
-        </div>
+          <figcaption className="relative px-6 pb-6 sm:px-8 sm:pb-8">
+            <ul aria-label={w.factsLabel} className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[15px]">
+              {facts.map((fact, i) => (
+                <li key={fact} className="flex items-center gap-5">
+                  {i > 0 && <span aria-hidden="true" className="h-4 w-px bg-white/20" />}
+                  <span className="tabular font-semibold text-[#ede9e3]">{fact}</span>
+                </li>
+              ))}
+            </ul>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );

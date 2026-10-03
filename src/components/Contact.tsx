@@ -5,11 +5,10 @@ import { business, openWhatsApp, whatsappUrl } from "@/config/business";
 import { WhatsAppIcon, InstagramIcon, TikTokIcon } from "./icons";
 import DateField from "./DateField";
 import { dateToIso } from "@/lib/dates";
-
-const formatDate = (iso: string) => (iso ? iso.split("-").reverse().join("/") : "");
+import { bookingRequest } from "@/lib/booking-message";
 
 export default function Contact() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const c = t.contact;
   const [form, setForm] = useState({ name: "", email: "", start: "", end: "", vehicle: "", message: "" });
 
@@ -18,17 +17,16 @@ export default function Contact() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const w = t.whatsapp;
-    const lines = [
-      w.request,
-      `${w.name}: ${form.name}`,
-      ...(form.email.trim() ? [`${w.email}: ${form.email.trim()}`] : []),
-      `${w.vehicle_}: ${form.vehicle || w.any}`,
-      `${w.start}: ${formatDate(form.start) || w.any}`,
-      `${w.end}: ${formatDate(form.end) || w.any}`,
-    ];
-    if (form.message.trim()) lines.push(`${w.message}: ${form.message.trim()}`);
-    openWhatsApp(lines.join("\n"));
+    openWhatsApp(
+      bookingRequest(t, language, {
+        name: form.name,
+        email: form.email,
+        vehicle: form.vehicle,
+        start: form.start,
+        end: form.end,
+        message: form.message,
+      }),
+    );
   };
 
   const channels = [
@@ -39,7 +37,7 @@ export default function Contact() {
   ];
 
   return (
-    <section id="contact" aria-labelledby="contact-title" className="border-t border-border pb-24 pt-20 lg:pb-32 lg:pt-28">
+    <section id="contact" aria-labelledby="contact-title" className="pb-24 pt-20 lg:pb-32 lg:pt-28">
       <div className="container grid gap-14 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-5">
           <h2 id="contact-title" className="type-display text-4xl sm:text-5xl font-semibold text-foreground">

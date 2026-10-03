@@ -33,6 +33,8 @@
     <script>
       // Runs before the app: apply a saved language/currency preference early.
       try {
+        // Scroll reveals only hide content when JS runs and the visitor allows motion.
+        if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("js-motion");
         var lang = localStorage.getItem("language");
         var cur = localStorage.getItem("currency");
         if ((lang && lang !== "fr") || cur === "MAD") document.documentElement.classList.add("csr");

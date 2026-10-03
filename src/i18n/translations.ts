@@ -42,6 +42,8 @@ const fr = {
     vehicle: "Véhicule",
     anyVehicle: "Tous les véhicules",
     submit: "Vérifier la disponibilité",
+    searchCta: "Voir les véhicules",
+    orWhatsapp: "ou envoyer la demande directement sur WhatsApp",
     note: "Vous serez redirigé vers WhatsApp avec votre demande pré-remplie.",
     policies: {
       instantConfirmation: "Confirmation instantanée",
@@ -85,12 +87,17 @@ const fr = {
     details: "Voir la fiche",
     bookAria: (name: string) => `Réserver ${name} sur WhatsApp`,
     showMore: (n: number) => `Afficher les ${n} autres véhicules`,
+    yourSearch: "Votre recherche",
+    days: (n: number) => (n > 1 ? `${n} jours` : "1 jour"),
+    editSearch: "Modifier",
+    datesPending: "Dates à choisir",
   },
   services: {
     title: "Nos services",
     intro:
       "Une gamme complète de services pour rendre votre expérience de location aussi fluide et agréable que possible.",
     photoCaption: "Livraison à votre hôtel, riad ou villa, partout à Marrakech.",
+    listLabel: "Choisir un service",
     items: [
       {
         key: "longTermDegressive",
@@ -157,9 +164,15 @@ const fr = {
     title: "Ce que disent nos clients",
     intro: "Les avis de nos clients sur leur location avec Drive Prime.",
     listLabel: "Avis clients",
+    prev: "Avis précédent",
+    next: "Avis suivant",
+    rentedCar: "Voir ce véhicule",
+    position: (i: number, n: number) => `Avis ${i} sur ${n}`,
   },
   process: {
     title: "Réserver en trois étapes",
+    stepLabels: ["Choisir", "Réserver", "Rouler"],
+    previewCaption: "Le message envoyé, déjà rempli avec votre choix",
     steps: [
       {
         title: "Choisissez un véhicule",
@@ -175,6 +188,10 @@ const fr = {
         description: "Récupérez votre véhicule à l'aéroport, à votre hôtel ou à votre riad.",
       },
     ],
+  },
+  finalCta: {
+    title: "Votre voiture vous attend à Marrakech",
+    text: "Choisissez votre modèle, envoyez vos dates : notre équipe vous répond sur WhatsApp.",
   },
   contact: {
     title: "Une question, une demande\u00a0?",
@@ -290,6 +307,8 @@ const en: Translations = {
     vehicle: "Vehicle",
     anyVehicle: "Any vehicle",
     submit: "Check availability",
+    searchCta: "See the vehicles",
+    orWhatsapp: "or send the request directly on WhatsApp",
     note: "You will be redirected to WhatsApp with your request pre-filled.",
     policies: {
       instantConfirmation: "Instant confirmation",
@@ -332,11 +351,16 @@ const en: Translations = {
     details: "View details",
     bookAria: (name: string) => `Book the ${name} on WhatsApp`,
     showMore: (n: number) => `Show the other ${n} vehicles`,
+    yourSearch: "Your search",
+    days: (n: number) => (n > 1 ? `${n} days` : "1 day"),
+    editSearch: "Edit",
+    datesPending: "Dates to choose",
   },
   services: {
     title: "Our services",
     intro: "A complete range of services to make your rental as smooth and pleasant as possible.",
     photoCaption: "Delivery to your hotel, riad or villa, anywhere in Marrakech.",
+    listLabel: "Choose a service",
     items: [
       {
         key: "longTermDegressive",
@@ -402,9 +426,15 @@ const en: Translations = {
     title: "What our customers say",
     intro: "Reviews from our customers about renting with Drive Prime.",
     listLabel: "Customer reviews",
+    prev: "Previous review",
+    next: "Next review",
+    rentedCar: "See this vehicle",
+    position: (i: number, n: number) => `Review ${i} of ${n}`,
   },
   process: {
     title: "Book in three steps",
+    stepLabels: ["Choose", "Book", "Drive"],
+    previewCaption: "The message we receive, pre-filled with your choice",
     steps: [
       {
         title: "Choose a vehicle",
@@ -420,6 +450,10 @@ const en: Translations = {
         description: "Collect your car at the airport, your hotel or your riad.",
       },
     ],
+  },
+  finalCta: {
+    title: "Your car is waiting in Marrakech",
+    text: "Choose your model, send your dates: our team replies on WhatsApp.",
   },
   contact: {
     title: "A question, a request?",
@@ -532,6 +566,8 @@ const ar: Translations = {
     vehicle: "السيارة",
     anyVehicle: "كل السيارات",
     submit: "تحقق من التوفر",
+    searchCta: "عرض السيارات",
+    orWhatsapp: "أو أرسل الطلب مباشرة عبر واتساب",
     note: "سيتم تحويلك إلى واتساب مع طلبك جاهزاً.",
     policies: {
       instantConfirmation: "تأكيد فوري",
@@ -574,11 +610,16 @@ const ar: Translations = {
     details: "عرض التفاصيل",
     bookAria: (name: string) => `احجز ${name} عبر واتساب`,
     showMore: (n: number) => `عرض ${n} سيارة أخرى`,
+    yourSearch: "بحثك",
+    days: (n: number) => `${n} يوم`,
+    editSearch: "تعديل",
+    datesPending: "اختر التواريخ",
   },
   services: {
     title: "خدماتنا",
     intro: "مجموعة متكاملة من الخدمات لجعل تجربة الإيجار سلسة وممتعة قدر الإمكان.",
     photoCaption: "التوصيل إلى فندقك أو رياضك أو الفيلا في أي مكان بمراكش.",
+    listLabel: "اختر خدمة",
     items: [
       {
         key: "longTermDegressive",
@@ -642,9 +683,15 @@ const ar: Translations = {
     title: "ماذا يقول عملاؤنا",
     intro: "آراء عملائنا حول تجربة الإيجار مع Drive Prime.",
     listLabel: "آراء العملاء",
+    prev: "الرأي السابق",
+    next: "الرأي التالي",
+    rentedCar: "عرض هذه السيارة",
+    position: (i: number, n: number) => `الرأي ${i} من ${n}`,
   },
   process: {
     title: "احجز في ثلاث خطوات",
+    stepLabels: ["اختر", "احجز", "انطلق"],
+    previewCaption: "الرسالة المرسلة، معبأة مسبقاً باختيارك",
     steps: [
       {
         title: "اختر سيارة",
@@ -659,6 +706,10 @@ const ar: Translations = {
         description: "استلم سيارتك في المطار أو الفندق أو الرياض.",
       },
     ],
+  },
+  finalCta: {
+    title: "سيارتك في انتظارك في مراكش",
+    text: "اختر سيارتك وأرسل تواريخك: يرد عليك فريقنا عبر واتساب.",
   },
   contact: {
     title: "سؤال أو طلب؟",

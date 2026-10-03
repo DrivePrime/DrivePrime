@@ -15,11 +15,14 @@ import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import { stageZoom } from "@/data/stage";
 import { WhatsAppIcon } from "@/components/icons";
 import { vehicleLabel } from "@/i18n/vehicle-label";
+import { useBooking } from "@/context/BookingContext";
+import { bookingRequest } from "@/lib/booking-message";
 
 export default function VehicleDetail() {
   const { id } = useParams<{ id: string }>();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { formatPrice } = useCurrency();
+  const booking = useBooking();
   const d = t.vehicleDetail;
 
   useEffect(() => {
@@ -70,7 +73,11 @@ export default function VehicleDetail() {
 
   const transmission = t.fleet.transmission[vehicle.transmission];
   const fullName = `${vehicle.name} (${transmission})`;
-  const waHref = whatsappUrl(t.whatsapp.vehicle(fullName));
+  const waHref = whatsappUrl(
+    booking.hasDates
+      ? bookingRequest(t, language, { vehicle: fullName, location: booking.location, start: booking.start, end: booking.end })
+      : t.whatsapp.vehicle(fullName),
+  );
 
   const sameCategory = vehicles.filter((v) => v.category === vehicle.category && v.id !== vehicle.id);
   const similar = (sameCategory.length ? sameCategory : vehicles.filter((v) => v.id !== vehicle.id))
