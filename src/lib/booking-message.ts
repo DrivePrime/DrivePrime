@@ -13,27 +13,29 @@ interface RequestFields {
   name?: string;
   email?: string;
   vehicle?: string;
-  /** e.g. "À partir de 300 € / jour" — the rate the visitor saw */
-  rate?: string;
   location?: string;
   start?: string;
   end?: string;
   message?: string;
 }
 
-/** One WhatsApp booking request format for the whole site. */
+/*
+  One WhatsApp booking request format for the whole site.
+  Only what the visitor actually chose is included — never a price (prices stay on the site).
+*/
 export function bookingRequest(t: Translations, language: Language, f: RequestFields) {
   const w = t.whatsapp;
-  const optional = (label: string, value?: string) => (value?.trim() ? [`${label}: ${value.trim()}`] : []);
+  const line = (label: string, value?: string) => (value?.trim() ? [`${label}${w.sep}${value.trim()}`] : []);
+  const start = formatDay(f.start ?? "");
+  const end = formatDay(f.end ?? "");
+  const dates = start && end ? [`${w.dates}${w.sep}${w.range(start, end)}`] : [...line(w.start, start), ...line(w.end, end)];
   return [
-    w.request,
-    ...optional(w.name, f.name),
-    ...optional(w.email, f.email),
-    `${w.vehicle_}: ${f.vehicle || w.any}`,
-    ...optional(w.rate, f.rate),
-    `${w.location}: ${(f.location && locationText(f.location, language, t)) || w.any}`,
-    `${w.start}: ${formatDay(f.start ?? "") || w.any}`,
-    `${w.end}: ${formatDay(f.end ?? "") || w.any}`,
-    ...optional(w.message, f.message),
+    f.vehicle ? w.bookVehicle(f.vehicle) : w.bookAny,
+    ...line(w.name, f.name),
+    ...line(w.email, f.email),
+    ...dates,
+    ...line(w.pickup, f.location && locationText(f.location, language, t)),
+    ...line(w.message, f.message),
+    w.confirm,
   ].join("\n");
 }

@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./icons";
 import PriceTag from "./PriceTag";
 import Availability from "./Availability";
-import { useCurrency } from "@/i18n/CurrencyContext";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -36,19 +35,17 @@ export default function VehicleCard({
 }: VehicleCardProps) {
   const { t, language } = useLanguage();
   const booking = useBooking();
-  const { formatPrice } = useCurrency();
   const transmission = t.fleet.transmission[vehicle.transmission];
   const label = vehicleLabel(vehicle, t);
   const fullName = `${vehicle.name} (${transmission})`;
   const message = booking.hasDates
     ? bookingRequest(t, language, {
         vehicle: fullName,
-        rate: `${t.fleet.from} ${formatPrice(vehicle.pricePerDay)} ${t.fleet.perDay}`,
         location: booking.location,
         start: booking.start,
         end: booking.end,
       })
-    : t.whatsapp.vehicle(fullName);
+    : bookingRequest(t, language, { vehicle: fullName });
 
   const reserve = (
     <a
