@@ -197,6 +197,7 @@ const fr = {
   },
   finalCta: {
     title: "Votre voiture vous attend à Marrakech",
+    lines: ["Votre prochaine voiture", "vous attend à Marrakech."],
     text: "Choisissez votre modèle, envoyez vos dates : notre équipe vous répond sur WhatsApp.",
   },
   contact: {
@@ -467,6 +468,7 @@ const en: Translations = {
   },
   finalCta: {
     title: "Your car is waiting in Marrakech",
+    lines: ["Your next car", "is waiting in Marrakech."],
     text: "Choose your model, send your dates: our team replies on WhatsApp.",
   },
   contact: {
@@ -732,6 +734,7 @@ const ar: Translations = {
   },
   finalCta: {
     title: "سيارتك في انتظارك في مراكش",
+    lines: ["سيارتك القادمة", "في انتظارك في مراكش."],
     text: "اختر سيارتك وأرسل تواريخك: يرد عليك فريقنا عبر واتساب.",
   },
   contact: {

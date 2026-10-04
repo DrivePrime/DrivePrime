@@ -36,7 +36,10 @@ export default function VehicleDetail() {
     vehicle
       ? {
           title: t.meta.vehicleTitle(label),
-          description: t.meta.vehicleDescription(label, `${vehicle.pricePerDay} €`),
+          description: t.meta.vehicleDescription(
+            label,
+            `${vehicle.pricePerDay} €`,
+          ),
           path: `/vehicule/${vehicle.id}`,
           image: vehicle.image,
           imageWidth: 1536,
@@ -46,13 +49,33 @@ export default function VehicleDetail() {
             "@context": "https://schema.org",
             "@type": "BreadcrumbList",
             itemListElement: [
-              { "@type": "ListItem", position: 1, name: d.home, item: `${SITE_URL}/` },
-              { "@type": "ListItem", position: 2, name: d.back, item: `${SITE_URL}/#flotte` },
-              { "@type": "ListItem", position: 3, name: label, item: `${SITE_URL}/vehicule/${vehicle.id}` },
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: d.home,
+                item: `${SITE_URL}/`,
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: d.back,
+                item: `${SITE_URL}/#flotte`,
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: label,
+                item: `${SITE_URL}/vehicule/${vehicle.id}`,
+              },
             ],
           },
         }
-      : { title: `${d.notFound} | Drive Prime`, description: d.notFoundDescription, path: `/vehicule/${id}`, noindex: true },
+      : {
+          title: `${d.notFound} | Drive Prime`,
+          description: d.notFoundDescription,
+          path: `/vehicule/${id}`,
+          noindex: true,
+        },
   );
 
   if (!vehicle) {
@@ -60,8 +83,12 @@ export default function VehicleDetail() {
       <div className="min-h-screen bg-background">
         <Header />
         <main className="container flex min-h-[70vh] flex-col items-start justify-center pt-24">
-          <h1 className="type-display text-4xl sm:text-5xl font-semibold text-foreground">{d.notFound}</h1>
-          <p className="mt-4 max-w-md text-muted-foreground">{d.notFoundDescription}</p>
+          <h1 className="type-display text-4xl sm:text-5xl font-semibold text-foreground">
+            {d.notFound}
+          </h1>
+          <p className="mt-4 max-w-md text-muted-foreground">
+            {d.notFoundDescription}
+          </p>
           <Link to="/#flotte" className="btn-primary mt-8">
             {t.hero.ctaFleet}
           </Link>
@@ -75,13 +102,28 @@ export default function VehicleDetail() {
   const fullName = `${vehicle.name} (${transmission})`;
   const waHref = whatsappUrl(
     booking.hasDates
-      ? bookingRequest(t, language, { vehicle: fullName, location: booking.location, start: booking.start, end: booking.end })
+      ? bookingRequest(t, language, {
+          vehicle: fullName,
+          location: booking.location,
+          start: booking.start,
+          end: booking.end,
+        })
       : bookingRequest(t, language, { vehicle: fullName }),
   );
 
-  const sameCategory = vehicles.filter((v) => v.category === vehicle.category && v.id !== vehicle.id);
-  const similar = (sameCategory.length ? sameCategory : vehicles.filter((v) => v.id !== vehicle.id))
-    .sort((a, b) => Math.abs(a.pricePerDay - vehicle.pricePerDay) - Math.abs(b.pricePerDay - vehicle.pricePerDay))
+  const sameCategory = vehicles.filter(
+    (v) => v.category === vehicle.category && v.id !== vehicle.id,
+  );
+  const similar = (
+    sameCategory.length
+      ? sameCategory
+      : vehicles.filter((v) => v.id !== vehicle.id)
+  )
+    .sort(
+      (a, b) =>
+        Math.abs(a.pricePerDay - vehicle.pricePerDay) -
+        Math.abs(b.pricePerDay - vehicle.pricePerDay),
+    )
     .slice(0, 3);
 
   const specs = [
@@ -100,13 +142,19 @@ export default function VehicleDetail() {
           <nav aria-label={t.nav.breadcrumb} className="py-5 lg:py-7">
             <ol className="flex flex-wrap items-center gap-2 text-[14px] text-muted-foreground">
               <li>
-                <Link to="/" className="hover:text-foreground transition-colors">
+                <Link
+                  to="/"
+                  className="hover:text-foreground transition-colors"
+                >
                   {d.home}
                 </Link>
               </li>
               <li aria-hidden="true">/</li>
               <li>
-                <Link to="/#flotte" className="hover:text-foreground transition-colors">
+                <Link
+                  to="/#flotte"
+                  className="hover:text-foreground transition-colors"
+                >
                   {d.back}
                 </Link>
               </li>
@@ -118,8 +166,15 @@ export default function VehicleDetail() {
           </nav>
 
           <div className="grid gap-10 lg:grid-cols-12 lg:gap-14">
-            <div key={vehicle.id} className="anim-settle lg:col-span-7 xl:col-span-8">
-              <VehicleGallery photos={vehiclePhotos(vehicle)} label={label} zoom={stageZoom(vehicle.id) - 0.04} />
+            <div
+              key={vehicle.id}
+              className="anim-settle lg:col-span-7 xl:col-span-8"
+            >
+              <VehicleGallery
+                photos={vehiclePhotos(vehicle)}
+                label={label}
+                zoom={stageZoom(vehicle.id) - 0.04}
+              />
             </div>
 
             <div className="lg:col-span-5 xl:col-span-4">
@@ -129,22 +184,38 @@ export default function VehicleDetail() {
                 </h1>
                 <Availability long className="mt-3" />
 
-                <PriceTag pricePerDay={vehicle.pricePerDay} size="lg" className="mt-6" />
-                <p className="mt-3 max-w-[40ch] text-[12px] leading-relaxed text-muted-foreground">{t.fleet.priceNote}</p>
+                <PriceTag
+                  pricePerDay={vehicle.pricePerDay}
+                  size="lg"
+                  className="mt-6"
+                />
+                <p className="mt-3 max-w-[40ch] text-[12px] leading-relaxed text-muted-foreground">
+                  {t.fleet.priceNote}
+                </p>
 
                 <h2 className="sr-only">{d.specs}</h2>
                 <dl className="mt-8 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-border pt-6">
                   {specs.map((s) => (
                     <div key={s.label}>
-                      <dt className="text-[13px] text-muted-foreground">{s.label}</dt>
-                      <dd className="mt-1 text-[16px] font-medium text-foreground">{s.value}</dd>
+                      <dt className="text-[13px] text-muted-foreground">
+                        {s.label}
+                      </dt>
+                      <dd className="mt-1 text-[16px] font-medium text-foreground">
+                        {s.value}
+                      </dd>
                     </div>
                   ))}
                 </dl>
 
                 <div className="mt-9 rounded-md border border-border bg-card p-5 sm:p-6">
-                  <h2 className="type-wide text-lg font-semibold text-foreground">{d.bookTitle}</h2>
-                  <BookingForm layout="stack" vehicleName={fullName} className="mt-5" />
+                  <h2 className="type-wide text-lg font-semibold text-foreground">
+                    {d.bookTitle}
+                  </h2>
+                  <BookingForm
+                    layout="stack"
+                    vehicleName={fullName}
+                    className="mt-5"
+                  />
                   <a
                     href={business.phoneHref}
                     className="mt-4 flex items-center justify-center gap-2 text-[14px] text-muted-foreground hover:text-foreground transition-colors"
@@ -158,13 +229,23 @@ export default function VehicleDetail() {
           </div>
 
           {similar.length > 0 && (
-            <section aria-labelledby="similar-title" className="mt-24 pb-24 lg:mt-32">
-              <h2 id="similar-title" className="type-display text-3xl sm:text-4xl font-semibold text-foreground">
+            <section
+              aria-labelledby="similar-title"
+              className="mt-24 pb-24 lg:mt-32"
+            >
+              <h2
+                id="similar-title"
+                className="type-display text-3xl sm:text-4xl font-semibold text-foreground"
+              >
                 {d.similar}
               </h2>
               <div className="mt-10 grid gap-y-14 md:grid-cols-2 md:gap-x-10 lg:grid-cols-3 lg:gap-x-10">
                 {similar.map((v) => (
-                  <VehicleCard key={v.id} vehicle={v} sizes="(min-width: 1024px) 31vw, (min-width: 768px) 48vw, 100vw" />
+                  <VehicleCard
+                    key={v.id}
+                    vehicle={v}
+                    sizes="(min-width: 1024px) 31vw, (min-width: 768px) 48vw, 100vw"
+                  />
                 ))}
               </div>
             </section>
@@ -176,14 +257,19 @@ export default function VehicleDetail() {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-background/95 backdrop-blur-sm pb-[env(safe-area-inset-bottom)] lg:hidden">
         <div className="container flex h-[72px] items-center justify-between gap-4">
           <PriceTag pricePerDay={vehicle.pricePerDay} size="sm" />
-          <a href={waHref} target="_blank" rel="noopener noreferrer" className="btn-primary">
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary"
+          >
             <WhatsAppIcon className="h-4 w-4" />
             {t.fleet.book}
           </a>
         </div>
       </div>
 
-      <Footer />
+      <Footer vehicle={vehicle} />
       <FloatingWhatsApp hideOnMobile />
     </div>
   );
