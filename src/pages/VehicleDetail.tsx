@@ -10,6 +10,8 @@ import Footer from "@/components/Footer";
 import BookingForm from "@/components/BookingForm";
 import VehicleCard from "@/components/VehicleCard";
 import PriceTag from "@/components/PriceTag";
+import Availability from "@/components/Availability";
+import { useCurrency } from "@/i18n/CurrencyContext";
 import VehicleGallery from "@/components/VehicleGallery";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import { stageZoom } from "@/data/stage";
@@ -22,6 +24,7 @@ export default function VehicleDetail() {
   const { id } = useParams<{ id: string }>();
   const { t, language } = useLanguage();
   const booking = useBooking();
+  const { formatPrice } = useCurrency();
   const d = t.vehicleDetail;
 
   useEffect(() => {
@@ -72,9 +75,10 @@ export default function VehicleDetail() {
 
   const transmission = t.fleet.transmission[vehicle.transmission];
   const fullName = `${vehicle.name} (${transmission})`;
+  const rate = `${t.fleet.from} ${formatPrice(vehicle.pricePerDay)} ${t.fleet.perDay}`;
   const waHref = whatsappUrl(
     booking.hasDates
-      ? bookingRequest(t, language, { vehicle: fullName, location: booking.location, start: booking.start, end: booking.end })
+      ? bookingRequest(t, language, { vehicle: fullName, rate, location: booking.location, start: booking.start, end: booking.end })
       : t.whatsapp.vehicle(fullName),
   );
 
@@ -126,6 +130,7 @@ export default function VehicleDetail() {
                 <h1 className="type-display text-4xl sm:text-5xl font-semibold text-foreground">
                   {label}
                 </h1>
+                <Availability long className="mt-3" />
 
                 <PriceTag pricePerDay={vehicle.pricePerDay} size="lg" className="mt-6" />
                 <p className="mt-3 max-w-[40ch] text-[12px] leading-relaxed text-muted-foreground">{t.fleet.priceNote}</p>
@@ -142,7 +147,7 @@ export default function VehicleDetail() {
 
                 <div className="mt-9 rounded-md border border-border bg-card p-5 sm:p-6">
                   <h2 className="type-wide text-lg font-semibold text-foreground">{d.bookTitle}</h2>
-                  <BookingForm layout="stack" vehicleName={fullName} className="mt-5" />
+                  <BookingForm layout="stack" vehicleName={fullName} vehicleRate={rate} className="mt-5" />
                   <a
                     href={business.phoneHref}
                     className="mt-4 flex items-center justify-center gap-2 text-[14px] text-muted-foreground hover:text-foreground transition-colors"

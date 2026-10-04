@@ -19,12 +19,14 @@ interface BookingFormProps {
   layout?: "engine" | "stack";
   /** Vehicle page: the vehicle being booked. */
   vehicleName?: string;
+  /** Vehicle page: the listed rate, repeated in the request */
+  vehicleRate?: string;
   className?: string;
 }
 
 const today = () => dateToIso(new Date());
 
-export default function BookingForm({ layout = "engine", vehicleName, className }: BookingFormProps) {
+export default function BookingForm({ layout = "engine", vehicleName, vehicleRate, className }: BookingFormProps) {
   const { t, language } = useLanguage();
   const booking = useBooking();
   const navigate = useNavigate();
@@ -35,6 +37,7 @@ export default function BookingForm({ layout = "engine", vehicleName, className 
     openWhatsApp(
       bookingRequest(t, language, {
         vehicle: vehicleName,
+        rate: vehicleRate,
         location: booking.location,
         start: booking.start,
         end: booking.end,

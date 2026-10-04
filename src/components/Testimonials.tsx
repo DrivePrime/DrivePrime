@@ -160,7 +160,7 @@ export default function Testimonials() {
           </div>
 
           {/* Progress: one segment per review, each one selectable */}
-          <div className="mt-10 flex items-center gap-2">
+          <div className="mt-7 flex items-center">
             {testimonials.map((r, i) => (
               <button
                 key={r.name}
@@ -168,7 +168,7 @@ export default function Testimonials() {
                 onClick={() => show(i, i > index ? 1 : -1)}
                 aria-label={t.testimonials.position(i + 1, n)}
                 aria-current={i === index}
-                className="group/seg py-3"
+                className="group/seg grid h-11 min-w-11 place-items-center px-1"
               >
                 <span
                   className={cn(

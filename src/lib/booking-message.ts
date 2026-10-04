@@ -13,6 +13,8 @@ interface RequestFields {
   name?: string;
   email?: string;
   vehicle?: string;
+  /** e.g. "À partir de 300 € / jour" — the rate the visitor saw */
+  rate?: string;
   location?: string;
   start?: string;
   end?: string;
@@ -28,6 +30,7 @@ export function bookingRequest(t: Translations, language: Language, f: RequestFi
     ...optional(w.name, f.name),
     ...optional(w.email, f.email),
     `${w.vehicle_}: ${f.vehicle || w.any}`,
+    ...optional(w.rate, f.rate),
     `${w.location}: ${(f.location && locationText(f.location, language, t)) || w.any}`,
     `${w.start}: ${formatDay(f.start ?? "") || w.any}`,
     `${w.end}: ${formatDay(f.end ?? "") || w.any}`,

@@ -11,6 +11,8 @@ import { stageZoom } from "@/data/stage";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./icons";
 import PriceTag from "./PriceTag";
+import Availability from "./Availability";
+import { useCurrency } from "@/i18n/CurrencyContext";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -34,11 +36,18 @@ export default function VehicleCard({
 }: VehicleCardProps) {
   const { t, language } = useLanguage();
   const booking = useBooking();
+  const { formatPrice } = useCurrency();
   const transmission = t.fleet.transmission[vehicle.transmission];
   const label = vehicleLabel(vehicle, t);
   const fullName = `${vehicle.name} (${transmission})`;
   const message = booking.hasDates
-    ? bookingRequest(t, language, { vehicle: fullName, location: booking.location, start: booking.start, end: booking.end })
+    ? bookingRequest(t, language, {
+        vehicle: fullName,
+        rate: `${t.fleet.from} ${formatPrice(vehicle.pricePerDay)} ${t.fleet.perDay}`,
+        location: booking.location,
+        start: booking.start,
+        end: booking.end,
+      })
     : t.whatsapp.vehicle(fullName);
 
   const reserve = (
@@ -47,7 +56,7 @@ export default function VehicleCard({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={t.fleet.bookAria(label)}
-      className="relative z-10 inline-flex items-center gap-2 text-[14px] font-semibold text-primary transition-colors hover:text-gold-light"
+      className="relative z-10 -my-3 inline-flex items-center gap-2 py-3 text-[14px] font-semibold text-primary transition-colors hover:text-gold-light"
     >
       <WhatsAppIcon className="h-4 w-4" />
       {t.fleet.book}
@@ -102,13 +111,16 @@ export default function VehicleCard({
         <PriceTag pricePerDay={vehicle.pricePerDay} size="md" align="end" />
       </div>
 
-      <p className="mt-2 px-1 text-[14px] text-muted-foreground">
-        {transmission}
-        <span aria-hidden="true" className="mx-2 text-foreground/20">/</span>
-        {t.fleet.seats(vehicle.seats)}
-        <span aria-hidden="true" className="mx-2 text-foreground/20">/</span>
-        {t.fleet.fuel[vehicle.fuel]}
-      </p>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-1">
+        <p className="text-[14px] text-muted-foreground">
+          {transmission}
+          <span aria-hidden="true" className="mx-2 text-foreground/20">/</span>
+          {t.fleet.seats(vehicle.seats)}
+          <span aria-hidden="true" className="mx-2 text-foreground/20">/</span>
+          {t.fleet.fuel[vehicle.fuel]}
+        </p>
+        <Availability />
+      </div>
 
       {/* Visible action row: always on touch screens; on desktop kept for keyboard and screen readers */}
       <div className="mt-5 flex items-center gap-6 px-1 [@media(hover:hover)]:sr-only [@media(hover:hover)]:focus-within:not-sr-only">
