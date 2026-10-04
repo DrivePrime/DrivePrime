@@ -428,3 +428,211 @@
 [dir="rtl"] .quote-in-prev {
   animation-name: dp-quote-next;
 }
+
+/* ───── Header ───── */
+.site-header {
+  /* Veil over the hero; the opaque compact layer (::before) fades in on top of it */
+  /* No blur at the top: a blur region would end on a visible edge over the photo */
+  background: linear-gradient(to bottom, hsl(var(--background) / 0.78) 0%, hsl(var(--background) / 0.35) 60%, hsl(var(--background) / 0) 100%);
+  transition:
+    box-shadow 0.5s var(--ease-out),
+    backdrop-filter 0.5s var(--ease-out);
+}
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: hsl(var(--background) / 0.94);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+}
+.header-compact {
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 14px 34px -22px rgb(0 0 0 / 0.9);
+}
+.header-compact::before {
+  opacity: 1;
+}
+
+/* Links: brighten on hover; a brass line draws from the centre. Current section keeps it. */
+.nav-link {
+  color: hsl(var(--foreground) / 0.72);
+  transition: color 0.25s ease;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0.75rem;
+  bottom: 0.15rem;
+  height: 1.5px;
+  border-radius: 1px;
+  background: hsl(var(--primary));
+  transform: scaleX(0);
+  transition: transform 0.35s var(--ease-out);
+}
+.nav-link:hover,
+.nav-link[data-current] {
+  color: hsl(var(--foreground));
+}
+.nav-link:hover::after {
+  transform: scaleX(0.55);
+}
+.nav-link[data-current]::after {
+  transform: scaleX(1);
+}
+
+/* Main booking action */
+.cta-book {
+  transition:
+    background-color 0.25s ease,
+    transform 0.15s ease;
+}
+.cta-book:hover {
+  background-color: hsl(var(--gold-light));
+}
+.cta-book:active {
+  transform: scale(0.97);
+}
+.cta-arrow {
+  transition: transform 0.35s var(--ease-out);
+}
+.cta-book:hover .cta-arrow {
+  transform: translateX(3px);
+}
+[dir="rtl"] .cta-book:hover .cta-arrow {
+  transform: rotate(180deg) translateX(3px);
+}
+
+/* Signature: reading-progress hairline on the header's lower edge */
+.header-progress {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(to right, hsl(var(--primary) / 0.15), hsl(var(--primary)));
+  transform: scaleX(var(--progress, 0));
+  transform-origin: left center;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-out);
+}
+[dir="rtl"] .header-progress {
+  background: linear-gradient(to left, hsl(var(--primary) / 0.15), hsl(var(--primary)));
+  transform-origin: right center;
+}
+.header-compact .header-progress {
+  opacity: 1;
+}
+
+/* Preference dropdowns */
+@keyframes dp-pref-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+.pref-pop[data-state="open"] {
+  animation: dp-pref-in 0.2s var(--ease-out) both;
+}
+
+/* ───── Fleet category selector ───── */
+.rail-cell + .rail-cell::before {
+  /* hairline divider between cells */
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 30%;
+  bottom: 30%;
+  width: 1px;
+  background: hsl(var(--border));
+}
+.rail-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+  transition: color 0.3s ease;
+}
+[dir="rtl"] .rail-label {
+  font-size: 14px;
+  letter-spacing: 0;
+}
+.rail-count {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1;
+  color: hsl(var(--foreground) / 0.28);
+  transition:
+    color 0.3s ease,
+    transform 0.4s var(--ease-out);
+}
+@media (hover: hover) {
+  .rail-cell:not([data-selected]):hover .rail-label {
+    color: hsl(var(--foreground) / 0.9);
+  }
+  .rail-cell:not([data-selected]):hover .rail-count {
+    color: hsl(var(--foreground) / 0.55);
+    transform: translateY(-2px);
+  }
+}
+.rail-cell[data-selected] .rail-label {
+  color: hsl(var(--foreground));
+}
+.rail-cell[data-selected] .rail-count {
+  color: hsl(var(--primary));
+}
+.rail-cell:focus-visible {
+  outline-offset: -4px;
+}
+/* Active surface: lifted cell + brass line on top, sliding between categories */
+.rail-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: hsl(var(--foreground) / 0.045);
+  pointer-events: none;
+}
+.rail-indicator::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: -1px;
+  height: 2px;
+  background: hsl(var(--primary));
+}
+.rail-indicator.is-ready {
+  transition:
+    left 0.45s var(--ease-out),
+    width 0.45s var(--ease-out);
+}
+/* Edge fades only where categories are hidden */
+.fleet-rail-frame.fade-end > div {
+  -webkit-mask-image: linear-gradient(to right, #000 82%, transparent);
+  mask-image: linear-gradient(to right, #000 82%, transparent);
+}
+.fleet-rail-frame.fade-start > div {
+  -webkit-mask-image: linear-gradient(to left, #000 82%, transparent);
+  mask-image: linear-gradient(to left, #000 82%, transparent);
+}
+.fleet-rail-frame.fade-start.fade-end > div {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+}
+[dir="rtl"] .fleet-rail-frame.fade-end:not(.fade-start) > div {
+  -webkit-mask-image: linear-gradient(to left, #000 82%, transparent);
+  mask-image: linear-gradient(to left, #000 82%, transparent);
+}
+[dir="rtl"] .fleet-rail-frame.fade-start:not(.fade-end) > div {
+  -webkit-mask-image: linear-gradient(to right, #000 82%, transparent);
+  mask-image: linear-gradient(to right, #000 82%, transparent);
+}
+/* Category change: cards leave quickly before the new selection settles in */
+.fleet-leave > * {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.14s ease-in,
+    transform 0.14s ease-in;
+}

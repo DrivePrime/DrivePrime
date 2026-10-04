@@ -59,31 +59,51 @@ function SearchSummary() {
 }
 
 export default function Fleet() {
+  // `selected` moves the rail at once; `active` swaps the grid after the cards have faded out.
+  const [selected, setSelected] = useState<VehicleCategory>("Tous");
   const [active, setActive] = useState<VehicleCategory>("Tous");
+  const [leaving, setLeaving] = useState(false);
+  const swapTimer = useRef<number>();
+  const [edges, setEdges] = useState({ start: true, end: false });
   const [expanded, setExpanded] = useState(false);
   // Cards only animate in after a visitor action (filter, show more), never on first paint.
   const [interacted, setInteracted] = useState(false);
   const { t } = useLanguage();
   const gridRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
-  const [indicator, setIndicator] = useState({ left: 0, width: 0 });
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, ready: false });
 
   // Underline follows the active tab (also on resize and language change); keep it in view.
   useIsoLayoutEffect(() => {
     const place = () => {
-      const btn = railRef.current?.querySelector<HTMLButtonElement>(`[data-category="${active}"]`);
-      if (btn) setIndicator({ left: btn.offsetLeft, width: btn.offsetWidth });
+      const btn = railRef.current?.querySelector<HTMLButtonElement>(`[data-category="${selected}"]`);
+      if (btn) setIndicator({ left: btn.offsetLeft, width: btn.offsetWidth, ready: true });
     };
     place();
     window.addEventListener("resize", place);
     document.fonts?.ready.then(place);
     return () => window.removeEventListener("resize", place);
-  }, [active, t]);
+  }, [selected, t]);
+
+  // Fade hints on the rail's edges only where more categories are hidden.
+  const updateEdges = () => {
+    const el = railRef.current;
+    if (!el) return;
+    const max = el.scrollWidth - el.clientWidth;
+    const pos = Math.abs(el.scrollLeft); // scrollLeft is negative in RTL
+    setEdges({ start: pos < 4, end: max - pos < 4 });
+  };
+  useIsoLayoutEffect(() => {
+    updateEdges();
+    window.addEventListener("resize", updateEdges);
+    return () => window.removeEventListener("resize", updateEdges);
+  }, [t]);
+  useEffect(() => () => window.clearTimeout(swapTimer.current), []);
 
   // Arrow keys move between categories (one tab stop for the whole rail).
   const onRailKey = (e: React.KeyboardEvent) => {
     const keys = document.documentElement.dir === "rtl" ? ["ArrowLeft", "ArrowRight"] : ["ArrowRight", "ArrowLeft"];
-    const i = visibleCategories.indexOf(active);
+    const i = visibleCategories.indexOf(selected);
     let to = i;
     if (e.key === keys[0]) to = Math.min(i + 1, visibleCategories.length - 1);
     else if (e.key === keys[1]) to = Math.max(i - 1, 0);
@@ -108,7 +128,18 @@ export default function Fleet() {
   const collapsed = active === "Tous" && !expanded && filtered.length > INITIAL_MOBILE;
 
   const selectCategory = (category: VehicleCategory) => {
-    setActive(category);
+    if (category === selected) return;
+    setSelected(category);
+    window.clearTimeout(swapTimer.current);
+    if (prefersReducedMotion()) setActive(category);
+    else {
+      // Short exit (140 ms), then the new selection settles in.
+      setLeaving(true);
+      swapTimer.current = window.setTimeout(() => {
+        setActive(category);
+        setLeaving(false);
+      }, 140);
+    }
     railRef.current
       ?.querySelector(`[data-category="${category}"]`)
       ?.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "nearest", inline: "center" });
@@ -145,47 +176,50 @@ export default function Fleet() {
 
         <SearchSummary />
 
-        {/* Category filters: typographic tabs, a brass underline slides to the active one */}
-        <div className="sticky top-16 z-30 -mx-5 mt-10 bg-background/95 px-5 backdrop-blur-sm sm:mx-0 sm:px-0 lg:top-[72px]">
+        {/* Category selector: a gear-selector rail. Each cell = name + two-digit count;
+            the active cell gets a lifted surface with a brass top line that slides between cells. */}
+        <div className="sticky top-16 z-30 -mx-5 mt-12 bg-background/95 backdrop-blur-sm sm:mx-0 lg:top-[68px]">
           <div
-            ref={railRef}
-            role="group"
-            aria-label={t.fleet.filterLabel}
-            onKeyDown={onRailKey}
-            className="no-scrollbar relative -mx-5 flex gap-7 overflow-x-auto border-b border-border px-5 sm:mx-0 sm:gap-9 sm:px-0 max-sm:[mask-image:linear-gradient(to_right,#000_85%,transparent)] max-sm:rtl:[mask-image:linear-gradient(to_left,#000_85%,transparent)]"
+            className={cn(
+              "fleet-rail-frame relative border-y border-border sm:w-fit sm:max-w-full sm:border-x",
+              !edges.start && "fade-start",
+              !edges.end && "fade-end",
+            )}
           >
-            {visibleCategories.map((category) => {
-              const selected = active === category;
-              return (
-                <button
-                  key={category}
-                  type="button"
-                  data-category={category}
-                  aria-pressed={selected}
-                  tabIndex={selected ? 0 : -1}
-                  onClick={() => selectCategory(category)}
-                  className={cn(
-                    "shrink-0 whitespace-nowrap rounded-sm py-4 text-[15px] transition-colors duration-200 focus-visible:outline-offset-[-3px]",
-                    selected ? "font-semibold text-foreground" : "font-medium text-muted-foreground hover:text-foreground",
-                  )}
-                >
-                  {t.fleet.categories[category]}
-                  <span
-                    className={cn(
-                      "tabular ms-1.5 align-top text-[11px] font-normal transition-colors",
-                      selected ? "text-primary" : "text-muted-foreground/70",
-                    )}
+            <div
+              ref={railRef}
+              role="group"
+              aria-label={t.fleet.filterLabel}
+              onKeyDown={onRailKey}
+              onScroll={updateEdges}
+              className="no-scrollbar relative flex overflow-x-auto overscroll-x-contain scroll-px-5 px-5 sm:px-0"
+            >
+              <span
+                aria-hidden="true"
+                className={cn("rail-indicator", indicator.ready && "is-ready")}
+                style={{ left: indicator.left, width: indicator.width }}
+              />
+              {visibleCategories.map((category) => {
+                const isSelected = selected === category;
+                const count = counts.get(category) ?? 0;
+                return (
+                  <button
+                    key={category}
+                    type="button"
+                    data-category={category}
+                    aria-pressed={isSelected}
+                    aria-label={`${t.fleet.categories[category]}, ${t.fleet.count(count)}`}
+                    tabIndex={isSelected ? 0 : -1}
+                    onClick={() => selectCategory(category)}
+                    className="rail-cell group/cell relative z-10 flex shrink-0 flex-col items-start gap-1.5 px-4 py-3.5 text-start sm:px-5"
+                    data-selected={isSelected || undefined}
                   >
-                    {counts.get(category)}
-                  </span>
-                </button>
-              );
-            })}
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute bottom-0 h-0.5 rounded-full bg-primary transition-[left,width] duration-500 [transition-timing-function:var(--ease-out)]"
-              style={{ left: indicator.left, width: indicator.width }}
-            />
+                    <span className="rail-label whitespace-nowrap">{t.fleet.categories[category]}</span>
+                    <span className="rail-count tabular type-wide">{String(count).padStart(2, "0")}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -196,6 +230,7 @@ export default function Fleet() {
           className={cn(
             "mt-10 scroll-mt-40 grid gap-y-14 md:grid-cols-2 md:gap-x-10 lg:gap-x-14 lg:gap-y-20",
             interacted && "fleet-enter",
+            leaving && "fleet-leave",
           )}
         >
           {filtered.map((vehicle, i) => (

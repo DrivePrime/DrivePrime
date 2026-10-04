@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { whatsappUrl, hasConfirmedServices } from "@/config/business";
 import { cn } from "@/lib/utils";
@@ -9,18 +9,40 @@ import CurrencySwitcher from "./CurrencySwitcher";
 import { WhatsAppIcon } from "./icons";
 import logo from "@/assets/logo-160.webp";
 
-/** `overlay` = transparent over the home hero until the page scrolls. */
+/*
+  Header with two states.
+  - Over the hero (`overlay`, top of page): taller, blended into the photograph.
+  - Scrolled (or any other page): compact, opaque, a soft shadow.
+  Signature: one brass hairline along the bottom edge that follows reading progress.
+  The header is fixed, so changing its height never shifts the page.
+*/
 export default function Header({ overlay = false }: { overlay?: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("");
+  const progressRef = useRef<HTMLSpanElement>(null);
   const { t } = useLanguage();
   const location = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
+    let frame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const y = window.scrollY;
+        setScrolled(y > 24);
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        progressRef.current?.style.setProperty("--progress", String(max > 0 ? Math.min(1, y / max) : 0));
+      });
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
   }, []);
 
   useEffect(() => setMenuOpen(false), [location.pathname, location.hash]);
@@ -37,47 +59,88 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
   }, [menuOpen]);
 
   const navLinks = [
-    { name: t.nav.fleet, to: "/#flotte" },
-    ...(hasConfirmedServices ? [{ name: t.nav.services, to: "/#services" }] : []),
-    { name: t.nav.whyUs, to: "/#pourquoi" },
-    { name: t.nav.testimonials, to: "/#temoignages" },
-    { name: t.nav.contact, to: "/#contact" },
+    { name: t.nav.fleet, id: "flotte" },
+    ...(hasConfirmedServices ? [{ name: t.nav.services, id: "services" }] : []),
+    { name: t.nav.whyUs, id: "pourquoi" },
+    { name: t.nav.testimonials, id: "temoignages" },
+    { name: t.nav.contact, id: "contact" },
   ];
 
-  const solid = !overlay || scrolled || menuOpen;
+  // Home page: the link of the section in the middle of the screen is marked as current.
+  const sectionIds = navLinks.map((l) => l.id).join(",");
+  useEffect(() => {
+    if (location.pathname !== "/" || !("IntersectionObserver" in window)) return;
+    const els = sectionIds
+      .split(",")
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => !!el);
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) setActiveSection(e.target.id);
+        });
+      },
+      { rootMargin: "-45% 0px -50% 0px" },
+    );
+    els.forEach((el) => io.observe(el));
+    const clearAtTop = () => window.scrollY < window.innerHeight * 0.5 && setActiveSection("");
+    window.addEventListener("scroll", clearAtTop, { passive: true });
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", clearAtTop);
+    };
+  }, [location.pathname, sectionIds]);
+
+  const expanded = overlay && !scrolled && !menuOpen;
 
   return (
     <header
+      data-state={expanded ? "top" : "compact"}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color] duration-300",
-        solid
-          ? "bg-background/95 backdrop-blur-sm border-b border-border"
-          : "bg-transparent border-b border-transparent",
+        "site-header fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)]",
+        expanded ? "header-top" : "header-compact",
       )}
     >
-      <div className="container flex h-16 lg:h-[72px] items-center gap-6">
-        <Link to="/" className="flex items-center gap-3 shrink-0" aria-label="Drive Prime">
-          <img src={logo} alt="" width={36} height={36} className="h-9 w-9 rounded-full" />
-          <span className="type-wide text-[17px] font-semibold tracking-tight text-foreground">
-            Drive Prime
-          </span>
+      <div
+        className={cn(
+          "container flex items-center gap-8 transition-[height] duration-500 [transition-timing-function:var(--ease-out)]",
+          expanded ? "h-16 lg:h-[88px]" : "h-16 lg:h-[68px]",
+        )}
+      >
+        <Link to="/" className="-ms-1 flex shrink-0 items-center gap-3.5 rounded-sm py-1 ps-1 pe-2" aria-label="Drive Prime">
+          <img
+            src={logo}
+            alt=""
+            width={44}
+            height={44}
+            className={cn(
+              "rounded-full transition-[width,height] duration-500 [transition-timing-function:var(--ease-out)]",
+              expanded ? "h-10 w-10 lg:h-11 lg:w-11" : "h-10 w-10",
+            )}
+          />
+          <span className="type-wide text-[18px] font-semibold tracking-[-0.01em] text-foreground">Drive Prime</span>
         </Link>
 
-        <nav aria-label={t.nav.mainNav} className="hidden lg:flex items-center gap-8 ms-auto">
-          {navLinks.map((link) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              className="text-[14px] font-medium text-foreground/80 hover:text-foreground transition-colors"
-            >
-              {link.name}
-            </Link>
-          ))}
+        <nav aria-label={t.nav.mainNav} className="ms-auto hidden items-center gap-1 lg:flex">
+          {navLinks.map((link) => {
+            const current = activeSection === link.id;
+            return (
+              <Link
+                key={link.id}
+                to={`/#${link.id}`}
+                aria-current={current ? "true" : undefined}
+                data-current={current || undefined}
+                className="nav-link relative rounded-sm px-3 py-2 text-[14px] font-medium"
+              >
+                {link.name}
+              </Link>
+            );
+          })}
         </nav>
 
-        <div className="hidden lg:flex items-center gap-1 ps-6 border-s border-foreground/15">
+        <div className="hidden items-center lg:flex">
           <LanguageSwitcher />
-          <span className="mx-1 h-4 w-px bg-foreground/15" aria-hidden="true" />
+          <span className="mx-1 h-3.5 w-px bg-foreground/20" aria-hidden="true" />
           <CurrencySwitcher />
         </div>
 
@@ -85,10 +148,11 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
           href={whatsappUrl(t.whatsapp.general)}
           target="_blank"
           rel="noopener noreferrer"
-          className="btn-primary hidden h-10 px-4 text-[14px] lg:ms-0 lg:inline-flex"
+          className="cta-book hidden h-11 items-center gap-2.5 rounded-sm bg-primary ps-4 pe-3.5 text-[14px] font-semibold text-primary-foreground lg:inline-flex"
         >
           <WhatsAppIcon className="h-4 w-4" />
           {t.nav.book}
+          <ArrowRight className="cta-arrow h-4 w-4 rtl:rotate-180" aria-hidden="true" />
         </a>
 
         <button
@@ -97,33 +161,41 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
           aria-expanded={menuOpen}
           aria-controls="mobile-menu"
           aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu}
-          className="-me-2 ms-auto grid h-10 w-10 place-items-center text-foreground lg:hidden"
+          className="-me-2 ms-auto grid h-11 w-11 place-items-center rounded-sm text-foreground lg:hidden"
         >
           {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
 
-      <div
-        id="mobile-menu"
-        hidden={!menuOpen}
-        className="lg:hidden h-[calc(100dvh-4rem)] overflow-y-auto bg-background"
-      >
-        <nav aria-label={t.nav.mainNav} className="container flex flex-col pt-4 pb-10">
+      {/* Signature: reading-progress hairline (brass), shown once the page moves */}
+      <span ref={progressRef} aria-hidden="true" className="header-progress" />
+
+      <div id="mobile-menu" hidden={!menuOpen} className="h-[calc(100dvh-4rem)] overflow-y-auto bg-background lg:hidden">
+        <nav aria-label={t.nav.mainNav} className="container flex flex-col pb-10 pt-4">
           {navLinks.map((link) => (
             <Link
-              key={link.to}
-              to={link.to}
+              key={link.id}
+              to={`/#${link.id}`}
               // Close in the same render as the navigation, so the scroll lock is released before scrolling.
               onClick={() => setMenuOpen(false)}
-              className="type-wide py-4 text-2xl font-semibold text-foreground border-b border-border"
+              className="type-wide border-b border-border py-4 text-2xl font-semibold text-foreground"
             >
               {link.name}
             </Link>
           ))}
-          <div className="mt-8 flex items-center justify-between">
-            <LanguageSwitcher />
-            <CurrencySwitcher />
+          <div className="mt-8 flex items-center gap-2">
+            <LanguageSwitcher className="h-11 border border-border px-3" />
+            <CurrencySwitcher className="h-11 border border-border px-3" />
           </div>
+          <a
+            href={whatsappUrl(t.whatsapp.general)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary mt-8"
+          >
+            <WhatsAppIcon className="h-4 w-4" />
+            {t.hero.ctaWhatsapp}
+          </a>
         </nav>
       </div>
     </header>
