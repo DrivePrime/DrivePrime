@@ -31,15 +31,19 @@ export default function WhyUs() {
   return (
     <section id="pourquoi" aria-labelledby="whyus-title" className="surface-light py-24 lg:py-32">
       <div className="container grid gap-14 lg:grid-cols-12 lg:items-center lg:gap-16">
-        <div className="lg:col-span-6">
+        <div className="lg:col-span-6" data-reveal="rise">
           <h2 id="whyus-title" className="type-display text-4xl font-semibold text-foreground sm:text-5xl lg:text-[3.5rem]">
             {w.title}
           </h2>
           <p className="mt-6 max-w-[46ch] text-base leading-relaxed text-muted-foreground sm:text-lg">{w.intro}</p>
 
-          <ul className="mt-14 grid gap-x-12 gap-y-10 sm:grid-cols-2">
-            {w.reasons.map((reason) => (
-              <li key={reason.title}>
+          <ul
+            data-reveal="stagger"
+            style={{ "--reveal-delay": "220ms" } as CSSProperties}
+            className="mt-14 grid gap-x-12 gap-y-10 sm:grid-cols-2"
+          >
+            {w.reasons.map((reason, i) => (
+              <li key={reason.title} style={{ "--i": i } as CSSProperties}>
                 <h3 className="type-wide text-[1.35rem] font-semibold leading-tight text-foreground">{reason.title}</h3>
                 <p className="mt-3 max-w-[34ch] text-[15px] leading-relaxed text-muted-foreground">{reason.description}</p>
               </li>
@@ -48,7 +52,7 @@ export default function WhyUs() {
         </div>
 
         {/* Studio window: the photo's own night backdrop, framed as an object on the light page */}
-        <figure className="studio-window relative overflow-hidden rounded-xl lg:col-span-6">
+        <figure data-reveal="clip" className="studio-window relative overflow-hidden rounded-xl lg:col-span-6">
           <div className="stage" style={{ "--stage-zoom": stageZoom(featured.id) } as CSSProperties}>
             <img
               src={featured.image}

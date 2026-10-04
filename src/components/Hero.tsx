@@ -38,7 +38,7 @@ export default function Hero() {
           height={934}
           {...{ fetchpriority: "high" }}
           decoding="async"
-          className="anim-photo hero-photo absolute inset-0 h-full w-full object-cover"
+          className="anim-photo hero-photo hero-depth absolute inset-0 h-full w-full object-cover"
         />
         {/* Legibility: header band on top, the floor where the engine sits, and the copy side */}
         <div
@@ -52,18 +52,18 @@ export default function Hero() {
           <div className="max-w-[34rem] lg:max-w-[29rem] lg:rtl:ms-auto">
             <h1
               id="hero-title"
-              style={delay(150)}
+              style={delay(220)}
               className="anim-rise type-display text-[2.35rem] font-semibold text-foreground sm:text-[3.4rem] lg:text-[4rem]"
             >
               {t.hero.title}
             </h1>
             <p
-              style={delay(280)}
-              className="anim-rise mt-5 max-w-[42ch] text-base leading-relaxed text-foreground/80 sm:text-lg"
+              style={delay(300)}
+              className="anim-enter mt-5 max-w-[42ch] text-base leading-relaxed text-foreground/80 sm:text-lg"
             >
               {t.hero.subtitle(vehicles.length)}
             </p>
-            <div style={delay(380)} className="anim-rise mt-6">
+            <div style={delay(380)} className="anim-enter mt-6">
               <PriceTag pricePerDay={LOWEST_RATE} size="sm" layout="inline" />
             </div>
           </div>
@@ -73,8 +73,8 @@ export default function Hero() {
       {/* Booking engine, anchored on the photograph */}
       <div className="container relative z-20 -mt-14 lg:-mt-32">
         <div
-          style={delay(460)}
-          className="anim-rise rounded-lg border border-foreground/10 bg-card p-5 shadow-[0_40px_90px_-35px_rgb(0_0_0/0.9)] sm:p-6 lg:p-8"
+          style={delay(440)}
+          className="anim-enter rounded-lg border border-foreground/10 bg-card p-5 shadow-[0_40px_90px_-35px_rgb(0_0_0/0.9)] sm:p-6 lg:p-8"
         >
           <BookingForm layout="engine" />
           {POLICIES.length > 0 && (

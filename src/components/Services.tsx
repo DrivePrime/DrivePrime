@@ -52,7 +52,7 @@ export default function Services() {
     <section id="services" aria-labelledby="services-title" className="relative py-24 lg:py-32">
       <div className="container grid gap-10 lg:grid-cols-12 lg:items-center lg:gap-14">
         {/* Photograph + the active service written on it */}
-        <div className="relative order-2 min-w-0 overflow-hidden rounded-lg bg-background lg:col-span-7">
+        <div data-reveal="clip" className="relative order-2 min-w-0 overflow-hidden rounded-lg bg-background lg:col-span-7">
           <div className="relative aspect-[4/3] sm:aspect-[16/11] lg:aspect-[6/5]">
             <img
               src={riad1400}
@@ -104,7 +104,7 @@ export default function Services() {
         </div>
 
         {/* Heading + service selector */}
-        <div className="order-1 min-w-0 lg:col-span-5">
+        <div data-reveal="rise" className="order-1 min-w-0 lg:col-span-5">
           <h2 id="services-title" className="type-display text-4xl font-semibold text-foreground sm:text-5xl">
             {t.services.title}
           </h2>

@@ -39,7 +39,7 @@ export default function Contact() {
   return (
     <section id="contact" aria-labelledby="contact-title" className="pb-24 pt-20 lg:pb-32 lg:pt-28">
       <div className="container grid gap-14 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-5">
+        <div data-reveal="rise" className="lg:col-span-5">
           <h2 id="contact-title" className="type-display text-4xl sm:text-5xl font-semibold text-foreground">
             {c.title}
           </h2>

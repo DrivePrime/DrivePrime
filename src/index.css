@@ -47,6 +47,31 @@
   --whatsapp: 142 70% 41%;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /*
+    Motion language — precise, mechanical, never bouncy.
+    standard: UI state changes · premium (= --ease-out): arrivals, reveals · in: exits.
+  */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --dur-fast: 160ms; /* hover, press, small feedback */
+  --dur-normal: 320ms; /* state changes, dropdowns, swaps */
+  --dur-slow: 640ms; /* reveals, indicators travelling */
+  --dur-hero: 1000ms; /* the single page-load moment */
+  --reveal-y: 18px;
+  --reveal-x: 28px;
+  --stagger: 70ms;
+}
+/* Phones: shorter distances, quicker beats */
+@media (max-width: 767px) {
+  :root {
+    --dur-slow: 480ms;
+    --dur-hero: 760ms;
+    --reveal-y: 10px;
+    --reveal-x: 14px;
+    --stagger: 50ms;
+  }
 }
 
 @layer base {
@@ -207,14 +232,16 @@
     transform-origin: 50% 60%;
     filter: brightness(0.86) contrast(1.06);
     transition:
-      transform 0.9s var(--ease-out),
-      filter 0.6s var(--ease-out);
+      transform var(--dur-slow) var(--ease-premium),
+      translate var(--dur-slow) var(--ease-premium),
+      filter var(--dur-normal) var(--ease-standard);
   }
   /* Hover: the studio light comes up and the car eases forward */
   @media (hover: hover) {
     .group:hover .stage > img {
-      transform: scale(calc(var(--stage-zoom, 1.1) + 0.03));
-      filter: brightness(0.97) contrast(1.06);
+      transform: scale(calc(var(--stage-zoom, 1.1) + 0.025));
+      translate: -1.2% 0; /* every fleet photo faces left: the car moves forward */
+      filter: brightness(0.98) contrast(1.06);
     }
   }
 }
@@ -238,9 +265,16 @@
   All of it is neutralised by the prefers-reduced-motion rule above.
 */
 @keyframes dp-photo {
+  /* the car arrives from the side it is driving towards (it faces left) */
   from {
-    transform: scale(1.06);
-    opacity: 0.4;
+    transform: translateX(var(--reveal-x)) scale(1.04);
+    opacity: 0.25;
+  }
+}
+@keyframes dp-enter {
+  from {
+    opacity: 0;
+    transform: translateY(var(--reveal-y));
   }
 }
 @keyframes dp-rise {
@@ -279,44 +313,48 @@
 
 @layer utilities {
   .anim-photo {
-    animation: dp-photo 1.8s var(--ease-out) both;
+    animation: dp-photo var(--dur-hero) var(--ease-premium) both;
   }
   .anim-rise {
-    animation: dp-rise 0.9s var(--ease-out) both;
+    animation: dp-rise var(--dur-slow) var(--ease-premium) both;
   }
   .anim-settle {
-    animation: dp-settle 0.9s var(--ease-out) both;
+    animation: dp-settle var(--dur-slow) var(--ease-premium) both;
   }
   .anim-fade {
-    animation: dp-fade 0.35s ease-out both;
+    animation: dp-fade var(--dur-normal) var(--ease-standard) both;
   }
   .pop-in {
     transform-origin: var(--radix-popover-content-transform-origin);
-    animation: dp-pop 0.18s var(--ease-out) both;
+    animation: dp-pop var(--dur-fast) var(--ease-standard) both;
   }
   .lightbox-fade {
-    animation: dp-fade 0.25s ease-out both;
+    animation: dp-fade var(--dur-normal) var(--ease-standard) both;
   }
   .lightbox-zoom {
-    animation: dp-zoom-in 0.35s var(--ease-out) both;
+    animation: dp-zoom-in var(--dur-normal) var(--ease-premium) both;
   }
   .anim-card {
-    animation: dp-card-in 0.5s var(--ease-out) both;
+    animation: dp-card-in var(--dur-slow) var(--ease-premium) both;
+  }
+  /* hero secondary elements: rise + fade (the h1 itself only rises: it is the LCP element) */
+  .anim-enter {
+    animation: dp-enter var(--dur-slow) var(--ease-premium) both;
   }
 }
 
 /* Filter / show-more: cards settle in with a short stagger (first 8 only) */
 .fleet-enter > * {
-  animation: dp-card-in 0.5s var(--ease-out) both;
+  animation: dp-card-in var(--dur-normal) var(--ease-premium) both;
 }
-.fleet-enter > :nth-child(1) { animation-delay: 0ms; }
-.fleet-enter > :nth-child(2) { animation-delay: 45ms; }
-.fleet-enter > :nth-child(3) { animation-delay: 90ms; }
-.fleet-enter > :nth-child(4) { animation-delay: 135ms; }
-.fleet-enter > :nth-child(5) { animation-delay: 180ms; }
-.fleet-enter > :nth-child(6) { animation-delay: 225ms; }
-.fleet-enter > :nth-child(7) { animation-delay: 270ms; }
-.fleet-enter > :nth-child(8) { animation-delay: 315ms; }
+.fleet-enter > :nth-child(1) { animation-delay: calc(var(--stagger) * 0); }
+.fleet-enter > :nth-child(2) { animation-delay: calc(var(--stagger) * 0.6); }
+.fleet-enter > :nth-child(3) { animation-delay: calc(var(--stagger) * 1.2); }
+.fleet-enter > :nth-child(4) { animation-delay: calc(var(--stagger) * 1.7999999999999998); }
+.fleet-enter > :nth-child(5) { animation-delay: calc(var(--stagger) * 2.4); }
+.fleet-enter > :nth-child(6) { animation-delay: calc(var(--stagger) * 3); }
+.fleet-enter > :nth-child(7) { animation-delay: calc(var(--stagger) * 3.5999999999999996); }
+.fleet-enter > :nth-child(8) { animation-delay: calc(var(--stagger) * 4.2); }
 
 /* Hero photograph: framed on the car; the copy always sits on the darkened left side
    (the photo cannot shift enough to free the right side, so Arabic copy stays left, right-aligned) */
@@ -337,8 +375,8 @@
   opacity: 0;
   transform: translateY(8px);
   transition:
-    opacity 0.3s var(--ease-out),
-    transform 0.4s var(--ease-out);
+    opacity var(--dur-normal) var(--ease-standard),
+    transform var(--dur-slow) var(--ease-premium);
 }
 .group:hover .card-actions,
 .group:focus-within .card-actions {
@@ -350,12 +388,16 @@
 .services-photo {
   transform: scale(var(--zoom, 1));
   transition:
-    object-position 1.4s var(--ease-out),
-    transform 1.4s var(--ease-out);
+    object-position calc(var(--dur-slow) * 2) var(--ease-premium),
+    transform calc(var(--dur-slow) * 2) var(--ease-premium);
 }
-.service-swap {
-  animation: dp-card-in 0.5s var(--ease-out) both;
+/* service caption: number, title then text arrive a beat apart */
+.service-swap > * {
+  animation: dp-enter var(--dur-normal) var(--ease-premium) both;
 }
+.service-swap > :nth-child(2) { animation-delay: calc(var(--stagger) * 0.7); }
+.service-swap > :nth-child(3) { animation-delay: calc(var(--stagger) * 1.4); }
+.service-swap > :nth-child(4) { animation-delay: calc(var(--stagger) * 2); }
 
 /* Daylight surface: the design-system tokens re-declared for a light section */
 .surface-light {
@@ -382,45 +424,24 @@
   Scroll reveal. Content is only hidden when JavaScript runs and motion is allowed
   (html.js-motion, set in index.html before paint); without it everything stays visible.
 */
-.journey-fill {
-  transform-origin: left center;
-  transition: transform 1.4s var(--ease-out) 0.15s;
-}
-[dir="rtl"] .journey-fill {
-  transform-origin: right center;
-}
-.js-motion .reveal:not(.in-view) .journey-fill {
-  transform: scaleX(0);
-}
-.journey-step {
-  transition:
-    opacity 0.7s var(--ease-out),
-    transform 0.8s var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 140ms + 150ms);
-}
-.js-motion .reveal:not(.in-view) .journey-step {
-  opacity: 0;
-  transform: translateY(18px);
-}
-
 /* Reviews: fade with a slight slide in the direction of travel (mirrored in Arabic) */
 @keyframes dp-quote-next {
   from {
     opacity: 0;
-    transform: translateX(28px);
+    transform: translateX(var(--reveal-x));
   }
 }
 @keyframes dp-quote-prev {
   from {
     opacity: 0;
-    transform: translateX(-28px);
+    transform: translateX(calc(var(--reveal-x) * -1));
   }
 }
 .quote-in-next {
-  animation: dp-quote-next 0.6s var(--ease-out) both;
+  animation: dp-quote-next var(--dur-slow) var(--ease-premium) both;
 }
 .quote-in-prev {
-  animation: dp-quote-prev 0.6s var(--ease-out) both;
+  animation: dp-quote-prev var(--dur-slow) var(--ease-premium) both;
 }
 [dir="rtl"] .quote-in-next {
   animation-name: dp-quote-prev;
@@ -435,8 +456,8 @@
   /* No blur at the top: a blur region would end on a visible edge over the photo */
   background: linear-gradient(to bottom, hsl(var(--background) / 0.78) 0%, hsl(var(--background) / 0.35) 60%, hsl(var(--background) / 0) 100%);
   transition:
-    box-shadow 0.5s var(--ease-out),
-    backdrop-filter 0.5s var(--ease-out);
+    box-shadow var(--dur-slow) var(--ease-standard),
+    backdrop-filter var(--dur-slow) var(--ease-standard);
 }
 .site-header::before {
   content: "";
@@ -445,7 +466,7 @@
   z-index: -1;
   background: hsl(var(--background) / 0.94);
   opacity: 0;
-  transition: opacity 0.5s var(--ease-out);
+  transition: opacity var(--dur-slow) var(--ease-standard);
 }
 .header-compact {
   -webkit-backdrop-filter: blur(12px);
@@ -459,7 +480,7 @@
 /* Links: brighten on hover; a brass line draws from the centre. Current section keeps it. */
 .nav-link {
   color: hsl(var(--foreground) / 0.72);
-  transition: color 0.25s ease;
+  transition: color var(--dur-fast) var(--ease-standard);
 }
 .nav-link::after {
   content: "";
@@ -470,7 +491,7 @@
   border-radius: 1px;
   background: hsl(var(--primary));
   transform: scaleX(0);
-  transition: transform 0.35s var(--ease-out);
+  transition: transform var(--dur-normal) var(--ease-premium);
 }
 .nav-link:hover,
 .nav-link[data-current] {
@@ -486,8 +507,8 @@
 /* Main booking action */
 .cta-book {
   transition:
-    background-color 0.25s ease,
-    transform 0.15s ease;
+    background-color var(--dur-normal) var(--ease-standard),
+    transform var(--dur-fast) var(--ease-standard);
 }
 .cta-book:hover {
   background-color: hsl(var(--gold-light));
@@ -496,7 +517,7 @@
   transform: scale(0.97);
 }
 .cta-arrow {
-  transition: transform 0.35s var(--ease-out);
+  transition: transform var(--dur-normal) var(--ease-premium);
 }
 .cta-book:hover .cta-arrow {
   transform: translateX(3px);
@@ -515,7 +536,7 @@
   transform: scaleX(var(--progress, 0));
   transform-origin: left center;
   opacity: 0;
-  transition: opacity 0.5s var(--ease-out);
+  transition: opacity var(--dur-slow) var(--ease-standard);
 }
 [dir="rtl"] .header-progress {
   background: linear-gradient(to left, hsl(var(--primary) / 0.15), hsl(var(--primary)));
@@ -533,7 +554,7 @@
   }
 }
 .pref-pop[data-state="open"] {
-  animation: dp-pref-in 0.2s var(--ease-out) both;
+  animation: dp-pref-in var(--dur-fast) var(--ease-standard) both;
 }
 
 /* ───── Fleet category selector ───── */
@@ -553,7 +574,7 @@
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: hsl(var(--muted-foreground));
-  transition: color 0.3s ease;
+  transition: color var(--dur-fast) var(--ease-standard);
 }
 [dir="rtl"] .rail-label {
   font-size: 14px;
@@ -565,8 +586,8 @@
   line-height: 1;
   color: hsl(var(--foreground) / 0.28);
   transition:
-    color 0.3s ease,
-    transform 0.4s var(--ease-out);
+    color var(--dur-fast) var(--ease-standard),
+    transform var(--dur-normal) var(--ease-premium);
 }
 @media (hover: hover) {
   .rail-cell:not([data-selected]):hover .rail-label {
@@ -604,8 +625,8 @@
 }
 .rail-indicator.is-ready {
   transition:
-    left 0.45s var(--ease-out),
-    width 0.45s var(--ease-out);
+    left var(--dur-slow) var(--ease-premium),
+    width var(--dur-slow) var(--ease-premium);
 }
 /* Edge fades only where categories are hidden */
 .fleet-rail-frame.fade-end > div {
@@ -633,6 +654,178 @@
   opacity: 0;
   transform: translateY(6px);
   transition:
-    opacity 0.14s ease-in,
-    transform 0.14s ease-in;
+    opacity var(--dur-fast) var(--ease-in),
+    transform var(--dur-fast) var(--ease-in);
+}
+
+/* ───── Scroll reveals: three behaviours, reused ─────
+   Hidden only under html.js-motion (JS on, motion allowed). Each fires once.
+   rise    — headings and text blocks: short lift + fade
+   clip    — photographs: the frame opens from a slightly inset mask
+   stagger — lists: children rise one after another (delay = --i × --stagger) */
+[data-reveal] {
+  transition:
+    opacity var(--dur-slow) var(--ease-premium),
+    transform var(--dur-slow) var(--ease-premium),
+    clip-path calc(var(--dur-slow) * 1.4) var(--ease-premium);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+.js-motion [data-reveal="rise"]:not(.in-view) {
+  opacity: 0;
+  transform: translateY(var(--reveal-y));
+}
+.js-motion [data-reveal="clip"]:not(.in-view) {
+  clip-path: inset(7% 5% 7% 5% round 12px);
+  opacity: 0.4;
+}
+[data-reveal="stagger"] > * {
+  transition:
+    opacity var(--dur-slow) var(--ease-premium),
+    transform var(--dur-slow) var(--ease-premium);
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger));
+}
+.js-motion [data-reveal="stagger"]:not(.in-view) > * {
+  opacity: 0;
+  transform: translateY(var(--reveal-y));
+}
+
+/* ───── Header: one brass marker slides to the current section ───── */
+.nav-marker {
+  position: absolute;
+  bottom: 0.15rem;
+  height: 1.5px;
+  border-radius: 1px;
+  background: hsl(var(--primary));
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    left var(--dur-slow) var(--ease-premium),
+    width var(--dur-slow) var(--ease-premium),
+    opacity var(--dur-normal) var(--ease-standard);
+}
+.nav-marker[data-visible] {
+  opacity: 1;
+}
+/* hover: a faint line draws under the hovered link (the brass marker is reserved for "current") */
+.nav-link::after {
+  background: hsl(var(--foreground) / 0.35) !important;
+}
+.nav-link[data-current]::after,
+.nav-link[data-current]:hover::after {
+  transform: scaleX(0) !important;
+}
+/* booking CTA: the WhatsApp mark answers the pointer */
+.cta-book svg:first-child {
+  transition: transform var(--dur-normal) var(--ease-premium);
+}
+.cta-book:hover svg:first-child {
+  transform: scale(1.12) rotate(-6deg);
+}
+
+/* ───── Hero depth: scroll-linked, compositor-only (no JS), desktop only ───── */
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    .hero-depth {
+      animation: dp-hero-depth linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100vh;
+    }
+  }
+}
+@keyframes dp-hero-depth {
+  to {
+    scale: 1.06;
+    translate: 0 4%;
+  }
+}
+
+/* ───── Booking journey (signature) ───── */
+.journey-track {
+  position: absolute;
+  inset-inline: 0;
+  top: 1.1rem;
+  height: 1px;
+  background: hsl(var(--foreground) / 0.12);
+}
+.journey-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 100%;
+  background: hsl(var(--primary));
+  transform: scaleX(var(--journey, 0));
+  transform-origin: left center;
+}
+[dir="rtl"] .journey-fill {
+  transform-origin: right center;
+}
+/* abstract car silhouette riding the head of the line */
+.journey-car {
+  position: absolute;
+  top: -9px;
+  inset-inline-start: 0;
+  width: 34px;
+  height: 14px;
+  color: hsl(var(--primary));
+  translate: calc(var(--journey, 0) * var(--track-w, 0px) - 34px) 0;
+  opacity: min(1, calc(var(--journey, 0) * 24));
+}
+[dir="rtl"] .journey-car {
+  translate: calc(var(--journey, 0) * var(--track-w, 0px) * -1 + 34px) 0;
+  scale: -1 1;
+}
+.journey-step {
+  transition:
+    opacity var(--dur-slow) var(--ease-premium),
+    transform var(--dur-slow) var(--ease-premium);
+}
+.journey-step .journey-dot {
+  transition:
+    background-color var(--dur-normal) var(--ease-standard),
+    color var(--dur-normal) var(--ease-standard),
+    border-color var(--dur-normal) var(--ease-standard);
+}
+.js-motion .journey:not([data-step]) .journey-step,
+.js-motion .journey-step[data-pending] {
+  opacity: 0.38;
+}
+.js-motion .journey:not([data-step]) .journey-step {
+  transform: translateY(var(--reveal-y));
+}
+.journey-step[data-active] .journey-dot {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* ───── Reviews: the outgoing quote leaves towards the opposite side ───── */
+@keyframes dp-quote-out-next {
+  to {
+    opacity: 0;
+    transform: translateX(calc(var(--reveal-x) * -0.8));
+  }
+}
+@keyframes dp-quote-out-prev {
+  to {
+    opacity: 0;
+    transform: translateX(calc(var(--reveal-x) * 0.8));
+  }
+}
+.quote-out-next {
+  animation: dp-quote-out-next var(--dur-fast) var(--ease-in) both;
+}
+.quote-out-prev {
+  animation: dp-quote-out-prev var(--dur-fast) var(--ease-in) both;
+}
+[dir="rtl"] .quote-out-next {
+  animation-name: dp-quote-out-prev;
+}
+[dir="rtl"] .quote-out-prev {
+  animation-name: dp-quote-out-next;
+}
+/* the name follows the quote a beat later */
+.quote-in-next figcaption,
+.quote-in-prev figcaption {
+  animation: dp-enter var(--dur-slow) var(--ease-premium) both;
+  animation-delay: calc(var(--dur-fast) + var(--stagger) * 1.6);
 }

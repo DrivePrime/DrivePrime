@@ -19,7 +19,7 @@ export default function FinalCta() {
   return (
     <section aria-labelledby="final-cta-title" className="relative overflow-hidden bg-card">
       <div className="container grid items-center gap-6 py-16 lg:grid-cols-12 lg:gap-10 lg:py-6">
-        <div className="relative z-10 lg:col-span-5 lg:py-20">
+        <div data-reveal="rise" className="relative z-10 lg:col-span-5 lg:py-20">
           <h2 id="final-cta-title" className="type-display text-4xl font-semibold text-foreground sm:text-5xl">
             {t.finalCta.title}
           </h2>
@@ -35,7 +35,7 @@ export default function FinalCta() {
             </Link>
           </div>
         </div>
-        <div className="-mx-5 sm:mx-0 lg:col-span-7">
+        <div data-reveal="clip" className="-mx-5 sm:mx-0 lg:col-span-7">
           <div className="stage" style={{ "--stage-zoom": 1.06 } as CSSProperties}>
             <img
               src={featured.image}

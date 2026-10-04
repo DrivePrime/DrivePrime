@@ -6,7 +6,7 @@ import { useBooking } from "@/context/BookingContext";
 import { whatsappUrl } from "@/config/business";
 import { bookingRequest } from "@/lib/booking-message";
 import { vehicles } from "@/data/vehicles";
-import { useInView } from "@/hooks/use-in-view";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { WhatsAppIcon } from "./icons";
 import hero960 from "@/assets/hero-960.webp";
@@ -26,7 +26,61 @@ const TRIO = ["clio-5", "range-rover-sport", "mercedes-classe-g"]
 export default function Process() {
   const { t, language } = useLanguage();
   const booking = useBooking();
-  const { ref, inView } = useInView<HTMLOListElement>(0.2);
+  const listRef = useRef<HTMLOListElement>(null);
+  // Number of steps reached (0–3). Scroll-linked on desktop; all reached on phones / reduced motion.
+  const [reached, setReached] = useState(0);
+
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const animate =
+      document.documentElement.classList.contains("js-motion") && window.matchMedia("(min-width: 768px)").matches;
+    if (!animate) {
+      list.style.setProperty("--journey", "1");
+      setReached(3);
+      return;
+    }
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const rect = list.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // 0 when the steps enter the lower part of the screen, 1 once they sit in its upper half
+      const p = Math.min(1, Math.max(0, (vh * 0.9 - rect.top) / (vh * 0.55)));
+      const dots = list.querySelectorAll<HTMLElement>(".journey-dot");
+      const lastDot = dots[dots.length - 1];
+      const trackW = list.clientWidth;
+      // the line ends under the centre of the last step's number, measured from the inline start
+      const lr = list.getBoundingClientRect();
+      const dr = lastDot?.getBoundingClientRect();
+      const end = dr
+        ? document.documentElement.dir === "rtl"
+          ? lr.right - (dr.left + dr.width / 2)
+          : dr.left + dr.width / 2 - lr.left
+        : trackW;
+      list.style.setProperty("--track-w", `${trackW}px`);
+      list.style.setProperty("--journey", String((p * end) / trackW));
+      setReached(p < 0.08 ? 0 : p < 0.5 ? 1 : p < 0.94 ? 2 : 3);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    // Listen to scroll only while the journey is on screen.
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        window.addEventListener("scroll", onScroll, { passive: true });
+        update();
+      } else window.removeEventListener("scroll", onScroll);
+    });
+    io.observe(list);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
   const preview = bookingRequest(t, language, { location: booking.location, start: booking.start, end: booking.end });
 
   const visuals = [
@@ -94,20 +148,28 @@ export default function Process() {
         </div>
 
         <ol
-          ref={ref}
-          className={cn(
-            "reveal journey no-scrollbar relative -mx-5 mt-14 flex snap-x snap-mandatory scroll-px-5 gap-5 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0",
-            inView && "in-view",
-          )}
+          ref={listRef}
+          data-step={reached || undefined}
+          className="journey no-scrollbar relative -mx-5 mt-14 flex snap-x snap-mandatory scroll-px-5 gap-5 overflow-x-auto px-5 pb-2 md:mx-0 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0"
         >
-          {/* progress line (desktop): fills when the journey comes into view */}
-          <span aria-hidden="true" className="journey-track absolute inset-x-0 top-[1.1rem] hidden h-px bg-foreground/12 md:block">
-            <span className="journey-fill block h-full bg-primary" />
+          {/* progress line (desktop): follows the scroll; a minimal car outline rides its head */}
+          <span aria-hidden="true" className="journey-track hidden md:block">
+            <span className="journey-fill" />
+            <svg className="journey-car" viewBox="0 0 34 14" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M1.5 10.5h3m5.5 0h13m5.5 0h3.5v-2.2c0-1.1-.8-1.9-1.9-2.1l-4.6-.9-4.2-3.2c-.7-.5-1.5-.8-2.4-.8h-7.2c-1 0-1.9.4-2.6 1.1L5.5 6.1l-2.6.6c-.8.2-1.4.9-1.4 1.8v2" />
+              <circle cx="7.3" cy="10.6" r="2.3" />
+              <circle cx="25.8" cy="10.6" r="2.3" />
+            </svg>
           </span>
           {t.process.steps.map((step, i) => (
-            <li key={step.title} className="journey-step relative w-[84%] shrink-0 snap-start md:w-auto" style={{ "--i": i } as CSSProperties}>
+            <li
+              key={step.title}
+              data-active={i < reached || undefined}
+              data-pending={i >= reached || undefined}
+              className="journey-step relative w-[84%] shrink-0 snap-start md:w-auto"
+            >
               <div className="flex items-center gap-3">
-                <span className="tabular type-wide relative z-10 grid h-9 w-9 place-items-center rounded-full border border-primary/70 bg-card text-[14px] font-semibold text-primary">
+                <span className="journey-dot tabular type-wide relative z-10 grid h-9 w-9 place-items-center rounded-full border border-primary/70 bg-card text-[14px] font-semibold text-primary">
                   {i + 1}
                 </span>
                 <span className="type-wide relative z-10 bg-card pe-3 ps-1 text-[15px] font-semibold text-foreground/80">

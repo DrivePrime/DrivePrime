@@ -164,7 +164,7 @@ export default function Fleet() {
   return (
     <section id="flotte" aria-labelledby="fleet-title" className="pb-24 pt-24 lg:pb-32 lg:pt-32">
       <div className="container">
-        <div className="max-w-2xl">
+        <div className="max-w-2xl" data-reveal="rise">
           <h2 id="fleet-title" className="type-display text-4xl font-semibold text-foreground sm:text-5xl">
             {t.fleet.title}
           </h2>

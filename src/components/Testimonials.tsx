@@ -1,4 +1,4 @@
-import { useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -18,14 +18,25 @@ export default function Testimonials() {
   const { t, isRTL } = useLanguage();
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
+  // The outgoing review, kept on screen for its short exit.
+  const [leaving, setLeaving] = useState<number | null>(null);
+  const exitTimer = useRef<number>();
   const n = testimonials.length;
   const review = testimonials[index];
   const car = review.vehicleId ? vehicles.find((v) => v.id === review.vehicleId) : undefined;
+  useEffect(() => () => window.clearTimeout(exitTimer.current), []);
 
-  const go = (step: 1 | -1) => {
-    setDir(step);
-    setIndex((i) => (i + step + n) % n);
+  const show = (next: number, d: 1 | -1) => {
+    if (next === index) return;
+    setDir(d);
+    window.clearTimeout(exitTimer.current);
+    if (document.documentElement.classList.contains("js-motion")) {
+      setLeaving(index);
+      exitTimer.current = window.setTimeout(() => setLeaving(null), 200);
+    }
+    setIndex(next);
   };
+  const go = (step: 1 | -1) => show((index + step + n) % n, step);
   // Physical swipe left = next in LTR, previous in RTL.
   const swipe = useSwipe((d) => go((isRTL ? -d : d) as 1 | -1));
   const onKey = (e: KeyboardEvent) => {
@@ -34,6 +45,39 @@ export default function Testimonials() {
     else return;
     e.preventDefault();
   };
+
+  // Link to the car named in the review (only when the exact model is known).
+  const carLink = car ? (
+    <Link
+      to={`/vehicule/${car.id}`}
+      aria-label={`${t.testimonials.rentedCar} : ${car.name}`}
+      className="group/car inline-flex items-center gap-3 rounded-full border border-border py-1 pe-4 ps-1 text-[14px] text-foreground/85 transition-colors hover:border-foreground/30 hover:text-foreground"
+    >
+      <span className="block h-8 w-12 overflow-hidden rounded-full bg-card">
+        <img src={car.thumb} alt="" loading="lazy" className="h-full w-full scale-[1.45] object-cover object-[50%_62%]" />
+      </span>
+      {car.name}
+      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/car:translate-x-0.5" />
+    </Link>
+  ) : null;
+
+  // Shared by the incoming review and the outgoing one (during its exit).
+  const quoteBody = (r: (typeof testimonials)[number], extra: ReactNode) => (
+    <>
+      <blockquote>
+        <p className="type-wide max-w-[30ch] text-[1.4rem] font-medium leading-[1.42] text-foreground sm:text-[1.85rem] lg:text-[2.1rem]">
+          {r.text}
+        </p>
+      </blockquote>
+      <figcaption className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <span>
+          <span className="block text-[15px] font-semibold text-foreground">{r.name}</span>
+          <span className="block text-[14px] text-muted-foreground">{r.location}</span>
+        </span>
+        {extra}
+      </figcaption>
+    </>
+  );
 
   const arrow =
     "grid h-14 w-14 place-items-center rounded-full border border-foreground/20 text-foreground transition-[background-color,border-color,color,transform] duration-300 hover:border-primary hover:bg-primary hover:text-primary-foreground active:scale-95";
@@ -55,7 +99,7 @@ export default function Testimonials() {
   return (
     <section id="temoignages" aria-labelledby="testimonials-title" className="relative overflow-hidden py-24 lg:py-36">
       <div className="container grid gap-12 lg:grid-cols-12 lg:gap-16">
-        <div className="flex flex-col lg:col-span-4">
+        <div data-reveal="rise" className="flex flex-col lg:col-span-4">
           <h2 id="testimonials-title" className="type-display text-4xl font-semibold text-foreground sm:text-5xl">
             {t.testimonials.title}
           </h2>
@@ -88,38 +132,30 @@ export default function Testimonials() {
             aria-roledescription="slide"
             aria-label={t.testimonials.position(index + 1, n)}
             aria-live="polite"
-            className="min-h-[20rem] pt-20 sm:min-h-[22rem] sm:pt-24"
+            className="relative min-h-[20rem] pt-20 sm:min-h-[22rem] sm:pt-24"
           >
+            {leaving !== null && (
+              <figure
+                key={`out-${leaving}`}
+                aria-hidden="true"
+                lang={testimonials[leaving].lang}
+                dir="ltr"
+                className={cn(
+                  "pointer-events-none absolute inset-x-0 text-left",
+                  dir === 1 ? "quote-out-next" : "quote-out-prev",
+                )}
+              >
+                {quoteBody(testimonials[leaving], null)}
+              </figure>
+            )}
             <figure
               key={index}
               lang={review.lang}
               dir="ltr"
+              style={leaving !== null ? { animationDelay: "var(--dur-fast)" } : undefined}
               className={cn("text-left", dir === 1 ? "quote-in-next" : "quote-in-prev")}
             >
-              <blockquote>
-                <p className="type-wide max-w-[30ch] text-[1.4rem] font-medium leading-[1.42] text-foreground sm:text-[1.85rem] lg:text-[2.1rem]">
-                  {review.text}
-                </p>
-              </blockquote>
-              <figcaption className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <span>
-                  <span className="block text-[15px] font-semibold text-foreground">{review.name}</span>
-                  <span className="block text-[14px] text-muted-foreground">{review.location}</span>
-                </span>
-                {car && (
-                  <Link
-                    to={`/vehicule/${car.id}`}
-                    aria-label={`${t.testimonials.rentedCar} : ${car.name}`}
-                    className="group/car inline-flex items-center gap-3 rounded-full border border-border py-1 pe-4 ps-1 text-[14px] text-foreground/85 transition-colors hover:border-foreground/30 hover:text-foreground"
-                  >
-                    <span className="block h-8 w-12 overflow-hidden rounded-full bg-card">
-                      <img src={car.thumb} alt="" loading="lazy" className="h-full w-full scale-[1.45] object-cover object-[50%_62%]" />
-                    </span>
-                    {car.name}
-                    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/car:translate-x-0.5" />
-                  </Link>
-                )}
-              </figcaption>
+              {quoteBody(review, carLink)}
             </figure>
           </div>
 
@@ -129,10 +165,7 @@ export default function Testimonials() {
               <button
                 key={r.name}
                 type="button"
-                onClick={() => {
-                  setDir(i > index ? 1 : -1);
-                  setIndex(i);
-                }}
+                onClick={() => show(i, i > index ? 1 : -1)}
                 aria-label={t.testimonials.position(i + 1, n)}
                 aria-current={i === index}
                 className="group/seg py-3"

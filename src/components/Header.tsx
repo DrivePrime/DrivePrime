@@ -21,6 +21,8 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("");
   const progressRef = useRef<HTMLSpanElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const [marker, setMarker] = useState({ left: 0, width: 0 });
   const { t } = useLanguage();
   const location = useLocation();
 
@@ -31,6 +33,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
       frame = requestAnimationFrame(() => {
         const y = window.scrollY;
         setScrolled(y > 24);
+        if (y < window.innerHeight * 0.5) setActiveSection("");
         const max = document.documentElement.scrollHeight - window.innerHeight;
         progressRef.current?.style.setProperty("--progress", String(max > 0 ? Math.min(1, y / max) : 0));
       });
@@ -83,13 +86,20 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
       { rootMargin: "-45% 0px -50% 0px" },
     );
     els.forEach((el) => io.observe(el));
-    const clearAtTop = () => window.scrollY < window.innerHeight * 0.5 && setActiveSection("");
-    window.addEventListener("scroll", clearAtTop, { passive: true });
-    return () => {
-      io.disconnect();
-      window.removeEventListener("scroll", clearAtTop);
-    };
+    return () => io.disconnect();
   }, [location.pathname, sectionIds]);
+
+  // The brass marker travels to the current link (measured, so it follows any language).
+  useEffect(() => {
+    const place = () => {
+      const link = navRef.current?.querySelector<HTMLElement>(`[data-id="${activeSection}"]`);
+      if (link) setMarker({ left: link.offsetLeft + 12, width: link.offsetWidth - 24 });
+    };
+    place();
+    window.addEventListener("resize", place);
+    document.fonts?.ready.then(place);
+    return () => window.removeEventListener("resize", place);
+  }, [activeSection, t]);
 
   const expanded = overlay && !scrolled && !menuOpen;
 
@@ -121,7 +131,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
           <span className="type-wide text-[18px] font-semibold tracking-[-0.01em] text-foreground">Drive Prime</span>
         </Link>
 
-        <nav aria-label={t.nav.mainNav} className="ms-auto hidden items-center gap-1 lg:flex">
+        <nav ref={navRef} aria-label={t.nav.mainNav} className="relative ms-auto hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => {
             const current = activeSection === link.id;
             return (
@@ -130,12 +140,19 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
                 to={`/#${link.id}`}
                 aria-current={current ? "true" : undefined}
                 data-current={current || undefined}
+                data-id={link.id}
                 className="nav-link relative rounded-sm px-3 py-2 text-[14px] font-medium"
               >
                 {link.name}
               </Link>
             );
           })}
+          <span
+            aria-hidden="true"
+            className="nav-marker"
+            data-visible={activeSection ? "" : undefined}
+            style={{ left: marker.left, width: marker.width }}
+          />
         </nav>
 
         <div className="hidden items-center lg:flex">

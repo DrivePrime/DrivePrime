@@ -13,12 +13,14 @@ import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { useSeo } from "@/hooks/use-seo";
+import { useReveal } from "@/hooks/use-reveal";
 
 const Index = () => {
   const { hash, key } = useLocation();
   const { t } = useLanguage();
 
   useSeo({ title: t.meta.homeTitle, description: t.meta.homeDescription, path: "/" });
+  useReveal();
 
   // Supports /#flotte links coming from other routes as well as in-page navigation.
   useEffect(() => {
