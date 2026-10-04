@@ -1,108 +1,49 @@
-import { vehicles, type Vehicle } from "./vehicles";
-import riad800 from "@/assets/riad-800.webp";
-import riad1400 from "@/assets/riad-1400.webp";
-import hero960 from "@/assets/hero-960.webp";
-import hero1680 from "@/assets/hero-1680.webp";
-
 /*
-  One visual world per service ("Nos services").
+  One photograph per service ("Nos services").
+  Originals: public/images/service-*.png (kept untouched). The site serves WebP copies
+  made from them (src/assets/services/<key>-960|1536.webp, same pixels, web-compressed).
 
-  Dedicated photographs: drop a file named after the service key into src/assets/services/
-  (e.g. chauffeur.webp, airportDelivery.jpg). It is picked up automatically and replaces the
-  interim scene below — no code change needed.
-
-  Interim scenes use only what is real: the two Marrakech photographs of the site, or the
-  studio photo of the actual fleet vehicle that fits the service, staged in layers.
+  `position` is the object-position used by object-fit: cover. Each one is set per image so the
+  subject survives the crop (the frame is narrower than the 3:2 photos on desktop and phones).
 */
-const dropped = import.meta.glob<string>(
-  "../assets/services/*.{webp,avif,jpg,jpeg,png}",
-  {
-    eager: true,
-    import: "default",
-  },
-);
-const droppedFor = (key: string) =>
-  Object.entries(dropped).find(
-    ([path]) =>
-      path
-        .split("/")
-        .pop()!
-        .replace(/\.\w+$/, "") === key,
-  )?.[1];
-
-export type ServiceScene =
-  | {
-      kind: "photo";
-      src: string;
-      srcSet?: string;
-      position: string;
-      final: boolean;
-    }
-  | {
-      kind: "studio";
-      vehicle: Vehicle;
-      mood: "dusk" | "night";
-      overlay?: "message";
-      final: false;
-    };
-
-const fleet = (id: string) => vehicles.find((v) => v.id === id)!;
-
-const interim: Record<string, ServiceScene> = {
-  // Real Marrakech photograph: white Range Rover Sport in a riad courtyard at golden hour
-  longTermDegressive: {
-    kind: "photo",
-    src: riad1400,
-    srcSet: `${riad800} 800w, ${riad1400} 1400w`,
-    position: "50% 62%",
-    final: true,
-  },
-  // No chauffeur photo yet: the fleet's flagship sedan
-  chauffeur: {
-    kind: "studio",
-    vehicle: fleet("mercedes-classe-s"),
-    mood: "dusk",
-    final: false,
-  },
-  // No airport photo yet: the fleet's 8-seat van (luggage, transfers)
-  airportDelivery: {
-    kind: "studio",
-    vehicle: fleet("mercedes-vito"),
-    mood: "dusk",
-    final: false,
-  },
-  // Real Marrakech photograph: black Range Rover at a riad entrance
-  hotelDelivery: {
-    kind: "photo",
-    src: hero1680,
-    srcSet: `${hero960} 960w, ${hero1680} 1680w`,
-    position: "60% 55%",
-    final: true,
-  },
-  // No night photo yet: a fleet SUV under night light
-  support24h: {
-    kind: "studio",
-    vehicle: fleet("range-rover-vogue"),
-    mood: "night",
-    final: false,
-  },
-  // No phone photo yet: the real WhatsApp request the site sends, over a fleet car
-  quickBooking: {
-    kind: "studio",
-    vehicle: fleet("mercedes-classe-g"),
-    mood: "dusk",
-    overlay: "message",
-    final: false,
-  },
+const files = import.meta.glob<string>("../assets/services/*.webp", {
+  eager: true,
+  import: "default",
+});
+const file = (name: string) => {
+  const hit = Object.entries(files).find(([path]) =>
+    path.endsWith(`/${name}.webp`),
+  );
+  if (!hit) throw new Error(`Missing service image: ${name}`);
+  return hit[1];
 };
 
-export function sceneFor(key: string): ServiceScene {
-  const photo = droppedFor(key);
-  if (photo)
-    return { kind: "photo", src: photo, position: "50% 50%", final: true };
-  return interim[key];
+export interface ServiceScene {
+  src: string;
+  srcSet: string;
+  /** object-position — keeps the subject in frame */
+  position: string;
 }
 
-/** Image URLs to warm up before a scene is shown. */
-export const sceneImages = (scene: ServiceScene) =>
-  scene.kind === "photo" ? [scene.src] : [scene.vehicle.image];
+const scene = (key: string, position: string): ServiceScene => ({
+  src: file(`${key}-1536`),
+  srcSet: `${file(`${key}-960`)} 960w, ${file(`${key}-1536`)} 1536w`,
+  position,
+});
+
+const scenes: Record<string, ServiceScene> = {
+  // white Range Rover Sport, Moroccan architecture at golden hour (car right of centre)
+  longTermDegressive: scene("longTermDegressive", "56% 50%"),
+  // chauffeur opening the door, client in the car (chauffeur left, car to the right edge)
+  chauffeur: scene("chauffeur", "78% 50%"),
+  // Marrakech Menara sign (left) + van, chauffeur, client and luggage
+  airportDelivery: scene("airportDelivery", "58% 50%"),
+  // key handover (left) + black Range Rover (right)
+  hotelDelivery: scene("hotelDelivery", "72% 50%"),
+  // night, Koutoubia: black car (left) and person on the phone
+  support24h: scene("support24h", "30% 50%"),
+  // smartphone in the foreground, car behind
+  quickBooking: scene("quickBooking", "88% 50%"),
+};
+
+export const sceneFor = (key: string): ServiceScene => scenes[key];

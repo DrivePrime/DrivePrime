@@ -215,10 +215,12 @@
     position: relative;
     overflow: hidden;
     aspect-ratio: 16 / 10;
-    -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent),
+    -webkit-mask-image:
+      linear-gradient(to right, transparent, #000 12%, #000 88%, transparent),
       linear-gradient(to bottom, transparent, #000 15%, #000 90%, transparent);
     -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent),
+    mask-image:
+      linear-gradient(to right, transparent, #000 12%, #000 88%, transparent),
       linear-gradient(to bottom, transparent, #000 15%, #000 90%, transparent);
     mask-composite: intersect;
   }
@@ -347,14 +349,30 @@
 .fleet-enter > * {
   animation: dp-card-in var(--dur-normal) var(--ease-premium) both;
 }
-.fleet-enter > :nth-child(1) { animation-delay: calc(var(--stagger) * 0); }
-.fleet-enter > :nth-child(2) { animation-delay: calc(var(--stagger) * 0.6); }
-.fleet-enter > :nth-child(3) { animation-delay: calc(var(--stagger) * 1.2); }
-.fleet-enter > :nth-child(4) { animation-delay: calc(var(--stagger) * 1.7999999999999998); }
-.fleet-enter > :nth-child(5) { animation-delay: calc(var(--stagger) * 2.4); }
-.fleet-enter > :nth-child(6) { animation-delay: calc(var(--stagger) * 3); }
-.fleet-enter > :nth-child(7) { animation-delay: calc(var(--stagger) * 3.5999999999999996); }
-.fleet-enter > :nth-child(8) { animation-delay: calc(var(--stagger) * 4.2); }
+.fleet-enter > :nth-child(1) {
+  animation-delay: calc(var(--stagger) * 0);
+}
+.fleet-enter > :nth-child(2) {
+  animation-delay: calc(var(--stagger) * 0.6);
+}
+.fleet-enter > :nth-child(3) {
+  animation-delay: calc(var(--stagger) * 1.2);
+}
+.fleet-enter > :nth-child(4) {
+  animation-delay: calc(var(--stagger) * 1.7999999999999998);
+}
+.fleet-enter > :nth-child(5) {
+  animation-delay: calc(var(--stagger) * 2.4);
+}
+.fleet-enter > :nth-child(6) {
+  animation-delay: calc(var(--stagger) * 3);
+}
+.fleet-enter > :nth-child(7) {
+  animation-delay: calc(var(--stagger) * 3.5999999999999996);
+}
+.fleet-enter > :nth-child(8) {
+  animation-delay: calc(var(--stagger) * 4.2);
+}
 
 /* Hero photograph: framed on the car; the copy always sits on the darkened left side
    (the photo cannot shift enough to free the right side, so Arabic copy stays left, right-aligned) */
@@ -362,7 +380,12 @@
   object-position: 64% 45%;
 }
 .hero-side-scrim {
-  background: linear-gradient(to right, hsl(var(--background) / 0.88) 0%, hsl(var(--background) / 0.55) 34%, transparent 62%);
+  background: linear-gradient(
+    to right,
+    hsl(var(--background) / 0.88) 0%,
+    hsl(var(--background) / 0.55) 34%,
+    transparent 62%
+  );
 }
 @media (min-width: 1024px) {
   .hero-photo {
@@ -384,17 +407,17 @@
   transform: none;
 }
 
-/* ───── Services: one scene per service ───── */
+/* ───── Services: one photograph per service, changed like a cut ───── */
 :root {
-  --dur-scene: 620ms;
+  --dur-shot: 600ms;
 }
 @media (max-width: 767px) {
   :root {
-    --dur-scene: 420ms;
+    --dur-shot: 400ms;
   }
 }
-/* incoming scene: a mask sweeps across while the picture settles from a slight push-in */
-@keyframes dp-scene-in {
+/* Incoming shot: wiped in from the edge we travel towards, settling from a slight push */
+@keyframes dp-wipe-from-end {
   from {
     clip-path: inset(0 0 0 100%);
   }
@@ -402,7 +425,7 @@
     clip-path: inset(0 0 0 0);
   }
 }
-@keyframes dp-scene-in-rtl {
+@keyframes dp-wipe-from-start {
   from {
     clip-path: inset(0 100% 0 0);
   }
@@ -410,83 +433,81 @@
     clip-path: inset(0 0 0 0);
   }
 }
-@keyframes dp-scene-settle {
+@keyframes dp-shot-settle {
   from {
-    transform: scale(1.07) translateX(2%);
+    transform: scale(1.06) translateX(calc(var(--travel, 1) * 2.5%));
+    opacity: 0.55;
+  }
+  45% {
+    opacity: 1;
   }
 }
-@keyframes dp-scene-out {
+/* Outgoing shot: eases back (scale 1.02) and drifts a touch against the travel */
+@keyframes dp-shot-leave {
   to {
-    transform: scale(1.04);
-    opacity: 0.45;
+    transform: scale(1.02) translateX(calc(var(--travel, 1) * -1.5%));
+    opacity: 0.6;
   }
 }
-.scene-enter {
+.shot-enter {
   z-index: 2;
-  animation: dp-scene-in var(--dur-scene) var(--ease-premium) both;
+  animation: dp-wipe-from-end var(--dur-shot) var(--ease-premium) both;
 }
-[dir="rtl"] .scene-enter {
-  animation-name: dp-scene-in-rtl;
+[data-travel="start"] > .shot-enter {
+  animation-name: dp-wipe-from-start;
 }
-.scene-enter .scene-media,
-.scene-enter .scene-bg {
-  animation: dp-scene-settle calc(var(--dur-scene) * 1.3) var(--ease-premium) both;
+.shot-enter .shot-media {
+  animation: dp-shot-settle calc(var(--dur-shot) * 1.15) var(--ease-premium)
+    both;
 }
-.scene-exit {
+.shot-exit {
   z-index: 1;
 }
-.scene-exit .scene-media,
-.scene-exit .scene-studio {
-  animation: dp-scene-out var(--dur-scene) var(--ease-standard) both;
+.shot-exit .shot-media {
+  animation: dp-shot-leave var(--dur-shot) var(--ease-standard) both;
 }
-.scene-exit .scene-caption {
-  opacity: 0;
-  transition: opacity var(--dur-fast) var(--ease-in);
+.shot-shade {
+  background: linear-gradient(
+    to top,
+    rgb(0 0 0 / 0.62) 0%,
+    rgb(0 0 0 / 0.28) 26%,
+    transparent 48%
+  );
 }
-/* layered (studio) scenes: background, then car, then overlay */
-.scene-studio .scene-bg {
-  background: radial-gradient(110% 85% at 62% 22%, #2c3744 0%, #151b23 58%, #0d1116 100%);
+.shot-caption {
+  text-shadow: 0 1px 18px rgb(0 0 0 / 0.35);
 }
-.scene-studio.is-night .scene-bg {
-  background: radial-gradient(90% 70% at 70% 15%, #1d2633 0%, #0b0f15 62%, #07090d 100%);
-}
-/* the studio photo dissolves into the scene light instead of showing its frame */
-.scene-car .stage {
-  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 54%, #000 62%, transparent 100%);
-  mask-image: radial-gradient(ellipse 50% 50% at 50% 54%, #000 62%, transparent 100%);
-}
-.scene-studio.is-night .stage > img {
-  filter: brightness(0.62) contrast(1.1) saturate(0.85);
-}
-@keyframes dp-layer-in {
-  from {
+/* Text: the old lines step up and out, the new ones arrive just after (≤ 14 px of travel) */
+@keyframes dp-cap-out {
+  to {
     opacity: 0;
-    transform: translateX(calc(var(--reveal-x) * 0.6));
+    transform: translateY(-12px);
   }
 }
-@keyframes dp-overlay-in {
+@keyframes dp-cap-in {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(14px);
   }
 }
-.scene-enter .scene-car {
-  animation: dp-layer-in var(--dur-scene) var(--ease-premium) both;
-  animation-delay: calc(var(--dur-scene) * 0.15);
+.shot-exit .shot-caption > div > *,
+.cap-exit > * {
+  animation: dp-cap-out calc(var(--dur-shot) * 0.4) var(--ease-in) both;
 }
-.scene-enter .scene-overlay {
-  animation: dp-overlay-in var(--dur-scene) var(--ease-premium) both;
-  animation-delay: calc(var(--dur-scene) * 0.35);
+.shot-exit .shot-caption > div > :nth-child(2),
+.cap-exit > :nth-child(2) {
+  animation-delay: 40ms;
 }
-/* caption: arrives just after the image */
-.scene-enter .scene-caption > div > * {
-  animation: dp-enter var(--dur-scene) var(--ease-premium) both;
-  animation-delay: calc(var(--dur-scene) * 0.3);
+.shot-enter .shot-caption > div > *,
+.cap-enter > * {
+  animation: dp-cap-in calc(var(--dur-shot) * 0.75) var(--ease-premium) both;
+  animation-delay: calc(var(--dur-shot) * 0.35);
 }
-.scene-enter .scene-caption > div > :nth-child(2) {
-  animation-delay: calc(var(--dur-scene) * 0.42);
+.shot-enter .shot-caption > div > :nth-child(2),
+.cap-enter > :nth-child(2) {
+  animation-delay: calc(var(--dur-shot) * 0.35 + 70ms);
 }
-/* counter digits roll in the direction of travel */
+/* Counter: the active number rolls in the direction of travel */
 @keyframes dp-roll-up {
   from {
     transform: translateY(100%);
@@ -505,36 +526,106 @@
 .roll-down {
   animation: dp-roll-down var(--dur-normal) var(--ease-premium) both;
 }
-/* desktop list: rows, hover feedback, sliding brass marker */
+/* Section entrance: the photograph opens with a horizontal wipe, then counter and caption */
+.js-motion [data-reveal="wipe"]:not(.in-view) > .svc-stage {
+  clip-path: inset(0 0 0 100% round 0.5rem);
+}
+[dir="rtl"].js-motion [data-reveal="wipe"]:not(.in-view) > .svc-stage {
+  clip-path: inset(0 100% 0 0 round 0.5rem);
+}
+[data-reveal="wipe"] > .svc-stage {
+  clip-path: inset(0 0 0 0 round 0.5rem);
+  transition: clip-path calc(var(--dur-slow) * 1.5) var(--ease-premium)
+    var(--reveal-delay, 0ms);
+}
+[data-reveal="wipe"] .shot-media {
+  transition: transform calc(var(--dur-slow) * 2) var(--ease-premium)
+    var(--reveal-delay, 0ms);
+}
+.js-motion [data-reveal="wipe"]:not(.in-view) .shot-media {
+  transform: scale(1.08);
+}
+[data-reveal="wipe"] .svc-counter,
+[data-reveal="wipe"] .shot-caption > div > * {
+  transition:
+    opacity var(--dur-slow) var(--ease-premium),
+    transform var(--dur-slow) var(--ease-premium);
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--dur-slow));
+}
+[data-reveal="wipe"] .shot-caption > div > :nth-child(2) {
+  transition-delay: calc(var(--reveal-delay, 0ms) + var(--dur-slow) + 90ms);
+}
+.js-motion [data-reveal="wipe"]:not(.in-view) .svc-counter,
+.js-motion [data-reveal="wipe"]:not(.in-view) .shot-caption > div > * {
+  opacity: 0;
+  transform: translateY(12px);
+}
+/* Desktop list: whole row interactive, hover brightens, the brass marker slides */
 .svc-row {
+  position: relative;
   color: hsl(var(--muted-foreground));
 }
 /* keeps the list's staggered entrance while hover colour stays instant */
 [data-reveal] > .svc-row {
   transition:
     color var(--dur-fast) var(--ease-standard) 0ms,
-    opacity var(--dur-slow) var(--ease-premium) calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger)),
-    transform var(--dur-slow) var(--ease-premium) calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger));
+    opacity var(--dur-slow) var(--ease-premium)
+      calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger)),
+    transform var(--dur-slow) var(--ease-premium)
+      calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger));
+}
+.svc-row::before {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  top: 30%;
+  bottom: 30%;
+  width: 2px;
+  background: hsl(var(--foreground) / 0.25);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-standard);
 }
 .svc-row:hover,
 .svc-row[data-active] {
   color: hsl(var(--foreground));
 }
+.svc-row:not([data-active]):hover::before {
+  opacity: 1;
+}
+.svc-row:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: -2px;
+}
 .svc-arrow {
   opacity: 0;
-  transform: translateX(-4px);
+  transform: translateX(-6px);
   transition:
     opacity var(--dur-normal) var(--ease-standard),
     transform var(--dur-normal) var(--ease-premium);
 }
+[dir="rtl"] .svc-arrow {
+  transform: translateX(6px) rotate(180deg);
+}
 .svc-row:hover .svc-arrow {
-  opacity: 0.45;
-  transform: none;
+  opacity: 0.5;
+  transform: translateX(-2px);
+}
+[dir="rtl"] .svc-row:hover .svc-arrow {
+  transform: translateX(2px) rotate(180deg);
 }
 .svc-row[data-active] .svc-arrow {
   opacity: 1;
   transform: none;
   color: hsl(var(--primary));
+}
+[dir="rtl"] .svc-row[data-active] .svc-arrow {
+  transform: rotate(180deg);
+}
+.svc-row[data-active]:hover .svc-arrow {
+  transform: translateX(3px);
+}
+[dir="rtl"] .svc-row[data-active]:hover .svc-arrow {
+  transform: translateX(-3px) rotate(180deg);
 }
 .svc-marker {
   position: absolute;
@@ -542,17 +633,12 @@
   width: 2px;
   background: hsl(var(--primary));
   pointer-events: none;
+  z-index: 1;
 }
 .svc-marker.is-ready {
   transition:
     top var(--dur-slow) var(--ease-premium),
     height var(--dur-slow) var(--ease-premium);
-}
-.service-swap > * {
-  animation: dp-enter var(--dur-normal) var(--ease-premium) both;
-}
-.service-swap > :nth-child(2) {
-  animation-delay: calc(var(--stagger) * 0.8);
 }
 
 /* Daylight surface: the design-system tokens re-declared for a light section */
@@ -572,7 +658,12 @@
 }
 /* The studio photos' own night backdrop, framed on a light page */
 .studio-window {
-  background: radial-gradient(120% 90% at 70% 20%, #2a3542 0%, #141a22 60%, #0d1116 100%);
+  background: radial-gradient(
+    120% 90% at 70% 20%,
+    #2a3542 0%,
+    #141a22 60%,
+    #0d1116 100%
+  );
   box-shadow: 0 50px 100px -40px rgb(20 24 31 / 0.55);
 }
 
@@ -610,7 +701,12 @@
 .site-header {
   /* Veil over the hero; the opaque compact layer (::before) fades in on top of it */
   /* No blur at the top: a blur region would end on a visible edge over the photo */
-  background: linear-gradient(to bottom, hsl(var(--background) / 0.78) 0%, hsl(var(--background) / 0.35) 60%, hsl(var(--background) / 0) 100%);
+  background: linear-gradient(
+    to bottom,
+    hsl(var(--background) / 0.78) 0%,
+    hsl(var(--background) / 0.35) 60%,
+    hsl(var(--background) / 0) 100%
+  );
   transition:
     box-shadow var(--dur-slow) var(--ease-standard),
     backdrop-filter var(--dur-slow) var(--ease-standard);
@@ -688,14 +784,22 @@
   inset-inline: 0;
   bottom: 0;
   height: 1px;
-  background: linear-gradient(to right, hsl(var(--primary) / 0.15), hsl(var(--primary)));
+  background: linear-gradient(
+    to right,
+    hsl(var(--primary) / 0.15),
+    hsl(var(--primary))
+  );
   transform: scaleX(var(--progress, 0));
   transform-origin: left center;
   opacity: 0;
   transition: opacity var(--dur-slow) var(--ease-standard);
 }
 [dir="rtl"] .header-progress {
-  background: linear-gradient(to left, hsl(var(--primary) / 0.15), hsl(var(--primary)));
+  background: linear-gradient(
+    to left,
+    hsl(var(--primary) / 0.15),
+    hsl(var(--primary))
+  );
   transform-origin: right center;
 }
 .header-compact .header-progress {
@@ -794,8 +898,20 @@
   mask-image: linear-gradient(to left, #000 82%, transparent);
 }
 .fleet-rail-frame.fade-start.fade-end > div {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
-  mask-image: linear-gradient(to right, transparent, #000 14%, #000 86%, transparent);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 14%,
+    #000 86%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 14%,
+    #000 86%,
+    transparent
+  );
 }
 [dir="rtl"] .fleet-rail-frame.fade-end:not(.fade-start) > div {
   -webkit-mask-image: linear-gradient(to left, #000 82%, transparent);
@@ -838,7 +954,9 @@
   transition:
     opacity var(--dur-slow) var(--ease-premium),
     transform var(--dur-slow) var(--ease-premium);
-  transition-delay: calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger));
+  transition-delay: calc(
+    var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger)
+  );
 }
 .js-motion [data-reveal="stagger"]:not(.in-view) > * {
   opacity: 0;
