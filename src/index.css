@@ -642,18 +642,62 @@
 }
 
 /* ───── Footer: the last scene, then the details ───── */
-.foot-car-img {
-  /* the studio backdrop dissolves into the page; only the car and its pool of light remain */
+/* Title: large, and never wider than its column — the size follows the column (container units)
+   and the widest line measured in em (--title-em, set by the component; fallback = longest FR line) */
+.foot-copy {
+  container-type: inline-size;
+}
+.foot-title {
+  font-size: 2.6rem;
+}
+@media (min-width: 640px) {
+  .foot-title {
+    font-size: 3.75rem;
+  }
+}
+@media (min-width: 1024px) {
+  .foot-title {
+    font-size: min(5.5rem, calc(100cqi / var(--title-em, 12.7)));
+  }
+  :lang(ar) .foot-title,
+  [lang="ar"] .foot-title {
+    font-size: min(4.75rem, calc(100cqi / var(--title-em, 12.7)));
+    white-space: nowrap;
+  }
+}
+/* the line mask clips the bottom only, so a line can never be cut at its side */
+.foot-line {
+  clip-path: inset(-0.3em -100vw 0 -100vw);
+}
+.foot-heading {
+  font-size: 13px;
+  font-weight: 500;
+  color: hsl(var(--primary));
+}
+.foot-label {
+  font-size: 12px;
+  color: hsl(var(--primary) / 0.72);
+}
+/* the frame crops the studio photo around the car and dissolves its backdrop into the page;
+   the photo is enlarged inside it (never beyond it), so only the car and its pool of light remain */
+.foot-car-in {
+  overflow: hidden;
   -webkit-mask-image: radial-gradient(
-    ellipse 49% 44% at 52% 56%,
-    #000 58%,
+    ellipse 52% 46% at 50% 54%,
+    #000 46%,
+    rgb(0 0 0 / 0.55) 72%,
     transparent 100%
   );
   mask-image: radial-gradient(
-    ellipse 49% 44% at 52% 56%,
-    #000 58%,
+    ellipse 52% 46% at 50% 54%,
+    #000 46%,
+    rgb(0 0 0 / 0.55) 72%,
     transparent 100%
   );
+}
+.foot-car-img {
+  transform: scale(1.14);
+  transform-origin: 50% 58%;
   filter: brightness(0.9) contrast(1.05);
 }
 .foot-trace path {
@@ -665,12 +709,17 @@
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
 }
+.foot-mark-frame {
+  container-type: inline-size;
+  overflow: hidden; /* intentional crop: the frame shows the letters down to just above their foot */
+  height: calc(100cqi / 7.12 * 0.62);
+  margin-top: 1.5rem;
+}
 .foot-mark {
-  font-size: 16.2vw;
-  letter-spacing: -0.045em;
-  color: hsl(var(--foreground) / 0.045);
-  margin-top: -0.06em;
-  margin-bottom: -0.24em; /* the baseline sits below the edge: the name is cut by the page end */
+  font-size: calc(100cqi / 7.12); /* "DRIVE PRIME" spans the grid width */
+  line-height: 0.74;
+  text-align: center;
+  color: hsl(var(--foreground) / 0.05);
 }
 /* links */
 .foot-underline {
@@ -687,7 +736,7 @@
   gap: 0.6rem;
   padding-block: 0.45rem;
   font-size: 17px;
-  color: hsl(var(--foreground) / 0.78);
+  color: hsl(var(--foreground) / 0.92);
   transition: color 180ms var(--ease-standard);
 }
 .foot-link-arrow {
@@ -721,14 +770,15 @@
   align-items: center;
   gap: 0.5rem;
   height: 2.5rem;
-  padding-inline: 0.5rem;
   border-radius: 2px;
   transition: color 180ms var(--ease-standard);
 }
 @media (hover: hover) {
+  .foot-social:hover {
+    color: hsl(var(--primary));
+  }
   .foot-link:hover,
   .foot-contact:hover,
-  .foot-social:hover,
   .foot-cta:hover {
     color: hsl(var(--foreground));
   }
@@ -771,10 +821,14 @@
     transform var(--dur-slow) var(--ease-premium) var(--d, 0ms),
     opacity var(--dur-slow) var(--ease-premium) var(--d, 0ms);
 }
+/* the car slides inside its frame (individual translate/scale, so the frame never leaves the page) */
 [data-foot] .foot-car-in {
+  transition: opacity 600ms var(--ease-standard) 240ms;
+}
+[data-foot] .foot-car-img {
   transition:
-    transform 900ms var(--ease-premium) 240ms,
-    opacity 600ms var(--ease-standard) 240ms;
+    translate 900ms var(--ease-premium) 240ms,
+    scale 900ms var(--ease-premium) 240ms;
 }
 [data-foot] .foot-trace path {
   transition: stroke-dashoffset 900ms var(--ease-premium) 0ms;
@@ -791,15 +845,18 @@
 }
 .js-motion [data-foot]:not(.is-in) .foot-car-in {
   opacity: 0;
-  transform: translateX(40px) scale(1.02);
 }
-[dir="rtl"].js-motion [data-foot]:not(.is-in) .foot-car-in {
-  transform: translateX(-40px) scale(1.02);
+.js-motion [data-foot]:not(.is-in) .foot-car-img {
+  translate: 40px 0;
+  scale: 1.02;
+}
+[dir="rtl"].js-motion [data-foot]:not(.is-in) .foot-car-img {
+  translate: -40px 0;
 }
 .js-motion [data-foot]:not(.is-in) .foot-trace path {
   stroke-dashoffset: 1;
 }
-.js-motion .foot-info:not(.is-in) ~ .foot-mark {
+.js-motion .foot-info:not(.is-in) ~ .foot-mark-frame .foot-mark {
   opacity: 0;
 }
 

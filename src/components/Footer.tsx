@@ -28,6 +28,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
   const root = useRef<HTMLElement>(null);
   const box = useRef<HTMLDivElement>(null);
   const fleetLink = useRef<HTMLAnchorElement>(null);
+  const title = useRef<HTMLHeadingElement>(null);
   const car = useRef<HTMLDivElement>(null);
   const [trace, setTrace] = useState<{
     w: number;
@@ -50,7 +51,23 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
       }
       return { x, y };
     };
+    // Title fit: the widest line's width in em sets --title-em; CSS then sizes the title so that
+    // line fills the column at most (container units) — it shrinks before it can be cut.
+    const fit = () => {
+      const h = title.current;
+      if (!h) return;
+      const size = parseFloat(getComputedStyle(h).fontSize);
+      let widest = 0;
+      h.querySelectorAll(".foot-line > span").forEach((line) => {
+        const r = document.createRange();
+        r.selectNodeContents(line);
+        widest = Math.max(widest, r.getBoundingClientRect().width);
+      });
+      if (size && widest)
+        h.style.setProperty("--title-em", (widest / size + 0.15).toFixed(3));
+    };
     const measure = () => {
+      fit();
       const b = box.current,
         link = fleetLink.current,
         c = car.current;
@@ -59,11 +76,13 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
       const k = within(c, b);
       const sx = isRTL ? l.x - 20 : l.x + link.offsetWidth + 20;
       const sy = l.y + link.offsetHeight / 2;
-      // the car box is lifted by translate-y-[-46%]; fleet photos face left, so the nearest wheel
-      // is the front one in LTR (car on the right) and the rear one in RTL (car on the left)
-      const top = k.y - c.offsetHeight * 0.46;
-      const ex = k.x + c.offsetWidth * (isRTL ? 0.74 : 0.27);
-      const ey = top + c.offsetHeight * 0.81;
+      // the car box is centred with translate-y-[-50%] and crops the photo (object-position 50% 55%);
+      // fleet photos face left, so the nearest wheel is the front one in LTR (car on the right)
+      // and the rear one in RTL (car on the left)
+      const top = k.y - c.offsetHeight * 0.5;
+      // (photo enlarged ×1.14 around 50% 58% inside the frame)
+      const ex = k.x + c.offsetWidth * (isRTL ? 0.81 : 0.2);
+      const ey = top + c.offsetHeight * 0.92;
       const dx = ex - sx;
       const d = `M ${sx} ${sy} C ${sx + dx * 0.5} ${sy}, ${sx + dx * 0.55} ${ey}, ${ex} ${ey}`;
       setTrace({ w: b.offsetWidth, h: b.offsetHeight, d });
@@ -112,7 +131,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
   ];
 
   return (
-    <footer ref={root} className="foot relative overflow-hidden bg-background">
+    <footer ref={root} className="foot relative bg-background">
       {/* ── 1. The closing scene ── */}
       <section
         data-foot
@@ -121,18 +140,16 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
       >
         <div
           ref={box}
-          className="container relative grid pb-6 pt-24 lg:min-h-[40rem] lg:grid-cols-12 lg:items-center lg:pb-24 lg:pt-28"
+          className="container relative flex flex-col pb-6 pt-24 lg:min-h-[38rem] lg:justify-center lg:pb-16 lg:pt-24"
         >
-          <div className="relative z-10 lg:col-span-7">
+          <div className="foot-copy relative z-10 lg:w-[54%]">
             <h2
+              ref={title}
               id="final-cta-title"
-              className="type-display text-[2.6rem] font-semibold leading-[1.02] text-foreground sm:text-6xl lg:text-[clamp(2.75rem,3.95vw,4.6rem)] lg:[&_span]:whitespace-nowrap"
+              className="foot-title type-display font-semibold leading-[1.02] text-foreground"
             >
               {t.finalCta.lines.map((line, i) => (
-                <span
-                  key={i}
-                  className="foot-line block overflow-hidden pb-[0.08em]"
-                >
+                <span key={i} className="foot-line block pb-[0.08em]">
                   <span
                     className="block"
                     style={
@@ -177,23 +194,23 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
             </div>
           </div>
 
-          {/* A real fleet photo, arriving from the edge; its studio backdrop dissolves into the night */}
+          {/* A real fleet photo, framed around the car; its studio backdrop dissolves into the night */}
           <div
             aria-hidden="true"
             ref={car}
-            className="foot-car pointer-events-none relative mt-6 w-[128%] max-w-none sm:mt-8 sm:w-[112%] lg:absolute lg:end-[-13vw] lg:top-1/2 lg:mt-0 lg:w-[60vw] lg:max-w-[70rem] lg:-translate-y-[46%]"
+            className="foot-car pointer-events-none relative mx-auto mt-10 w-full max-w-[40rem] lg:absolute lg:end-0 lg:start-[55%] lg:top-1/2 lg:mx-0 lg:mt-0 lg:w-auto lg:max-w-none lg:-translate-y-1/2"
           >
             <div className="foot-car-in relative z-[1]">
               <img
                 src={shown.image}
                 srcSet={`${shown.thumb} 768w, ${shown.image} 1536w`}
-                sizes="(min-width: 1024px) 60vw, 105vw"
+                sizes="(min-width: 1024px) 50vw, 100vw"
                 alt=""
                 width={1536}
                 height={1024}
                 loading="lazy"
                 decoding="async"
-                className="foot-car-img block w-full"
+                className="foot-car-img block aspect-[17/10] w-full object-cover object-[50%_55%]"
               />
             </div>
           </div>
@@ -245,7 +262,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
             className="foot-in lg:col-span-3"
             style={{ "--d": "70ms" } as React.CSSProperties}
           >
-            <h2 id="foot-nav" className="text-[13px] text-muted-foreground/80">
+            <h2 id="foot-nav" className="foot-heading">
               {t.footer.explore}
             </h2>
             <ul className="mt-4 grid grid-cols-2 gap-x-6 sm:grid-cols-1">
@@ -267,9 +284,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
             className="foot-in lg:col-span-4"
             style={{ "--d": "140ms" } as React.CSSProperties}
           >
-            <h2 className="text-[13px] text-muted-foreground/80">
-              {t.footer.contact}
-            </h2>
+            <h2 className="foot-heading">{t.footer.contact}</h2>
             <ul className="mt-4">
               <li>
                 <a
@@ -278,9 +293,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
                   rel="noopener noreferrer"
                   className="foot-contact group/fk"
                 >
-                  <span className="text-[13px] text-muted-foreground">
-                    {t.contact.whatsapp}
-                  </span>
+                  <span className="foot-label">{t.contact.whatsapp}</span>
                   <span className="flex items-center gap-2">
                     <span dir="ltr" className="foot-underline">
                       {business.phoneDisplay}
@@ -297,9 +310,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
                   href={`mailto:${business.email}`}
                   className="foot-contact group/fk"
                 >
-                  <span className="text-[13px] text-muted-foreground">
-                    {t.contact.email}
-                  </span>
+                  <span className="foot-label">{t.contact.email}</span>
                   <span className="flex min-w-0 items-center gap-2">
                     <span className="foot-underline truncate">
                       {business.email}
@@ -312,9 +323,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
                 </a>
               </li>
               <li className="flex flex-col gap-0.5 py-2.5">
-                <span className="text-[13px] text-muted-foreground">
-                  {t.contact.address}
-                </span>
+                <span className="foot-label">{t.contact.address}</span>
                 <span className="text-[17px] text-foreground">
                   {t.contact.addressValue}
                 </span>
@@ -331,7 +340,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
           <p>
             © {new Date().getFullYear()} Drive Prime. {t.footer.rights}
           </p>
-          <div className="-ms-2 flex gap-1">
+          <div className="flex items-center gap-6">
             <a
               href={business.instagram}
               target="_blank"
@@ -354,14 +363,15 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
         </div>
       </div>
 
-      {/* The name, very large and faint, cut by the bottom edge */}
-      <p
-        aria-hidden="true"
-        className="foot-mark type-display pointer-events-none select-none whitespace-nowrap text-center font-semibold leading-none"
-        dir="ltr"
-      >
-        Drive Prime
-      </p>
+      {/* Signature: the name set across the full grid width, very faint, its foot cropped by its own frame */}
+      <div aria-hidden="true" className="foot-mark-frame container">
+        <p
+          className="foot-mark type-display select-none whitespace-nowrap font-semibold"
+          dir="ltr"
+        >
+          DRIVE PRIME
+        </p>
+      </div>
     </footer>
   );
 }
