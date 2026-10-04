@@ -1,0 +1,11 @@
+Déposez ici une photo par service, nommée d'après sa clé :
+
+  longTermDegressive  (01 courte & longue durée)
+  chauffeur           (02 location avec chauffeur)
+  airportDelivery     (03 transfert aéroport)
+  hotelDelivery       (04 livraison à l'hôtel)
+  support24h          (05 assistance 24h/24)
+  quickBooking        (06 réservation rapide)
+
+Formats : .webp .avif .jpg .png — idéalement 1600 px de large, paysage.
+La photo remplace automatiquement la scène provisoire.

@@ -384,20 +384,176 @@
   transform: none;
 }
 
-/* Services showcase: the photograph re-frames smoothly; the caption swaps with a short rise */
-.services-photo {
-  transform: scale(var(--zoom, 1));
-  transition:
-    object-position calc(var(--dur-slow) * 2) var(--ease-premium),
-    transform calc(var(--dur-slow) * 2) var(--ease-premium);
+/* ───── Services: one scene per service ───── */
+:root {
+  --dur-scene: 620ms;
 }
-/* service caption: number, title then text arrive a beat apart */
+@media (max-width: 767px) {
+  :root {
+    --dur-scene: 420ms;
+  }
+}
+/* incoming scene: a mask sweeps across while the picture settles from a slight push-in */
+@keyframes dp-scene-in {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes dp-scene-in-rtl {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes dp-scene-settle {
+  from {
+    transform: scale(1.07) translateX(2%);
+  }
+}
+@keyframes dp-scene-out {
+  to {
+    transform: scale(1.04);
+    opacity: 0.45;
+  }
+}
+.scene-enter {
+  z-index: 2;
+  animation: dp-scene-in var(--dur-scene) var(--ease-premium) both;
+}
+[dir="rtl"] .scene-enter {
+  animation-name: dp-scene-in-rtl;
+}
+.scene-enter .scene-media,
+.scene-enter .scene-bg {
+  animation: dp-scene-settle calc(var(--dur-scene) * 1.3) var(--ease-premium) both;
+}
+.scene-exit {
+  z-index: 1;
+}
+.scene-exit .scene-media,
+.scene-exit .scene-studio {
+  animation: dp-scene-out var(--dur-scene) var(--ease-standard) both;
+}
+.scene-exit .scene-caption {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-in);
+}
+/* layered (studio) scenes: background, then car, then overlay */
+.scene-studio .scene-bg {
+  background: radial-gradient(110% 85% at 62% 22%, #2c3744 0%, #151b23 58%, #0d1116 100%);
+}
+.scene-studio.is-night .scene-bg {
+  background: radial-gradient(90% 70% at 70% 15%, #1d2633 0%, #0b0f15 62%, #07090d 100%);
+}
+/* the studio photo dissolves into the scene light instead of showing its frame */
+.scene-car .stage {
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 54%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 54%, #000 62%, transparent 100%);
+}
+.scene-studio.is-night .stage > img {
+  filter: brightness(0.62) contrast(1.1) saturate(0.85);
+}
+@keyframes dp-layer-in {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--reveal-x) * 0.6));
+  }
+}
+@keyframes dp-overlay-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+.scene-enter .scene-car {
+  animation: dp-layer-in var(--dur-scene) var(--ease-premium) both;
+  animation-delay: calc(var(--dur-scene) * 0.15);
+}
+.scene-enter .scene-overlay {
+  animation: dp-overlay-in var(--dur-scene) var(--ease-premium) both;
+  animation-delay: calc(var(--dur-scene) * 0.35);
+}
+/* caption: arrives just after the image */
+.scene-enter .scene-caption > div > * {
+  animation: dp-enter var(--dur-scene) var(--ease-premium) both;
+  animation-delay: calc(var(--dur-scene) * 0.3);
+}
+.scene-enter .scene-caption > div > :nth-child(2) {
+  animation-delay: calc(var(--dur-scene) * 0.42);
+}
+/* counter digits roll in the direction of travel */
+@keyframes dp-roll-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+@keyframes dp-roll-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+.roll-up {
+  animation: dp-roll-up var(--dur-normal) var(--ease-premium) both;
+}
+.roll-down {
+  animation: dp-roll-down var(--dur-normal) var(--ease-premium) both;
+}
+/* desktop list: rows, hover feedback, sliding brass marker */
+.svc-row {
+  color: hsl(var(--muted-foreground));
+}
+/* keeps the list's staggered entrance while hover colour stays instant */
+[data-reveal] > .svc-row {
+  transition:
+    color var(--dur-fast) var(--ease-standard) 0ms,
+    opacity var(--dur-slow) var(--ease-premium) calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger)),
+    transform var(--dur-slow) var(--ease-premium) calc(var(--reveal-delay, 0ms) + var(--i, 0) * var(--stagger));
+}
+.svc-row:hover,
+.svc-row[data-active] {
+  color: hsl(var(--foreground));
+}
+.svc-arrow {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition:
+    opacity var(--dur-normal) var(--ease-standard),
+    transform var(--dur-normal) var(--ease-premium);
+}
+.svc-row:hover .svc-arrow {
+  opacity: 0.45;
+  transform: none;
+}
+.svc-row[data-active] .svc-arrow {
+  opacity: 1;
+  transform: none;
+  color: hsl(var(--primary));
+}
+.svc-marker {
+  position: absolute;
+  inset-inline-start: 0;
+  width: 2px;
+  background: hsl(var(--primary));
+  pointer-events: none;
+}
+.svc-marker.is-ready {
+  transition:
+    top var(--dur-slow) var(--ease-premium),
+    height var(--dur-slow) var(--ease-premium);
+}
 .service-swap > * {
   animation: dp-enter var(--dur-normal) var(--ease-premium) both;
 }
-.service-swap > :nth-child(2) { animation-delay: calc(var(--stagger) * 0.7); }
-.service-swap > :nth-child(3) { animation-delay: calc(var(--stagger) * 1.4); }
-.service-swap > :nth-child(4) { animation-delay: calc(var(--stagger) * 2); }
+.service-swap > :nth-child(2) {
+  animation-delay: calc(var(--stagger) * 0.8);
+}
 
 /* Daylight surface: the design-system tokens re-declared for a light section */
 .surface-light {

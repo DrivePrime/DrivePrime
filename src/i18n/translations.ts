@@ -102,6 +102,8 @@ const fr = {
       "Une gamme complète de services pour rendre votre expérience de location aussi fluide et agréable que possible.",
     photoCaption: "Livraison à votre hôtel, riad ou villa, partout à Marrakech.",
     listLabel: "Choisir un service",
+    prev: "Service précédent",
+    next: "Service suivant",
     items: [
       {
         key: "longTermDegressive",
@@ -371,6 +373,8 @@ const en: Translations = {
     intro: "A complete range of services to make your rental as smooth and pleasant as possible.",
     photoCaption: "Delivery to your hotel, riad or villa, anywhere in Marrakech.",
     listLabel: "Choose a service",
+    prev: "Previous service",
+    next: "Next service",
     items: [
       {
         key: "longTermDegressive",
@@ -637,6 +641,8 @@ const ar: Translations = {
     intro: "مجموعة متكاملة من الخدمات لجعل تجربة الإيجار سلسة وممتعة قدر الإمكان.",
     photoCaption: "التوصيل إلى فندقك أو رياضك أو الفيلا في أي مكان بمراكش.",
     listLabel: "اختر خدمة",
+    prev: "الخدمة السابقة",
+    next: "الخدمة التالية",
     items: [
       {
         key: "longTermDegressive",
