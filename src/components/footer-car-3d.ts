@@ -17,6 +17,7 @@ import {
   PerspectiveCamera,
   PlaneGeometry,
   PMREMGenerator,
+  RectAreaLight,
   Scene,
   SRGBColorSpace,
   Vector3,
@@ -24,6 +25,7 @@ import {
 } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
+import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLightUniformsLib.js";
 
 /*
   The closing scene's car, in 3D (local prototype — the model's licence is non-commercial).
@@ -89,17 +91,18 @@ interface Options {
 // The fleet's Classe G is black; the downloaded model is painted olive. Paint it like the real car:
 // a near-black base under a glossy clear coat, so the studio's softboxes draw its lines.
 const PAINT = {
-  color: 0x030304,
+  color: 0x060708,
   metalness: 0.0,
-  roughness: 0.42,
+  roughness: 0.5, // the base stays a soft black; the clear coat draws the lines
   clearcoat: 1,
-  clearcoatRoughness: 0.06,
+  clearcoatRoughness: 0.035,
 };
 // Rest pose: front three-quarter, nose towards the text (like the studio photo it replaces).
 // Positive yaw turns the nose to the right; the intro arrives on the rest pose.
 const REST_YAW = (-38 * Math.PI) / 180;
 const INTRO_TURN = (25 * Math.PI) / 180;
 const INTRO_MS = 2600;
+const GLIDE_MS = 2200; // the softbox's single pass at the entrance
 const YAWS = 36; // angles checked when framing a full turn
 const PITCH = 0.1; // slight view from above, like a studio shot
 
@@ -183,7 +186,7 @@ function studio(renderer: WebGLRenderer) {
   room.background = new Color(0x000000);
   const shell = new Mesh(
     new BoxGeometry(30, 14, 30),
-    new MeshBasicMaterial({ color: 0x050506, side: BackSide }),
+    new MeshBasicMaterial({ color: 0x0f1013, side: BackSide }),
   );
   shell.position.y = 5;
   room.add(shell);
@@ -202,18 +205,30 @@ function studio(renderer: WebGLRenderer) {
     m.lookAt(...look);
     room.add(m);
   };
-  softbox(7, 2.6, 2.6, [0, 7, 0.5], [0, 0, 0.5]); // overhead: roof + bonnet line
-  softbox(9, 0.55, 5, [-7, 1.6, 0], [0, 1.4, 0]); // flank strip, left
-  softbox(9, 0.55, 5, [7, 1.6, 0], [0, 1.4, 0]); // flank strip, right
-  softbox(9, 0.35, 2.4, [-7, 0.45, 2], [0, 0.4, 0]); // low strip: sills, wheels
-  softbox(9, 0.35, 2.4, [7, 0.45, -2], [0, 0.4, 0]);
-  softbox(4.5, 2.2, 3, [0, 3, 8], [0, 1, 0]); // front, above camera: grille, lamps
-  softbox(12, 3, 2.2, [0, 2.6, -9], [0, 1, 0]); // behind: rim / silhouette
-  // tall soft panels on both front diagonals: the flanks and wings facing the viewer catch them
-  softbox(5, 1.6, 1.8, [-6, 1.3, 6], [0, 1, 0]);
-  softbox(5, 1.6, 1.8, [6, 1.3, 6], [0, 1, 0]);
-  softbox(5, 1.6, 1.4, [-6, 1.3, -6], [0, 1, 0]);
-  softbox(5, 1.6, 1.4, [6, 1.3, -6], [0, 1, 0]);
+  /*
+    The camera sits slightly above the car and never moves, so every face turned towards it
+    (front, flank, rear) mirrors the same band just below the horizon behind the camera, while
+    roof and bonnet mirror the band just above it. Long horizontal softboxes there draw the lines
+    of the body at every angle of the turn; dark gaps between them keep the black deep.
+  */
+  // behind the camera (+Z): long strips at the angles the body actually mirrors (the room is seen
+  // from the car's footprint: y / 10 ≈ the angle). Faces turned to the viewer mirror −1°…−9°,
+  // roof and bonnet +2°…+7°. Thin dark gaps between strips keep the lines crisp and the black deep.
+  softbox(16, 0.4, 5, [0, 0.95, 10], [0, 0.95, 0]); // roof
+  softbox(16, 0.22, 7, [0, 0.45, 10], [0, 0.45, 0]); // bonnet and roof edges
+  softbox(16, 0.1, 22, [0, -0.25, 10], [0, -0.2, 0]); // upper doors, pillars, window frames, grille top
+  softbox(16, 0.06, 16, [0, -0.6, 10], [0, -0.55, 0]); // waist line
+  softbox(16, 0.1, 18, [0, -0.95, 10], [0, -0.9, 0]); // lower doors, wings, tailgate
+  softbox(16, 0.22, 7, [0, -1.4, 10], [0, -1.35, 0]); // sills, bumpers, wheels
+  softbox(10, 2.2, 1.1, [0, 4.5, 8], [0, 0, 0]); // broad, dim key above: curvature on wings and edges
+  // overhead: roof and bonnet edges as they tilt
+  softbox(7, 2.4, 2.2, [0, 7, 0.5], [0, 0, 0.5]);
+  // sides: grazing lines when a flank turns away
+  softbox(9, 0.5, 3.4, [-8, 1.4, 1], [0, 1.2, 0]);
+  softbox(9, 0.5, 3.4, [8, 1.4, -1], [0, 1.2, 0]);
+  // behind the car (-Z): the rim — silhouette, roof line, rear pillars, wing tops
+  softbox(14, 1.2, 4.5, [0, 3.2, -10], [0, 1, 0]);
+  softbox(14, 0.4, 2.5, [0, 0.6, -10], [0, 0.6, 0]);
   const pmrem = new PMREMGenerator(renderer);
   const env = pmrem.fromScene(room, 0.02).texture;
   room.traverse((o) => {
@@ -299,18 +314,36 @@ export async function mountCar(
   );
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.toneMappingExposure = 1.4;
 
   const scene = new Scene();
   const env = studio(renderer);
   scene.environment = env;
   scene.environmentIntensity = 1;
-  // Direct light only for what reflections don't carry well (tyres, textured grille, wheels)
-  const key = new DirectionalLight(0xffffff, 0.9);
+  // Direct light: a soft key for what reflections don't carry (tyres, textured grille, wheels),
+  // two rims from behind and above to cut the silhouette out of the dark page
+  const key = new DirectionalLight(0xffffff, 1.2);
   key.position.set(-2, 6, 5);
-  const rim = new DirectionalLight(0xdfe6f2, 1.1);
-  rim.position.set(3, 4, -6);
-  scene.add(key, rim);
+  const rimL = new DirectionalLight(0xe4eaf4, 1.8);
+  rimL.position.set(-4, 5, -7);
+  const rimR = new DirectionalLight(0xe4eaf4, 1.8);
+  rimR.position.set(4, 5, -7);
+  scene.add(key, rimL, rimR);
+  // A softbox that glides once across the body when the scene appears (a real area light: its
+  // highlight follows the paint's shape), then rests at the end of its travel.
+  RectAreaLightUniformsLib.init();
+  const sweep = new RectAreaLight(0xffffff, 0, 7, 0.9);
+  const SWEEP_FROM = -7;
+  const SWEEP_TO = 6;
+  const placeSweep = (k: number) => {
+    sweep.position.set(SWEEP_FROM + (SWEEP_TO - SWEEP_FROM) * k, 1.1, 6.5);
+    sweep.lookAt(0, 0.9, 0);
+    // fades in, crosses, settles to a quiet level
+    sweep.intensity =
+      k <= 0 ? 0 : 30 * Math.sin(Math.PI * Math.min(1, k)) + 3 * k;
+  };
+  placeSweep(opts.reducedMotion ? 1 : 0);
+  scene.add(sweep);
 
   const gltf = await new GLTFLoader().loadAsync(opts.url);
   const source = gltf.scene as unknown as Group;
@@ -541,6 +574,7 @@ export async function mountCar(
   let velocity = 0; // rad / ms
   let intro: { from: number; start: number } | null = null;
   let dragging = false;
+  let glide: number | null = null; // start time of the softbox's single pass
   let last = performance.now();
   const render = () => {
     turntable.rotation.y = yaw;
@@ -551,6 +585,12 @@ export async function mountCar(
     const dt = Math.min(48, now - last);
     last = now;
     let again = false;
+    if (glide !== null) {
+      const k = Math.min(1, (now - glide) / GLIDE_MS);
+      placeSweep(k < 1 ? k * k * (3 - 2 * k) : 1);
+      if (k < 1) again = true;
+      else glide = null;
+    }
     if (intro) {
       const k = Math.min(1, (now - intro.start) / INTRO_MS);
       yaw = intro.from + INTRO_TURN * (0.5 - Math.cos(Math.PI * k) / 2);
@@ -704,6 +744,8 @@ export async function mountCar(
         if (!e.isIntersecting) return;
         io?.disconnect();
         window.setTimeout(() => {
+          glide = performance.now(); // the light passes once, even if the visitor already grabbed the car
+          schedule();
           if (interacted || dragging) return;
           intro = { from: yaw, start: performance.now() };
           schedule();
