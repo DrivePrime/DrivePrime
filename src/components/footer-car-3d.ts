@@ -73,7 +73,7 @@ interface Framing {
   gap: number;
   keepOut: KeepOut[];
   /** side away from the text: the car is pushed towards it */
-  far: "left" | "right";
+  far: "left" | "right" | "center";
 }
 
 interface Options {
@@ -86,6 +86,16 @@ interface Options {
   /** read at every resize: where and how the car may be framed */
   framing: () => Framing;
   onLayout?: (l: CarLayout) => void;
+  /** Per-model settings; the defaults are the G63's (closing scene). */
+  model?: {
+    /** real length in metres the model is scaled to */
+    lengthM?: number;
+    /** material adjustments (default: the G63's black paint + glass) */
+    tune?: (mat: MeshPhysicalMaterial, name: string) => Material | void;
+    exposure?: number;
+    /** the softbox pass at the entrance (default on) */
+    sweep?: boolean;
+  };
 }
 
 // The fleet's Classe G is black; the downloaded model is painted olive. Paint it like the real car:
@@ -141,12 +151,20 @@ function mergeByMaterial(root: Group) {
   return out;
 }
 
-function tuneMaterials(root: Group) {
+function tuneMaterials(
+  root: Group,
+  custom?: (mat: MeshPhysicalMaterial, name: string) => Material | void,
+) {
   root.traverse((o) => {
     const m = o as Mesh;
     if (!m.isMesh) return;
     const mat = m.material as MeshPhysicalMaterial;
     const name = mat.name || "";
+    if (custom) {
+      const next = custom(mat, name);
+      if (next && next !== mat) m.material = next;
+      return;
+    }
     if (/Paint/i.test(name)) {
       mat.color.setHex(PAINT.color);
       mat.metalness = PAINT.metalness;
@@ -314,7 +332,7 @@ export async function mountCar(
   );
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.4;
+  renderer.toneMappingExposure = opts.model?.exposure ?? 1.4;
 
   const scene = new Scene();
   const env = studio(renderer);
@@ -342,18 +360,19 @@ export async function mountCar(
     sweep.intensity =
       k <= 0 ? 0 : 30 * Math.sin(Math.PI * Math.min(1, k)) + 3 * k;
   };
-  placeSweep(opts.reducedMotion ? 1 : 0);
+  const sweepOn = opts.model?.sweep ?? true;
+  placeSweep(opts.reducedMotion || !sweepOn ? 1 : 0);
   scene.add(sweep);
 
   const gltf = await new GLTFLoader().loadAsync(opts.url);
   const source = gltf.scene as unknown as Group;
-  tuneMaterials(source);
+  tuneMaterials(source, opts.model?.tune);
   const car = mergeByMaterial(source);
 
   // The export is in centimetres x 0.01 (the car is 0.05 units long): scale it to the real
   // G63 length so lights, camera and shadow work in metres.
   const raw = new Box3().setFromObject(car).getSize(new Vector3());
-  car.scale.setScalar(4.87 / Math.max(raw.x, raw.z));
+  car.scale.setScalar((opts.model?.lengthM ?? 4.87) / Math.max(raw.x, raw.z));
   car.updateMatrixWorld(true);
 
   // Centre on the footprint, wheels on y = 0; length along Z
@@ -453,8 +472,8 @@ export async function mountCar(
       y1: k.y + k.h + f.gap,
     }));
     const groundPx = f.ground * H;
-    const left = f.far === "left" ? f.margin : 2;
-    const right = f.far === "right" ? f.margin : 2;
+    const left = f.far === "right" ? 2 : f.margin;
+    const right = f.far === "left" ? 2 : f.margin;
     const xs: number[] = [];
     const ys: number[] = [];
     // project one or more angles at distance d; returns the box (no offsets) and keeps the points
@@ -517,7 +536,11 @@ export async function mountCar(
       const box = shoot(dd, turn);
       // pushed to the far side (away from the text), wheels on the ground line
       const dx =
-        f.far === "right" ? W - f.margin - box.maxX : f.margin - box.minX;
+        f.far === "right"
+          ? W - f.margin - box.maxX
+          : f.far === "left"
+            ? f.margin - box.minX
+            : (W - box.maxX - box.minX) / 2;
       const dy = groundPx - box.maxY;
       if (!clear(box, dx, dy)) return false;
       off = { x: dx, y: dy };
@@ -740,11 +763,12 @@ export async function mountCar(
   let io: IntersectionObserver | null = null;
   if (!opts.reducedMotion) {
     io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
+      (entries) => {
+        // several entries can arrive in one callback: the latest state wins
+        if (!entries[entries.length - 1].isIntersecting) return;
         io?.disconnect();
         window.setTimeout(() => {
-          glide = performance.now(); // the light passes once, even if the visitor already grabbed the car
+          if (sweepOn) glide = performance.now(); // the light passes once, even if the visitor already grabbed the car
           schedule();
           if (interacted || dragging) return;
           intro = { from: yaw, start: performance.now() };

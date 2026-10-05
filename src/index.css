@@ -961,6 +961,112 @@
   color: hsl(36 20% 91%);
 }
 /* The studio photos' own night backdrop, framed on a light page */
+/* ───── "Pourquoi nous choisir ?": the section composes itself once ─────
+   title → introduction → each argument (its title leads its explanation), while the studio
+   window fades in and the car turns a little. ≈1.5 s in all, overlapping; ≈30 % faster on phones.
+   Hidden only under js-motion (reduced motion: everything is simply there). */
+.whyus {
+  --wy: 1;
+}
+@media (max-width: 767px) {
+  .whyus {
+    --wy: 0.7;
+  }
+}
+.wy-title,
+.wy-intro,
+.wy-point,
+.wy-detail,
+.wy-visual {
+  transition:
+    opacity calc(var(--dur-slow) * var(--wy)) var(--ease-premium),
+    transform calc(var(--dur-slow) * var(--wy)) var(--ease-premium),
+    filter calc(var(--dur-slow) * var(--wy)) var(--ease-premium);
+}
+.wy-title {
+  transition-duration: calc(760ms * var(--wy));
+}
+.wy-intro {
+  transition-delay: calc(130ms * var(--wy));
+}
+.wy-point {
+  transition-delay: calc((300ms + var(--i, 0) * 170ms) * var(--wy));
+}
+.wy-detail {
+  transition-delay: calc((380ms + var(--i, 0) * 170ms) * var(--wy));
+}
+.wy-visual {
+  transition-duration: calc(900ms * var(--wy));
+  transition-delay: calc(200ms * var(--wy));
+}
+.js-motion .whyus:not(.is-in) .wy-title {
+  opacity: 0;
+  transform: translateY(26px);
+  filter: blur(6px);
+}
+.js-motion .whyus:not(.is-in) .wy-intro {
+  opacity: 0;
+  transform: translateY(18px);
+  filter: blur(3px);
+}
+.js-motion .whyus:not(.is-in) .wy-point {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.js-motion .whyus:not(.is-in) .wy-detail {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.js-motion .whyus:not(.is-in) .wy-visual {
+  opacity: 0;
+  transform: scale(0.98);
+}
+/* 3D Evoque (local prototype): photo until the model is ready, then a crossfade, same frame */
+.wy-3d,
+.wy-photo {
+  transition: opacity 700ms var(--ease-standard);
+}
+.wy-3d {
+  opacity: 0;
+  pointer-events: none;
+  touch-action: pan-y; /* vertical swipes scroll the page; horizontal ones on the car turn it */
+}
+.wy-car[data-car="3d"] {
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.wy-car[data-car="3d"] .wy-3d {
+  opacity: 1;
+  pointer-events: auto;
+}
+.wy-car[data-car="3d"] .wy-photo {
+  opacity: 0;
+  pointer-events: none;
+}
+.wy-car:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: -4px;
+  border-radius: 8px;
+}
+.wy-hint {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(237 233 227 / 0.55);
+  opacity: 0;
+  transition: opacity 500ms var(--ease-standard);
+  pointer-events: none;
+}
+.wy-hint[data-on] {
+  opacity: 1;
+  transition-delay: 900ms;
+}
+.wy-hint svg {
+  color: hsl(var(--primary));
+}
+
 .studio-window {
   background: radial-gradient(
     120% 90% at 70% 20%,

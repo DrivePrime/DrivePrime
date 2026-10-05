@@ -68,7 +68,8 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
     let stage: { dispose(): void } | null = null;
     let cancelled = false;
     const io = new IntersectionObserver(
-      ([e]) => {
+      (entries) => {
+        const e = entries[entries.length - 1]; // latest state wins
         if (!e.isIntersecting) return;
         io.disconnect();
         import("./footer-car-3d")

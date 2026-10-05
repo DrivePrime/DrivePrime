@@ -14,7 +14,12 @@ const dropLocalModels = () => ({
   name: "drop-local-models",
   apply: "build" as const,
   writeBundle(options: { dir?: string }) {
-    if (process.env.VITE_G63_LOCAL === "true" || !options.dir) return;
+    if (
+      process.env.VITE_G63_LOCAL === "true" ||
+      process.env.VITE_3D_LOCAL === "true" ||
+      !options.dir
+    )
+      return;
     fs.rmSync(path.join(options.dir, "models"), {
       recursive: true,
       force: true,
