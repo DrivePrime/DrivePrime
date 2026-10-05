@@ -516,30 +516,57 @@ export function BookDemo() {
 
 /* ───────────────────────── 03 — Rouler ───────────────────────── */
 
-/** The owner's film: loaded when near, plays when visible, paused otherwise; poster with reduced motion. */
+/**
+ * The owner's film, looping while visible (paused only when fully off screen; poster with reduced
+ * motion). Its last frame does not match its first, so the loop seam is covered: the poster (= the
+ * first frame) fades in over the last ~0.5 s, the film restarts underneath, the poster fades out.
+ */
+const SEAM_S = 0.5;
+const POSTER_SET = `${poster768} 768w, ${poster1280} 1280w`;
 export function DriveFilm() {
   const box = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
-  const on = useOnScreen(box, 0.5);
+  const on = useOnScreen(box, 0);
   const [ready, setReady] = useState(false);
+  const [seam, setSeam] = useState(false);
   useEffect(() => {
     const v = video.current;
     if (!v || !motionAllowed()) return;
-    if (on) {
-      if (!v.src)
-        v.src =
-          v.clientWidth * (window.devicePixelRatio || 1) > 1000
-            ? "/videos/steps/03-rouler.mp4"
-            : "/videos/steps/03-rouler-720.mp4";
-      if (v.ended) v.currentTime = 0;
-      v.play().catch(() => undefined);
-    } else v.pause();
+    if (!on) {
+      v.pause();
+      return;
+    }
+    if (!v.src)
+      v.src =
+        v.clientWidth * (window.devicePixelRatio || 1) > 1000
+          ? "/videos/steps/03-rouler.mp4"
+          : "/videos/steps/03-rouler-720.mp4";
+    v.play().catch(() => undefined);
+    // watch the play head frame by frame (timeupdate is too coarse for the seam)
+    type Rvfc = HTMLVideoElement & {
+      requestVideoFrameCallback?: (cb: () => void) => number;
+      cancelVideoFrameCallback?: (id: number) => void;
+    };
+    const rv = v as Rvfc;
+    let id = 0;
+    let raf = 0;
+    const check = () => {
+      if (v.duration) setSeam(v.duration - v.currentTime < SEAM_S);
+      if (rv.requestVideoFrameCallback)
+        id = rv.requestVideoFrameCallback(check);
+      else raf = requestAnimationFrame(check);
+    };
+    check();
+    return () => {
+      if (id && rv.cancelVideoFrameCallback) rv.cancelVideoFrameCallback(id);
+      cancelAnimationFrame(raf);
+    };
   }, [on]);
   return (
     <div ref={box} className="relative h-full w-full">
       <img
         src={poster1280}
-        srcSet={`${poster768} 768w, ${poster1280} 1280w`}
+        srcSet={POSTER_SET}
         sizes="(min-width: 768px) 33vw, 84vw"
         alt=""
         loading="lazy"
@@ -552,14 +579,30 @@ export function DriveFilm() {
         ref={video}
         muted
         playsInline
+        loop
         preload="none"
         disablePictureInPicture
+        disableRemotePlayback
         aria-hidden="true"
         tabIndex={-1}
         onPlaying={() => setReady(true)}
         className={cn(
           "absolute inset-0 h-full w-full object-cover object-[50%_55%] transition-opacity duration-700",
           ready ? "opacity-100" : "opacity-0",
+        )}
+      />
+      {/* seam cover: the first frame, over the film for the loop's last half second */}
+      <img
+        src={poster1280}
+        srcSet={POSTER_SET}
+        sizes="(min-width: 768px) 33vw, 84vw"
+        alt=""
+        aria-hidden="true"
+        loading="lazy"
+        decoding="async"
+        className={cn(
+          "pointer-events-none absolute inset-0 h-full w-full object-cover object-[50%_55%] transition-opacity ease-in-out",
+          seam && ready ? "opacity-100 duration-500" : "opacity-0 duration-700",
         )}
       />
     </div>

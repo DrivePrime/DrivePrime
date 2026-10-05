@@ -3,7 +3,13 @@ import { ArrowRight } from "lucide-react";
 import { vehicles } from "@/data/vehicles";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { business, openWhatsApp, whatsappUrl } from "@/config/business";
-import { WhatsAppIcon, InstagramIcon, TikTokIcon } from "./icons";
+import {
+  WhatsAppIcon,
+  InstagramIcon,
+  TikTokIcon,
+  FacebookIcon,
+  SnapchatIcon,
+} from "./icons";
 import DateField from "./DateField";
 import { dateToIso } from "@/lib/dates";
 import { bookingRequest } from "@/lib/booking-message";
@@ -141,6 +147,24 @@ export default function Contact() {
                   className="grid h-10 w-10 place-items-center rounded-sm text-foreground/80 transition-colors hover:bg-foreground/5 hover:text-primary"
                 >
                   <TikTokIcon className="h-5 w-5" />
+                </a>
+                <a
+                  href={business.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="grid h-10 w-10 place-items-center rounded-sm text-foreground/80 transition-colors hover:bg-foreground/5 hover:text-primary"
+                >
+                  <FacebookIcon className="h-5 w-5" />
+                </a>
+                <a
+                  href={business.snapchat}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Snapchat"
+                  className="grid h-10 w-10 place-items-center rounded-sm text-foreground/80 transition-colors hover:bg-foreground/5 hover:text-primary"
+                >
+                  <SnapchatIcon className="h-5 w-5" />
                 </a>
               </dd>
             </div>

@@ -198,7 +198,7 @@ const fr = {
       },
       {
         title: "Prenez la route",
-        description: "Récupérez votre véhicule à l'aéroport, à votre hôtel ou à votre riad.",
+        description: "Récupérez votre véhicule où vous le souhaitez, à l'heure qui vous convient.",
       },
     ],
   },
@@ -478,7 +478,7 @@ const en: Translations = {
       },
       {
         title: "Hit the road",
-        description: "Collect your car at the airport, your hotel or your riad.",
+        description: "Pick up your car wherever you like, at the time that suits you.",
       },
     ],
   },
@@ -753,7 +753,7 @@ const ar: Translations = {
       },
       {
         title: "انطلق",
-        description: "استلم سيارتك في المطار أو الفندق أو الرياض.",
+        description: "استلم سيارتك في المكان الذي تختاره، وفي الوقت الذي يناسبك.",
       },
     ],
   },

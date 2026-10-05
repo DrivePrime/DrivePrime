@@ -10,7 +10,14 @@ export function WhatsAppIcon(props: SVGProps<SVGSVGElement>) {
 
 export function InstagramIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden="true" {...props}>
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      aria-hidden="true"
+      {...props}
+    >
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.5" cy="6.5" r="0.6" fill="currentColor" stroke="none" />
@@ -22,6 +29,22 @@ export function TikTokIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
       <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.3 0 .6.05.88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+    </svg>
+  );
+}
+
+export function FacebookIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M24 12.07C24 5.4 18.63 0 12 0S0 5.4 0 12.07C0 18.1 4.39 23.1 10.13 24v-8.44H7.08v-3.49h3.05V9.41c0-3.02 1.79-4.69 4.53-4.69 1.31 0 2.68.24 2.68.24v2.97h-1.51c-1.49 0-1.96.93-1.96 1.89v2.25h3.33l-.53 3.49h-2.8V24C19.61 23.1 24 18.1 24 12.07z" />
+    </svg>
+  );
+}
+
+export function SnapchatIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M12.21 1.5c1.07 0 4.7.3 6.4 4.1.57 1.27.43 3.43.32 5.17l-.01.18c.08.04.24.1.47.1.31-.01.67-.12 1.07-.3a.85.85 0 0 1 .37-.08c.14 0 .28.03.4.08.36.13.6.39.6.66.01.35-.3.65-.92.9l-.27.09c-.5.16-1.26.4-1.46.9-.1.26-.06.6.13.98l.01.02c.07.15 1.66 3.79 5.2 4.37.27.05.47.29.45.57a.67.67 0 0 1-.06.23c-.27.62-1.39 1.07-3.43 1.39-.07.1-.14.42-.19.65-.04.21-.09.42-.15.64-.09.3-.3.44-.62.44h-.03c-.15 0-.36-.03-.62-.08-.4-.08-.84-.15-1.4-.15-.33 0-.67.03-1.01.09-.67.11-1.24.52-1.9.98-.95.67-2.02 1.43-3.66 1.43h-.21c-1.64 0-2.7-.76-3.65-1.43-.66-.46-1.23-.87-1.9-.98a6.4 6.4 0 0 0-1.02-.09c-.6 0-1.07.09-1.4.16-.24.05-.45.09-.62.09-.42 0-.58-.25-.65-.46-.06-.22-.1-.44-.15-.65-.05-.24-.12-.56-.19-.66C1.5 20.04.38 19.6.11 18.97a.7.7 0 0 1-.06-.23.56.56 0 0 1 .46-.57c3.53-.58 5.12-4.22 5.19-4.37l.01-.02c.19-.38.24-.72.13-.98-.2-.5-.96-.74-1.46-.9l-.27-.09c-.84-.33-.96-.71-.9-.97.08-.37.58-.62.97-.62.11 0 .21.02.3.06.43.2.82.3 1.14.3.27 0 .44-.06.53-.11l-.02-.24c-.1-1.74-.24-3.9.33-5.17C8.17 1.8 11.78 1.5 12.21 1.5z" />
     </svg>
   );
 }

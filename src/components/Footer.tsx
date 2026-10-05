@@ -4,7 +4,13 @@ import { ArrowRight, ArrowUpRight, MoveHorizontal } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { business, whatsappUrl, hasConfirmedServices } from "@/config/business";
 import { vehicles, type Vehicle } from "@/data/vehicles";
-import { InstagramIcon, TikTokIcon, WhatsAppIcon } from "./icons";
+import {
+  FacebookIcon,
+  InstagramIcon,
+  SnapchatIcon,
+  TikTokIcon,
+  WhatsAppIcon,
+} from "./icons";
 import logo from "@/assets/logo-160.webp";
 
 const useIsoLayoutEffect =
@@ -559,7 +565,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
           <p>
             © {new Date().getFullYear()} Drive Prime. {t.footer.rights}
           </p>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
             <a
               href={business.instagram}
               target="_blank"
@@ -577,6 +583,24 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
             >
               <TikTokIcon className="h-4 w-4" />
               TikTok
+            </a>
+            <a
+              href={business.facebook}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="foot-social"
+            >
+              <FacebookIcon className="h-4 w-4" />
+              Facebook
+            </a>
+            <a
+              href={business.snapchat}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="foot-social"
+            >
+              <SnapchatIcon className="h-4 w-4" />
+              Snapchat
             </a>
           </div>
         </div>

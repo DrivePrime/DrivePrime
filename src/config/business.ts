@@ -11,6 +11,8 @@ export const business = {
   country: "Maroc",
   instagram: "https://www.instagram.com/location_drive_prime_",
   tiktok: "https://www.tiktok.com/@drive.prime",
+  facebook: "https://www.facebook.com/share/19ffBt9BTy/?mibextid=wwXIfr",
+  snapchat: "https://snapchat.com/t/UZfamE2t",
 };
 
 /*
@@ -46,7 +48,9 @@ export const confirmed = {
 
 export type ServiceKey = keyof typeof confirmed.services;
 
-export const hasConfirmedServices = Object.values(confirmed.services).some(Boolean);
+export const hasConfirmedServices = Object.values(confirmed.services).some(
+  Boolean,
+);
 
 export function whatsappUrl(message?: string) {
   const base = `https://wa.me/${business.whatsapp}`;
