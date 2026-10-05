@@ -35,6 +35,9 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "",
     port: 8080,
+    // large media dropped into public/ while the server runs (3D models, videos) can be locked
+    // by Windows mid-copy and crash the watcher; they are served as-is and need no watching
+    watch: { ignored: ["**/public/models/**", "**/public/videos/**"] },
   },
 
   plugins: [
