@@ -403,18 +403,14 @@ export async function mountCar(
   };
 
   /*
-    Framing, per angle. The turntable's axis is fixed on screen; for each of YAWS angles the
-    camera distance is the closest one at which the car, at that angle, stays inside the canvas
-    and clear of the text (keep-out boxes), wheels on the ground line. Distances are then
-    smoothed over ±20°, so turning the car eases the camera back a little where the car is
-    widest (profile) and forward where it is compact (three-quarter): every angle fits, and the
-    rest pose is as large as its own silhouette allows.
-    The axis is placed from the rest pose (and the intro's start pose): pushed to the far side.
+    Framing, computed once per canvas size (never during rotation): one camera distance and one
+    image offset for the whole turn. The car's real shape is projected at every angle of a full
+    turn; the closest distance at which all of them stay inside the canvas and clear of the text
+    (keep-out boxes), wheels on the ground line, is kept — that is the profile view's size, the
+    widest one. Then the camera, FOV and scale never change: only the turntable (Y axis) turns,
+    so a front view is naturally narrower than a profile.
   */
   const STEP = (Math.PI * 2) / YAWS;
-  let axisX = 0; // dx applied to the image: axis on screen = W / 2 + axisX
-  const dist = new Float64Array(YAWS);
-  const lift = new Float64Array(YAWS); // dy per angle (ground line)
   const fit = () => {
     const f = opts.framing();
     const outs = f.keepOut.map((k) => ({
@@ -482,52 +478,21 @@ export async function mountCar(
       }
       return hi;
     };
-    // 1. axis: the rest pose and the intro's start pose, pushed to the far side
-    const restYaws = [
-      REST_YAW - INTRO_TURN,
-      REST_YAW - INTRO_TURN / 2,
-      REST_YAW,
-    ];
-    let restDx = 0;
-    const dRest = bisect((d) => {
-      const b = shoot(d, restYaws);
-      const dx = f.far === "right" ? W - f.margin - b.maxX : f.margin - b.minX;
-      if (!clear(b, dx, groundPx - b.maxY)) return false;
-      restDx = dx;
+    const turn = Array.from({ length: YAWS }, (_, k) => k * STEP);
+    let off = { x: 0, y: 0 };
+    const d = bisect((dd) => {
+      const box = shoot(dd, turn);
+      // pushed to the far side (away from the text), wheels on the ground line
+      const dx =
+        f.far === "right" ? W - f.margin - box.maxX : f.margin - box.minX;
+      const dy = groundPx - box.maxY;
+      if (!clear(box, dx, dy)) return false;
+      off = { x: dx, y: dy };
       return true;
     });
-    shoot(dRest, restYaws);
-    axisX = restDx;
-    // 2. every angle, axis fixed
-    const raw = new Float64Array(YAWS);
-    for (let k = 0; k < YAWS; k++) {
-      raw[k] = bisect((d) => {
-        const b = shoot(d, [k * STEP]);
-        return clear(b, axisX, groundPx - b.maxY);
-      });
-    }
-    // 3. smooth: each angle takes the farthest distance within ±20° (gradual, and safe between samples)
-    const span = Math.round((20 * Math.PI) / 180 / STEP);
-    for (let k = 0; k < YAWS; k++) {
-      let m = 0;
-      for (let j = -span; j <= span; j++)
-        m = Math.max(m, raw[(k + j + YAWS) % YAWS]);
-      dist[k] = m;
-      const b = shoot(m, [k * STEP]);
-      lift[k] = groundPx - b.maxY;
-    }
-  };
-
-  /** Camera for a yaw: interpolated distance and ground lift; the axis stays put. */
-  const frameAt = (y: number) => {
-    const t = (((y % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2)) / STEP;
-    const k = Math.floor(t) % YAWS;
-    const n = (k + 1) % YAWS;
-    const u = t - Math.floor(t);
-    const s = u * u * (3 - 2 * u); // smoothstep between samples
-    place(dist[k] + (dist[n] - dist[k]) * s);
-    offX = axisX;
-    offY = lift[k] + (lift[n] - lift[k]) * s;
+    place(d);
+    offX = off.x;
+    offY = off.y;
     camera.setViewOffset(W, H, -offX, -offY, W, H);
     camera.updateProjectionMatrix();
   };
@@ -550,7 +515,6 @@ export async function mountCar(
   const reportLayout = () => {
     if (!opts.onLayout) return;
     const f = opts.framing();
-    frameAt(REST_YAW);
     const b = screenBox(REST_YAW);
     // the car's nearest point to the text among its low points (wheels, bumper)
     let near = f.far === "right" ? Infinity : -Infinity;
@@ -568,7 +532,6 @@ export async function mountCar(
       w: (b.x1 - b.x0) / W,
       h: (b.y1 - b.y0) / H,
     });
-    frameAt(yaw); // back to the current pose
   };
 
   // ── rendering on demand
@@ -580,7 +543,6 @@ export async function mountCar(
   let dragging = false;
   let last = performance.now();
   const render = () => {
-    frameAt(yaw);
     turntable.rotation.y = yaw;
     renderer.render(scene, camera);
   };
