@@ -26,6 +26,8 @@ const fr = {
     breadcrumb: "Fil d'Ariane",
   },
   hero: {
+    kicker: "Drive Prime · Marrakech",
+    headline: ["Conduisez Marrakech", "autrement."],
     title: "Location de voitures premium à Marrakech",
     subtitle: (count: number) =>
       `${count} véhicules, de la citadine au Mercedes Classe G, livrés à l'aéroport, à votre hôtel ou à votre riad.`,
@@ -165,11 +167,14 @@ const fr = {
     factRange: (min: string, max: string) => `de ${min} à ${max} par jour`,
     factSupport: "Assistance 24h/24",
     factsLabel: "Drive Prime en bref",
+    stats: { vehicles: "véhicules", perDay: "par jour", supportValue: "24h/24", support: "assistance" },
+    explore: "Explorer le véhicule",
   },
   testimonials: {
     title: "Ce que disent nos clients",
     intro: "Les avis de nos clients sur leur location avec Drive Prime.",
     listLabel: "Avis clients",
+    kicker: "Avis clients",
     prev: "Avis précédent",
     next: "Avis suivant",
     rentedCar: "Voir ce véhicule",
@@ -202,6 +207,7 @@ const fr = {
   },
   contact: {
     title: "Une question, une demande\u00a0?",
+    kicker: "Parlons de votre location",
     description:
       "Le plus simple est de nous écrire sur WhatsApp. Vous pouvez aussi remplir ce formulaire : il ouvre WhatsApp avec votre message.",
     name: "Nom",
@@ -301,6 +307,8 @@ const en: Translations = {
     breadcrumb: "Breadcrumb",
   },
   hero: {
+    kicker: "Drive Prime · Marrakech",
+    headline: ["Drive Marrakech", "your way."],
     title: "Premium car rental in Marrakech",
     subtitle: (count: number) =>
       `${count} vehicles, from city cars to the Mercedes G-Class, delivered to the airport, your hotel or your riad.`,
@@ -437,11 +445,14 @@ const en: Translations = {
     factRange: (min: string, max: string) => `from ${min} to ${max} per day`,
     factSupport: "24/7 assistance",
     factsLabel: "Drive Prime at a glance",
+    stats: { vehicles: "vehicles", perDay: "per day", supportValue: "24/7", support: "assistance" },
+    explore: "Explore the vehicle",
   },
   testimonials: {
     title: "What our customers say",
     intro: "Reviews from our customers about renting with Drive Prime.",
     listLabel: "Customer reviews",
+    kicker: "Customer reviews",
     prev: "Previous review",
     next: "Next review",
     rentedCar: "See this vehicle",
@@ -474,6 +485,7 @@ const en: Translations = {
   },
   contact: {
     title: "A question, a request?",
+    kicker: "Let's talk about your rental",
     description:
       "The easiest way is to message us on WhatsApp. You can also fill in this form: it opens WhatsApp with your message.",
     name: "Name",
@@ -571,6 +583,8 @@ const ar: Translations = {
     breadcrumb: "مسار التنقل",
   },
   hero: {
+    kicker: "Drive Prime · مراكش",
+    headline: ["قُد مراكش", "بأسلوب مختلف."],
     title: "تأجير سيارات فاخرة في مراكش",
     subtitle: (count: number) =>
       `${count} سيارة، من السيارات الصغيرة إلى مرسيدس الفئة G، نوصلها إلى المطار أو الفندق أو الرياض.`,
@@ -705,11 +719,14 @@ const ar: Translations = {
     factRange: (min: string, max: string) => `من ${min} إلى ${max} في اليوم`,
     factSupport: "مساعدة 24/24",
     factsLabel: "Drive Prime باختصار",
+    stats: { vehicles: "سيارة", perDay: "في اليوم", supportValue: "24/24", support: "مساعدة" },
+    explore: "استكشف السيارة",
   },
   testimonials: {
     title: "ماذا يقول عملاؤنا",
     intro: "آراء عملائنا حول تجربة الإيجار مع Drive Prime.",
     listLabel: "آراء العملاء",
+    kicker: "آراء العملاء",
     prev: "الرأي السابق",
     next: "الرأي التالي",
     rentedCar: "عرض هذه السيارة",
@@ -741,6 +758,7 @@ const ar: Translations = {
   },
   contact: {
     title: "سؤال أو طلب؟",
+    kicker: "لنتحدث عن حجزك",
     description: "أسهل طريقة هي مراسلتنا عبر واتساب. يمكنك أيضاً ملء هذا النموذج: سيفتح واتساب مع رسالتك.",
     name: "الاسم",
     namePlaceholder: "اسمك",

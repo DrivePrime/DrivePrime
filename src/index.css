@@ -46,18 +46,28 @@
 
   --whatsapp: 142 70% 41%;
 
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* Named colour roles (one brass family, from the "Réserver" CTA) */
+  --color-bg: hsl(var(--background));
+  --color-surface: hsl(var(--card));
+  --color-surface-elevated: hsl(216 12% 12%);
+  --color-text: hsl(var(--foreground));
+  --color-text-muted: hsl(var(--muted-foreground));
+  --color-border: hsl(var(--border));
+  --color-gold: hsl(var(--primary));
+  --color-gold-hover: hsl(var(--gold-light));
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 
   /*
     Motion language — precise, mechanical, never bouncy.
     standard: UI state changes · premium (= --ease-out): arrivals, reveals · in: exits.
   */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-premium: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
-  --dur-fast: 160ms; /* hover, press, small feedback */
-  --dur-normal: 320ms; /* state changes, dropdowns, swaps */
-  --dur-slow: 640ms; /* reveals, indicators travelling */
+  --dur-fast: 200ms; /* hover, press, small feedback */
+  --dur-normal: 420ms; /* state changes, dropdowns, swaps */
+  --dur-slow: 760ms; /* reveals, indicators travelling */
   --dur-hero: 1000ms; /* the single page-load moment */
   --reveal-y: 18px;
   --reveal-x: 28px;
@@ -374,23 +384,164 @@
   animation-delay: calc(var(--stagger) * 4.2);
 }
 
-/* Hero photograph: framed on the car; the copy always sits on the darkened left side
+/* Hero: photograph (poster / fallback) under a short film; the copy sits on the darkened left side
    (the photo cannot shift enough to free the right side, so Arabic copy stays left, right-aligned) */
 .hero-photo {
   object-position: 64% 45%;
-}
-.hero-side-scrim {
-  background: linear-gradient(
-    to right,
-    hsl(var(--background) / 0.88) 0%,
-    hsl(var(--background) / 0.55) 34%,
-    transparent 62%
-  );
 }
 @media (min-width: 1024px) {
   .hero-photo {
     object-position: 62% 50%;
   }
+}
+.hero-video {
+  opacity: 0;
+  transition: opacity 900ms var(--ease-standard);
+}
+.hero-video[data-on] {
+  opacity: 1;
+}
+/* Light where the car is: a navbar band on top, the floor under the engine, nothing uniform */
+.hero-scrim {
+  background:
+    linear-gradient(
+      to bottom,
+      hsl(var(--background) / 0.62) 0%,
+      hsl(var(--background) / 0.18) 14%,
+      transparent 26%
+    ),
+    linear-gradient(
+      to top,
+      hsl(var(--background)) 0%,
+      hsl(var(--background) / 0.82) 18%,
+      transparent 46%
+    );
+}
+.hero-side-scrim {
+  background: linear-gradient(
+    to right,
+    hsl(var(--background) / 0.82) 0%,
+    hsl(var(--background) / 0.55) 26%,
+    hsl(var(--background) / 0.12) 48%,
+    transparent 60%
+  );
+}
+/* Contact: brass labels over white values; the form sits one step above the page */
+.contact-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: hsl(var(--primary) / 0.9);
+}
+.contact-form {
+  background: var(--color-surface-elevated);
+  border: 1px solid hsl(var(--foreground) / 0.09);
+  box-shadow: 0 40px 80px -50px rgb(0 0 0 / 0.8);
+}
+.contact-form .field-label {
+  color: hsl(var(--foreground) / 0.82);
+}
+.contact-form .field:focus,
+.contact-form .field:focus-visible {
+  border-color: hsl(var(--primary) / 0.8);
+  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.35);
+}
+/* primary CTA: a 1 px lift and a touch of light, no glow */
+.cta-lift {
+  transition:
+    background-color 200ms var(--ease-standard),
+    transform 200ms var(--ease-standard),
+    filter 200ms var(--ease-standard);
+}
+@media (hover: hover) {
+  .cta-lift:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+  }
+}
+/* kicker: the small brass label above a heading (hero, reviews, contact) */
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: hsl(var(--primary));
+}
+.kicker-rule {
+  display: block;
+  width: 2rem;
+  height: 1px;
+  background: hsl(var(--primary));
+}
+/* the plain statement under the headline: what, where, premium */
+.hero-sub {
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: hsl(var(--foreground) / 0.92);
+}
+@media (min-width: 640px) {
+  .hero-sub {
+    font-size: 1.2rem;
+  }
+}
+/* Entrance: one sequence on load, then everything stays still.
+   --hx scales distances and durations (shorter on phones). */
+.hero-line,
+.hero-in,
+.hero-engine {
+  --hx: 1;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-delay: calc(var(--d, 0ms) * var(--hx));
+}
+@media (max-width: 767px) {
+  .hero-line,
+  .hero-in,
+  .hero-engine {
+    --hx: 0.7;
+  }
+}
+.hero-line {
+  animation-name: dp-hero-line;
+  animation-duration: calc(760ms * var(--hx));
+}
+.hero-in {
+  animation-name: dp-hero-in;
+  animation-duration: calc(620ms * var(--hx));
+}
+.hero-engine {
+  animation-name: dp-hero-engine;
+  animation-duration: calc(760ms * var(--hx));
+}
+@keyframes dp-hero-line {
+  from {
+    /* not 0: the headline counts as painted from its first frame (LCP), still invisible to the eye */
+    opacity: 0.02;
+    transform: translateY(calc(20px * var(--hx)));
+    filter: blur(6px);
+  }
+}
+@keyframes dp-hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(12px * var(--hx)));
+  }
+}
+@keyframes dp-hero-engine {
+  from {
+    opacity: 0;
+    transform: translateY(calc(26px * var(--hx)));
+    filter: blur(3px);
+  }
+}
+/* navbar: a light arrival on the home page only */
+.header-intro > * {
+  animation: dp-fade 500ms var(--ease-standard) 100ms both;
 }
 
 /* Fleet card: actions rise onto the photo on hover / keyboard focus (desktop pointers) */
@@ -1049,12 +1200,13 @@
   outline-offset: -4px;
   border-radius: 8px;
 }
+/* hint under the car: small capitals, a brass rule and arrows that sway until the first touch */
 .wy-hint {
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.16em;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: rgb(237 233 227 / 0.55);
+  color: rgb(237 233 227 / 0.62);
   opacity: 0;
   transition: opacity 500ms var(--ease-standard);
   pointer-events: none;
@@ -1063,8 +1215,69 @@
   opacity: 1;
   transition-delay: 900ms;
 }
-.wy-hint svg {
+.wy-hint-rule {
+  width: 1.5rem;
+  height: 1px;
+  background: hsl(var(--primary) / 0.7);
+}
+.wy-hint-arrows {
+  display: inline-flex;
   color: hsl(var(--primary));
+}
+.js-motion .wy-hint[data-on] .wy-hint-arrows {
+  animation: dp-sway 2.4s cubic-bezier(0.45, 0, 0.55, 1) 1.4s infinite;
+}
+@keyframes dp-sway {
+  0%,
+  60%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(3px);
+  }
+  40% {
+    transform: translateX(-3px);
+  }
+}
+/* the facts: one editorial line, figure over a small caption, thin brass separators */
+.wy-stats {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 1rem;
+}
+.wy-stat {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.3rem;
+  padding-inline: 1.5rem;
+  border-inline-start: 1px solid hsl(var(--primary) / 0.45);
+}
+.wy-stat:first-child {
+  padding-inline-start: 0;
+  border-inline-start: 0;
+}
+.wy-stat-value {
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: #f3efe9;
+  font-variation-settings: "wdth" 108;
+}
+.wy-stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(237 233 227 / 0.55);
+}
+@media (max-width: 479px) {
+  .wy-stat {
+    padding-inline: 1rem;
+  }
+  .wy-stat-value {
+    font-size: 1rem;
+  }
 }
 
 .studio-window {
@@ -1095,10 +1308,10 @@
   }
 }
 .quote-in-next {
-  animation: dp-quote-next var(--dur-slow) var(--ease-premium) both;
+  animation: dp-quote-next 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .quote-in-prev {
-  animation: dp-quote-prev var(--dur-slow) var(--ease-premium) both;
+  animation: dp-quote-prev 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 [dir="rtl"] .quote-in-next {
   animation-name: dp-quote-prev;

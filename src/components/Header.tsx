@@ -35,7 +35,10 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
         setScrolled(y > 24);
         if (y < window.innerHeight * 0.5) setActiveSection("");
         const max = document.documentElement.scrollHeight - window.innerHeight;
-        progressRef.current?.style.setProperty("--progress", String(max > 0 ? Math.min(1, y / max) : 0));
+        progressRef.current?.style.setProperty(
+          "--progress",
+          String(max > 0 ? Math.min(1, y / max) : 0),
+        );
       });
     };
     onScroll();
@@ -52,7 +55,8 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
 
   useEffect(() => {
     if (!menuOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    const onKey = (e: KeyboardEvent) =>
+      e.key === "Escape" && setMenuOpen(false);
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
     return () => {
@@ -72,7 +76,8 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
   // Home page: the link of the section in the middle of the screen is marked as current.
   const sectionIds = navLinks.map((l) => l.id).join(",");
   useEffect(() => {
-    if (location.pathname !== "/" || !("IntersectionObserver" in window)) return;
+    if (location.pathname !== "/" || !("IntersectionObserver" in window))
+      return;
     const els = sectionIds
       .split(",")
       .map((id) => document.getElementById(id))
@@ -92,8 +97,11 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
   // The brass marker travels to the current link (measured, so it follows any language).
   useEffect(() => {
     const place = () => {
-      const link = navRef.current?.querySelector<HTMLElement>(`[data-id="${activeSection}"]`);
-      if (link) setMarker({ left: link.offsetLeft + 12, width: link.offsetWidth - 24 });
+      const link = navRef.current?.querySelector<HTMLElement>(
+        `[data-id="${activeSection}"]`,
+      );
+      if (link)
+        setMarker({ left: link.offsetLeft + 12, width: link.offsetWidth - 24 });
     };
     place();
     window.addEventListener("resize", place);
@@ -109,6 +117,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
       className={cn(
         "site-header fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top)]",
         expanded ? "header-top" : "header-compact",
+        overlay && "header-intro",
       )}
     >
       <div
@@ -117,7 +126,11 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
           expanded ? "h-16 lg:h-[88px]" : "h-16 lg:h-[68px]",
         )}
       >
-        <Link to="/" className="-ms-1 flex shrink-0 items-center gap-3.5 rounded-sm py-1 ps-1 pe-2" aria-label="Drive Prime">
+        <Link
+          to="/"
+          className="-ms-1 flex shrink-0 items-center gap-3.5 rounded-sm py-1 ps-1 pe-2"
+          aria-label="Drive Prime"
+        >
           <img
             src={logo}
             alt=""
@@ -128,10 +141,16 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
               expanded ? "h-10 w-10 lg:h-11 lg:w-11" : "h-10 w-10",
             )}
           />
-          <span className="type-wide text-[18px] font-semibold tracking-[-0.01em] text-foreground">Drive Prime</span>
+          <span className="type-wide text-[18px] font-semibold tracking-[-0.01em] text-foreground">
+            Drive Prime
+          </span>
         </Link>
 
-        <nav ref={navRef} aria-label={t.nav.mainNav} className="relative ms-auto hidden items-center gap-1 lg:flex">
+        <nav
+          ref={navRef}
+          aria-label={t.nav.mainNav}
+          className="relative ms-auto hidden items-center gap-1 lg:flex"
+        >
           {navLinks.map((link) => {
             const current = activeSection === link.id;
             return (
@@ -157,7 +176,10 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
 
         <div className="hidden items-center lg:flex">
           <LanguageSwitcher />
-          <span className="mx-1 h-3.5 w-px bg-foreground/20" aria-hidden="true" />
+          <span
+            className="mx-1 h-3.5 w-px bg-foreground/20"
+            aria-hidden="true"
+          />
           <CurrencySwitcher />
         </div>
 
@@ -169,7 +191,10 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
         >
           <WhatsAppIcon className="h-4 w-4" />
           {t.nav.book}
-          <ArrowRight className="cta-arrow h-4 w-4 rtl:rotate-180" aria-hidden="true" />
+          <ArrowRight
+            className="cta-arrow h-4 w-4 rtl:rotate-180"
+            aria-hidden="true"
+          />
         </a>
 
         <button
@@ -187,8 +212,15 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
       {/* Signature: reading-progress hairline (brass), shown once the page moves */}
       <span ref={progressRef} aria-hidden="true" className="header-progress" />
 
-      <div id="mobile-menu" hidden={!menuOpen} className="h-[calc(100dvh-4rem)] overflow-y-auto bg-background lg:hidden">
-        <nav aria-label={t.nav.mainNav} className="container flex flex-col pb-10 pt-4">
+      <div
+        id="mobile-menu"
+        hidden={!menuOpen}
+        className="h-[calc(100dvh-4rem)] overflow-y-auto bg-background lg:hidden"
+      >
+        <nav
+          aria-label={t.nav.mainNav}
+          className="container flex flex-col pb-10 pt-4"
+        >
           {navLinks.map((link) => (
             <Link
               key={link.id}

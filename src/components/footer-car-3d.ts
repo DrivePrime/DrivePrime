@@ -95,6 +95,17 @@ interface Options {
     exposure?: number;
     /** the softbox pass at the entrance (default on) */
     sweep?: boolean;
+    /** turntable: a slow continuous turn (period of one turn), paused by any interaction and
+        resumed gently after resumeMs of inactivity; replaces the intro. Off with reduced motion. */
+    autoRotate?: { periodMs: number; resumeMs: number };
+    /** contact shadow strength (1 = default) */
+    shadow?: number;
+    /** a soft pool of studio light on the floor under the car (fixed, does not turn) */
+    floorLight?: number;
+    /** camera height (radians above the horizon); higher shows more floor and shadow */
+    pitch?: number;
+    envIntensity?: number;
+    keyIntensity?: number;
   };
 }
 
@@ -265,7 +276,12 @@ function studio(renderer: WebGLRenderer) {
  * canvas (lower = darker), blurred twice — tight under the tyres, soft under the body.
  * Lies on the turntable, so it turns with the car. No shadow maps, no visible floor.
  */
-function contactShadow(points: Float32Array, length: number, width: number) {
+function contactShadow(
+  points: Float32Array,
+  length: number,
+  width: number,
+  strength = 1,
+) {
   const W = 256;
   const spanX = width * 1.9;
   const spanZ = length * 1.35;
@@ -278,13 +294,26 @@ function contactShadow(points: Float32Array, length: number, width: number) {
   body.width = W;
   body.height = H;
   const bg = body.getContext("2d")!;
+  // strength > 1: the whole body casts a soft footprint (lower parts darker), not only the sills
+  const full = strength > 1;
+  let top = 0;
+  if (full)
+    for (let i = 1; i < points.length; i += 3) top = Math.max(top, points[i]);
   for (let i = 0; i < points.length; i += 3) {
     const y = points[i + 1];
+    if (full) {
+      const px = (points[i] / spanX + 0.5) * W;
+      const pz = (points[i + 2] / spanZ + 0.5) * H;
+      bg.fillStyle = `rgba(0,0,0,${0.05 * (1 - (0.7 * y) / top)})`;
+      bg.fillRect(px - 3, pz - 3, 6, 6);
+    }
     if (y > 0.9) continue;
     const px = (points[i] / spanX + 0.5) * W;
     const pz = (points[i + 2] / spanZ + 0.5) * H;
-    bg.fillStyle = "rgba(0,0,0,0.05)";
-    bg.fillRect(px - 2, pz - 2, 4, 4);
+    if (!full) {
+      bg.fillStyle = "rgba(0,0,0,0.05)";
+      bg.fillRect(px - 2, pz - 2, 4, 4);
+    }
     if (y < 0.12) {
       mg.fillStyle = `rgba(0,0,0,${0.35 * (1 - y / 0.12)})`;
       mg.fillRect(px - 1.5, pz - 1.5, 3, 3);
@@ -294,12 +323,18 @@ function contactShadow(points: Float32Array, length: number, width: number) {
   out.width = W;
   out.height = H;
   const g = out.getContext("2d")!;
-  g.filter = "blur(14px)";
-  g.globalAlpha = 0.85;
+  g.filter = full ? "blur(16px)" : "blur(14px)";
+  g.globalAlpha = Math.min(1, 0.85 * strength);
   g.drawImage(body, 0, 0);
   g.filter = "blur(4px)";
   g.globalAlpha = 1;
   g.drawImage(marks, 0, 0);
+  if (strength > 1) {
+    // tyres: a second, tighter pass where they touch the floor
+    g.filter = "blur(2px)";
+    g.globalAlpha = Math.min(1, strength - 1);
+    g.drawImage(marks, 0, 0);
+  }
   g.filter = "none";
   const mesh = new Mesh(
     new PlaneGeometry(spanX, spanZ),
@@ -337,10 +372,10 @@ export async function mountCar(
   const scene = new Scene();
   const env = studio(renderer);
   scene.environment = env;
-  scene.environmentIntensity = 1;
+  scene.environmentIntensity = opts.model?.envIntensity ?? 1;
   // Direct light: a soft key for what reflections don't carry (tyres, textured grille, wheels),
   // two rims from behind and above to cut the silhouette out of the dark page
-  const key = new DirectionalLight(0xffffff, 1.2);
+  const key = new DirectionalLight(0xffffff, opts.model?.keyIntensity ?? 1.2);
   key.position.set(-2, 6, 5);
   const rimL = new DirectionalLight(0xe4eaf4, 1.8);
   rimL.position.set(-4, 5, -7);
@@ -414,7 +449,34 @@ export async function mountCar(
     cloud[ci++] = p[2];
   });
   cells.clear();
-  turntable.add(contactShadow(cloud, length, width));
+  turntable.add(contactShadow(cloud, length, width, opts.model?.shadow ?? 1));
+  if (opts.model?.floorLight) {
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const g = c.getContext("2d")!;
+    const grad = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+    grad.addColorStop(0, `rgba(220,228,240,${opts.model.floorLight})`);
+    grad.addColorStop(
+      0.55,
+      `rgba(220,228,240,${opts.model.floorLight * 0.35})`,
+    );
+    grad.addColorStop(1, "rgba(220,228,240,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 256, 256);
+    const pool = new Mesh(
+      new PlaneGeometry(length * 2.1, length * 1.5),
+      new MeshBasicMaterial({
+        map: new CanvasTexture(c),
+        transparent: true,
+        depthWrite: false,
+        toneMapped: false,
+      }),
+    );
+    pool.rotation.x = -Math.PI / 2;
+    pool.position.y = 0.002;
+    pool.renderOrder = -2;
+    scene.add(pool);
+  }
 
   const camera = new PerspectiveCamera(15, 1, 0.1, 200);
   const viewProj = new Matrix4();
@@ -444,7 +506,7 @@ export async function mountCar(
   const aim = height * 0.45;
   const place = (d: number) => {
     camera.clearViewOffset();
-    camera.position.set(0, aim + Math.tan(PITCH) * d, d);
+    camera.position.set(0, aim + Math.tan(opts.model?.pitch ?? PITCH) * d, d);
     camera.lookAt(0, aim, 0);
     camera.updateMatrixWorld();
     camera.updateProjectionMatrix();
@@ -593,7 +655,12 @@ export async function mountCar(
   // ── rendering on demand
   let raf = 0;
   // with the intro the car starts a little before its rest pose; reduced motion: at rest, still
-  let yaw = opts.reducedMotion ? REST_YAW : REST_YAW - INTRO_TURN;
+  const turn = opts.reducedMotion ? undefined : opts.model?.autoRotate;
+  let yaw = opts.reducedMotion || turn ? REST_YAW : REST_YAW - INTRO_TURN;
+  let onScreen = false;
+  let lastTouch = -Infinity; // last interaction (ms)
+  let resumeTimer = 0;
+  let ramp = 0; // auto-rotation speed, eased in after a pause (0 → 1)
   let velocity = 0; // rad / ms
   let intro: { from: number; start: number } | null = null;
   let dragging = false;
@@ -623,6 +690,28 @@ export async function mountCar(
       yaw += velocity * dt;
       velocity *= Math.exp(-dt / 190); // short glide, settles within ~0.6 s
       again = true;
+    }
+    if (turn) {
+      const free =
+        !dragging &&
+        Math.abs(velocity) <= 0.00002 &&
+        now - lastTouch > turn.resumeMs;
+      if (free && onScreen) {
+        ramp = Math.min(1, ramp + dt / 1800); // eases back in over ~2 s, never a jolt
+        yaw +=
+          ((ramp * ramp * (3 - 2 * ramp) * Math.PI * 2) / turn.periodMs) * dt;
+        again = true;
+      } else {
+        ramp = 0;
+        // paused: no frames while waiting; wake up when the pause is over
+        if (onScreen && !dragging && Math.abs(velocity) <= 0.00002) {
+          window.clearTimeout(resumeTimer);
+          resumeTimer = window.setTimeout(
+            schedule,
+            Math.max(0, turn.resumeMs - (now - lastTouch)) + 30,
+          );
+        }
+      }
     }
     render();
     if (again) schedule();
@@ -682,6 +771,7 @@ export async function mountCar(
     // no native image drag / text selection: they would cancel the gesture
     if (e.pointerType === "mouse") e.preventDefault();
     intro = null;
+    lastTouch = performance.now();
     velocity = 0;
     start = {
       x: e.clientX,
@@ -719,6 +809,7 @@ export async function mountCar(
       surface.setPointerCapture(e.pointerId);
       firstTouch();
     }
+    lastTouch = performance.now();
     const prev = samples[samples.length - 1];
     yaw += (e.clientX - prev.x) * perPixel();
     samples.push({ x: e.clientX, t: e.timeStamp });
@@ -740,6 +831,7 @@ export async function mountCar(
     }
     dragging = false;
     start = null;
+    lastTouch = performance.now();
     delete surface.dataset.dragging;
     surface.style.cursor = e.pointerType === "mouse" && onCar(e) ? "grab" : "";
   };
@@ -747,6 +839,7 @@ export async function mountCar(
     if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
     e.preventDefault();
     intro = null;
+    lastTouch = performance.now();
     firstTouch();
     velocity = (e.key === "ArrowRight" ? 1 : -1) * 0.0022;
     schedule();
@@ -761,7 +854,19 @@ export async function mountCar(
 
   // ── intro: a slow ~25° turn the first time the car is on screen, then still
   let io: IntersectionObserver | null = null;
-  if (!opts.reducedMotion) {
+  // turntable: runs only while the car is on screen
+  let seen: IntersectionObserver | null = null;
+  if (turn) {
+    seen = new IntersectionObserver(
+      (entries) => {
+        onScreen = entries[entries.length - 1].isIntersecting;
+        if (onScreen) schedule();
+      },
+      { threshold: 0.15 },
+    );
+    seen.observe(canvas);
+  }
+  if (!opts.reducedMotion && !turn) {
     io = new IntersectionObserver(
       (entries) => {
         // several entries can arrive in one callback: the latest state wins
@@ -790,8 +895,10 @@ export async function mountCar(
   return {
     dispose() {
       cancelAnimationFrame(raf);
+      window.clearTimeout(resumeTimer);
       ro.disconnect();
       io?.disconnect();
+      seen?.disconnect();
       surface.removeEventListener("dragstart", noDrag);
       surface.removeEventListener("pointerdown", down);
       surface.removeEventListener("pointermove", move);

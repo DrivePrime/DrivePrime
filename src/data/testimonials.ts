@@ -12,7 +12,13 @@ export interface Testimonial {
   vehicleId?: string;
 }
 
-export const testimonials: Testimonial[] = [
+/*
+  Room for 11 reviews. Only real reviews are shown: the slider, its counter (01 / 06 … 01 / 11)
+  and its indicators are generated from `testimonials` below, so adding a review here is enough.
+  The 5 slots marked TODO wait for genuine reviews from the owner (name, city, text, language) —
+  never fill them with invented content.
+*/
+const reviews: (Testimonial | null)[] = [
   {
     name: "Pierre Dubois",
     location: "Paris, France",
@@ -50,4 +56,14 @@ export const testimonials: Testimonial[] = [
     text: "Réservation simple via WhatsApp, livraison au riad, véhicule impeccable. Que demander de plus ? Je reviendrai certainement !",
     lang: "fr",
   },
+  // TODO(owner): 5 genuine reviews to provide — { name, location, text, lang, vehicleId? }
+  null,
+  null,
+  null,
+  null,
+  null,
 ];
+
+export const testimonials: Testimonial[] = reviews.filter(
+  (r): r is Testimonial => r !== null,
+);

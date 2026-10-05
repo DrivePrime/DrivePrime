@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
@@ -23,7 +29,9 @@ export default function Testimonials() {
   const exitTimer = useRef<number>();
   const n = testimonials.length;
   const review = testimonials[index];
-  const car = review.vehicleId ? vehicles.find((v) => v.id === review.vehicleId) : undefined;
+  const car = review.vehicleId
+    ? vehicles.find((v) => v.id === review.vehicleId)
+    : undefined;
   useEffect(() => () => window.clearTimeout(exitTimer.current), []);
 
   const show = (next: number, d: 1 | -1) => {
@@ -32,7 +40,7 @@ export default function Testimonials() {
     window.clearTimeout(exitTimer.current);
     if (document.documentElement.classList.contains("js-motion")) {
       setLeaving(index);
-      exitTimer.current = window.setTimeout(() => setLeaving(null), 200);
+      exitTimer.current = window.setTimeout(() => setLeaving(null), 220);
     }
     setIndex(next);
   };
@@ -54,7 +62,12 @@ export default function Testimonials() {
       className="group/car inline-flex items-center gap-3 rounded-full border border-border py-1 pe-4 ps-1 text-[14px] text-foreground/85 transition-colors hover:border-foreground/30 hover:text-foreground"
     >
       <span className="block h-8 w-12 overflow-hidden rounded-full bg-card">
-        <img src={car.thumb} alt="" loading="lazy" className="h-full w-full scale-[1.45] object-cover object-[50%_62%]" />
+        <img
+          src={car.thumb}
+          alt=""
+          loading="lazy"
+          className="h-full w-full scale-[1.45] object-cover object-[50%_62%]"
+        />
       </span>
       {car.name}
       <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/car:translate-x-0.5" />
@@ -71,8 +84,12 @@ export default function Testimonials() {
       </blockquote>
       <figcaption className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3">
         <span>
-          <span className="block text-[15px] font-semibold text-foreground">{r.name}</span>
-          <span className="block text-[14px] text-muted-foreground">{r.location}</span>
+          <span className="block text-[15px] font-semibold text-foreground">
+            {r.name}
+          </span>
+          <span className="block text-[14px] text-muted-foreground">
+            {r.location}
+          </span>
         </span>
         {extra}
       </figcaption>
@@ -84,26 +101,56 @@ export default function Testimonials() {
 
   const controls = (className: string) => (
     <div className={cn("items-center gap-6", className)}>
-      <button type="button" onClick={() => go(-1)} aria-label={t.testimonials.prev} aria-controls="review-slide" className={arrow}>
+      <button
+        type="button"
+        onClick={() => go(-1)}
+        aria-label={t.testimonials.prev}
+        aria-controls="review-slide"
+        className={arrow}
+      >
         <ArrowLeft className="h-5 w-5 rtl:rotate-180" />
       </button>
-      <p dir="ltr" className="tabular type-wide text-[15px] font-semibold text-foreground" aria-hidden="true">
-        {pad(index + 1)} <span className="text-muted-foreground">/ {pad(n)}</span>
+      <p
+        dir="ltr"
+        className="tabular type-wide text-[15px] font-semibold text-foreground"
+        aria-hidden="true"
+      >
+        {pad(index + 1)}{" "}
+        <span className="text-muted-foreground">/ {pad(n)}</span>
       </p>
-      <button type="button" onClick={() => go(1)} aria-label={t.testimonials.next} aria-controls="review-slide" className={arrow}>
+      <button
+        type="button"
+        onClick={() => go(1)}
+        aria-label={t.testimonials.next}
+        aria-controls="review-slide"
+        className={arrow}
+      >
         <ArrowRight className="h-5 w-5 rtl:rotate-180" />
       </button>
     </div>
   );
 
   return (
-    <section id="temoignages" aria-labelledby="testimonials-title" className="relative overflow-hidden py-24 lg:py-36">
+    <section
+      id="temoignages"
+      aria-labelledby="testimonials-title"
+      className="relative overflow-hidden py-24 lg:py-36"
+    >
       <div className="container grid gap-12 lg:grid-cols-12 lg:gap-16">
         <div data-reveal="rise" className="flex flex-col lg:col-span-4">
-          <h2 id="testimonials-title" className="type-display text-4xl font-semibold text-foreground sm:text-5xl">
+          <p className="kicker">
+            <span aria-hidden="true" className="kicker-rule" />
+            {t.testimonials.kicker}
+          </p>
+          <h2
+            id="testimonials-title"
+            className="type-display mt-5 text-4xl font-semibold text-foreground sm:text-5xl"
+          >
             {t.testimonials.title}
           </h2>
-          <p className="mt-5 max-w-[34ch] text-base leading-relaxed text-muted-foreground sm:text-lg">{t.testimonials.intro}</p>
+          <p className="mt-5 max-w-[34ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
+            {t.testimonials.intro}
+          </p>
           {controls("mt-auto hidden pt-12 lg:flex")}
         </div>
 
@@ -152,15 +199,22 @@ export default function Testimonials() {
               key={index}
               lang={review.lang}
               dir="ltr"
-              style={leaving !== null ? { animationDelay: "var(--dur-fast)" } : undefined}
-              className={cn("text-left", dir === 1 ? "quote-in-next" : "quote-in-prev")}
+              style={
+                leaving !== null
+                  ? { animationDelay: "var(--dur-fast)" }
+                  : undefined
+              }
+              className={cn(
+                "text-left",
+                dir === 1 ? "quote-in-next" : "quote-in-prev",
+              )}
             >
               {quoteBody(review, carLink)}
             </figure>
           </div>
 
           {/* Progress: one segment per review, each one selectable */}
-          <div className="mt-7 flex items-center">
+          <div className="mt-7 flex flex-wrap items-center">
             {testimonials.map((r, i) => (
               <button
                 key={r.name}
@@ -168,12 +222,14 @@ export default function Testimonials() {
                 onClick={() => show(i, i > index ? 1 : -1)}
                 aria-label={t.testimonials.position(i + 1, n)}
                 aria-current={i === index}
-                className="group/seg grid h-11 min-w-11 place-items-center px-1"
+                className="group/seg grid h-11 min-w-10 place-items-center px-1"
               >
                 <span
                   className={cn(
                     "block h-0.5 rounded-full transition-[width,background-color] duration-500 [transition-timing-function:var(--ease-out)]",
-                    i === index ? "w-12 bg-primary" : "w-6 bg-foreground/20 group-hover/seg:bg-foreground/45",
+                    i === index
+                      ? "w-10 bg-primary"
+                      : "w-5 bg-foreground/20 group-hover/seg:bg-foreground/45",
                   )}
                 />
               </button>

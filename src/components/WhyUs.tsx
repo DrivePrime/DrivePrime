@@ -49,10 +49,27 @@ export default function WhyUs() {
   const section = useRef<HTMLElement>(null);
   const [shown, setShown] = useState(false);
 
-  const facts = [
-    w.factVehicles(vehicles.length),
-    w.factRange(formatPrice(LOWEST), formatPrice(HIGHEST)),
-    ...(confirmed.services.support24h ? [w.factSupport] : []),
+  // One editorial line: figure first, small caption under it (data or owner-confirmed only)
+  const stats = [
+    {
+      value: String(vehicles.length),
+      label: w.stats.vehicles,
+      full: w.factVehicles(vehicles.length),
+    },
+    {
+      value: `${formatPrice(LOWEST)} – ${formatPrice(HIGHEST)}`,
+      label: w.stats.perDay,
+      full: w.factRange(formatPrice(LOWEST), formatPrice(HIGHEST)),
+    },
+    ...(confirmed.services.support24h
+      ? [
+          {
+            value: w.stats.supportValue,
+            label: w.stats.support,
+            full: w.factSupport,
+          },
+        ]
+      : []),
   ];
 
   // One entrance per visit: never replays while scrolling up and down
@@ -115,23 +132,18 @@ export default function WhyUs() {
 
         {/* Studio window: the photo's own night backdrop, framed as an object on the light page */}
         <figure className="wy-visual studio-window relative overflow-hidden rounded-xl lg:col-span-6">
-          <EvoqueStage hint={t.footer.dragHint} />
-          <figcaption className="relative px-6 pb-6 sm:px-8 sm:pb-8">
-            <ul
-              aria-label={w.factsLabel}
-              className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[15px]"
-            >
-              {facts.map((fact, i) => (
-                <li key={fact} className="flex items-center gap-5">
-                  {i > 0 && (
-                    <span aria-hidden="true" className="h-4 w-px bg-white/20" />
-                  )}
-                  <span className="tabular font-semibold text-[#ede9e3]">
-                    {fact}
-                  </span>
-                </li>
+          <EvoqueStage hint={w.explore} />
+          <figcaption className="relative px-6 pb-7 sm:px-8 sm:pb-8">
+            <dl aria-label={w.factsLabel} className="wy-stats">
+              {stats.map((st) => (
+                <div key={st.label} className="wy-stat" title={st.full}>
+                  <dt className="wy-stat-label">{st.label}</dt>
+                  <dd dir="auto" className="wy-stat-value tabular">
+                    {st.value}
+                  </dd>
+                </div>
               ))}
-            </ul>
+            </dl>
           </figcaption>
         </figure>
       </div>
@@ -197,13 +209,28 @@ function EvoqueStage({ hint }: { hint: string }) {
                 !document.documentElement.classList.contains("js-motion"),
               onInteract: () => setHintOn(false),
               framing: () => ({
-                ground: 0.84,
+                ground: 0.8,
                 margin: window.innerWidth >= 640 ? 28 : 16,
                 gap: 0,
                 keepOut: [],
                 far: "center",
               }),
-              model: { lengthM: 4.37, tune, exposure: 0.82, sweep: false },
+              model: {
+                lengthM: 4.37,
+                tune,
+                exposure: 0.9,
+                envIntensity: 0.75,
+                keyIntensity: 0.9,
+                sweep: false,
+                shadow: 2,
+                floorLight: 0.22,
+                pitch: 0.2,
+                // a slow turntable: ~34 s a turn (~44 s on phones), paused 4 s after any touch
+                autoRotate: {
+                  periodMs: window.innerWidth < 768 ? 44000 : 34000,
+                  resumeMs: 4000,
+                },
+              },
             });
           })
           .then((s) => {
@@ -264,10 +291,13 @@ function EvoqueStage({ hint }: { hint: string }) {
           <p
             aria-hidden="true"
             data-on={(mode === "3d" && hintOn) || undefined}
-            className="wy-hint absolute inset-x-0 bottom-1 flex items-center justify-center gap-2"
+            className="wy-hint absolute inset-x-0 bottom-2 flex items-center justify-center gap-3"
           >
+            <span className="wy-hint-rule" />
             {hint}
-            <MoveHorizontal className="h-3.5 w-3.5" />
+            <span className="wy-hint-arrows">
+              <MoveHorizontal className="h-3.5 w-3.5" />
+            </span>
           </p>
         </>
       )}
