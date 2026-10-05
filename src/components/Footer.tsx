@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight, MoveHorizontal } from "lucide-react";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { business, whatsappUrl, hasConfirmedServices } from "@/config/business";
 import { vehicles, type Vehicle } from "@/data/vehicles";
@@ -11,6 +11,22 @@ const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 const FEATURED_ID = "mercedes-classe-g";
+
+/*
+  3D Classe G (G63 model) — LOCAL PROTOTYPE ONLY: the model's licence is non-commercial.
+  Enabled in `vite` dev, or in a local build made with VITE_G63_LOCAL=true. A normal build never
+  loads it, and vite.config removes public/models from the output.
+*/
+const G63_3D = import.meta.env.DEV || import.meta.env.VITE_G63_LOCAL === "true";
+const G63_URL = "/models/g63/2020_mercedes-benz_g-class_amg_g_63.glb";
+const hasWebGL = () => {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+};
 const featured = vehicles.find((v) => v.id === FEATURED_ID) ?? vehicles[0];
 
 /*
@@ -30,6 +46,55 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
   const fleetLink = useRef<HTMLAnchorElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
   const car = useRef<HTMLDivElement>(null);
+  const canvas = useRef<HTMLCanvasElement>(null);
+  const use3d = G63_3D && shown.id === FEATURED_ID;
+  // "photo" until the model is loaded and its first frame drawn; then a crossfade to "3d"
+  const [carMode, setCarMode] = useState<"photo" | "3d">("photo");
+  const [hint, setHint] = useState(true);
+  // where the brass line lands on the 3D car (fractions of its frame); null = the photo's wheel
+  const [anchor, setAnchor] = useState<{ fx: number; fy: number } | null>(null);
+
+  // Load the 3D car only when the closing scene approaches (13 MB model), never with the page.
+  // Any failure (no WebGL, network, parse) leaves the photo in place.
+  useEffect(() => {
+    if (!use3d || !car.current || !canvas.current || !hasWebGL()) return;
+    let stage: { dispose(): void } | null = null;
+    let cancelled = false;
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) return;
+        io.disconnect();
+        import("./footer-car-3d")
+          .then(({ mountCar }) =>
+            mountCar(canvas.current!, {
+              url: G63_URL,
+              surface: car.current!,
+              reducedMotion:
+                !document.documentElement.classList.contains("js-motion"),
+              onInteract: () => setHint(false),
+              groundAt: 0.95,
+              isRTL: () => document.documentElement.dir === "rtl",
+              onAnchor: (fx, fy) => setAnchor({ fx, fy }),
+            }),
+          )
+          .then((s) => {
+            if (cancelled) return s.dispose();
+            stage = s;
+            setCarMode("3d");
+          })
+          .catch((err) => {
+            console.warn("3D car unavailable, keeping the photo:", err);
+          });
+      },
+      { rootMargin: "700px 0px" },
+    );
+    io.observe(car.current);
+    return () => {
+      cancelled = true;
+      io.disconnect();
+      stage?.dispose();
+    };
+  }, [use3d]);
   const [trace, setTrace] = useState<{
     w: number;
     h: number;
@@ -81,8 +146,10 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
       // and the rear one in RTL (car on the left)
       const top = k.y - c.offsetHeight * 0.5;
       // (photo enlarged ×1.14 around 50% 58% inside the frame)
-      const ex = k.x + c.offsetWidth * (isRTL ? 0.81 : 0.2);
-      const ey = top + c.offsetHeight * 0.92;
+      const fx = carMode === "3d" && anchor ? anchor.fx : isRTL ? 0.81 : 0.2;
+      const fy = carMode === "3d" && anchor ? anchor.fy : 0.92;
+      const ex = k.x + c.offsetWidth * fx;
+      const ey = top + c.offsetHeight * fy;
       const dx = ex - sx;
       const d = `M ${sx} ${sy} C ${sx + dx * 0.5} ${sy}, ${sx + dx * 0.55} ${ey}, ${ex} ${ey}`;
       setTrace({ w: b.offsetWidth, h: b.offsetHeight, d });
@@ -92,7 +159,7 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
     if (box.current) ro.observe(box.current);
     document.fonts?.ready.then(measure);
     return () => ro.disconnect();
-  }, [isRTL, t]);
+  }, [isRTL, t, carMode, anchor]);
 
   useEffect(() => {
     const parts = Array.from(
@@ -196,9 +263,16 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
 
           {/* A real fleet photo, framed around the car; its studio backdrop dissolves into the night */}
           <div
-            aria-hidden="true"
             ref={car}
-            className="foot-car pointer-events-none relative mx-auto mt-10 w-full max-w-[40rem] lg:absolute lg:end-0 lg:start-[55%] lg:top-1/2 lg:mx-0 lg:mt-0 lg:w-auto lg:max-w-none lg:-translate-y-1/2"
+            data-car={carMode}
+            {...(carMode === "3d"
+              ? {
+                  role: "img",
+                  tabIndex: 0,
+                  "aria-label": `${shown.name} — ${t.footer.dragHint}`,
+                }
+              : { "aria-hidden": true })}
+            className="foot-car relative mx-auto mt-10 w-full max-w-[40rem] lg:absolute lg:end-0 lg:start-[55%] lg:top-1/2 lg:mx-0 lg:mt-0 lg:w-auto lg:max-w-none lg:-translate-y-1/2"
           >
             <div className="foot-car-in relative z-[1]">
               <img
@@ -210,9 +284,31 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
                 height={1024}
                 loading="lazy"
                 decoding="async"
+                draggable={false}
                 className="foot-car-img block aspect-[17/10] w-full object-cover object-[50%_55%]"
               />
             </div>
+            {use3d && (
+              <>
+                <div
+                  aria-hidden="true"
+                  className="foot-car-light absolute inset-0"
+                />
+                <canvas
+                  ref={canvas}
+                  aria-hidden="true"
+                  className="foot-car-3d absolute inset-0 h-full w-full"
+                />
+                <p
+                  aria-hidden="true"
+                  className="foot-hint absolute inset-x-0 top-full mt-1 flex items-center justify-center gap-2"
+                  data-on={(carMode === "3d" && hint) || undefined}
+                >
+                  {t.footer.dragHint}
+                  <MoveHorizontal className="h-3.5 w-3.5" />
+                </p>
+              </>
+            )}
           </div>
 
           {/* Signature: one brass line drawn from the text towards the car */}

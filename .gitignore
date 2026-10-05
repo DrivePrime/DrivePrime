@@ -37,3 +37,6 @@ supabase/.branches
 
 # Build-time prerender bundle
 dist-server
+
+# 3D models under non-commercial licences: local prototype only, never committed or deployed
+public/models/

@@ -227,6 +227,7 @@ const fr = {
     explore: "Navigation",
     contact: "Contact",
     rights: "Tous droits réservés.",
+    dragHint: "Glisser pour explorer",
   },
   vehicleDetail: {
     back: "La flotte",
@@ -498,6 +499,7 @@ const en: Translations = {
     explore: "Navigation",
     contact: "Contact",
     rights: "All rights reserved.",
+    dragHint: "Drag to explore",
   },
   vehicleDetail: {
     back: "Fleet",
@@ -763,6 +765,7 @@ const ar: Translations = {
     explore: "التصفح",
     contact: "اتصل بنا",
     rights: "جميع الحقوق محفوظة.",
+    dragHint: "اسحب للاستكشاف",
   },
   vehicleDetail: {
     back: "الأسطول",

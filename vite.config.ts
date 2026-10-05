@@ -3,9 +3,24 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// public/models holds 3D models under non-commercial licences (local prototype only):
+// they are removed from every build output unless VITE_G63_LOCAL=true is set explicitly.
+const dropLocalModels = () => ({
+  name: "drop-local-models",
+  apply: "build" as const,
+  writeBundle(options: { dir?: string }) {
+    if (process.env.VITE_G63_LOCAL === "true" || !options.dir) return;
+    fs.rmSync(path.join(options.dir, "models"), {
+      recursive: true,
+      force: true,
+    });
+  },
+});
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -19,6 +34,7 @@ export default defineConfig(({ mode }) => ({
 
   plugins: [
     react(),
+    dropLocalModels(),
     mode === "development" && componentTagger(),
   ].filter(Boolean),
 
