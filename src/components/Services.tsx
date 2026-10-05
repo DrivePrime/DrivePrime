@@ -73,8 +73,8 @@ function Shot({
         srcSet={scene.srcSet}
         sizes={SIZES}
         alt=""
-        width={1536}
-        height={1024}
+        width={1344}
+        height={752}
         loading={eager ? "eager" : "lazy"}
         decoding="async"
         className="shot-media absolute inset-0 h-full w-full object-cover"

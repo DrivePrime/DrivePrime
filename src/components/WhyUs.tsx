@@ -133,8 +133,12 @@ export default function WhyUs() {
         {/* Studio window: the photo's own night backdrop, framed as an object on the light page */}
         <figure className="wy-visual studio-window relative overflow-hidden rounded-xl lg:col-span-6">
           <EvoqueStage hint={w.explore} />
-          <figcaption className="relative px-6 pb-7 sm:px-8 sm:pb-8">
-            <dl aria-label={w.factsLabel} className="wy-stats">
+          <figcaption className="relative px-5 pb-7 pt-2 sm:px-8 sm:pb-8">
+            <dl
+              aria-label={w.factsLabel}
+              className="wy-stats"
+              style={{ "--n": stats.length } as CSSProperties}
+            >
               {stats.map((st) => (
                 <div key={st.label} className="wy-stat" title={st.full}>
                   <dt className="wy-stat-label">{st.label}</dt>
@@ -209,7 +213,7 @@ function EvoqueStage({ hint }: { hint: string }) {
                 !document.documentElement.classList.contains("js-motion"),
               onInteract: () => setHintOn(false),
               framing: () => ({
-                ground: 0.8,
+                ground: 0.88,
                 margin: window.innerWidth >= 640 ? 28 : 16,
                 gap: 0,
                 keepOut: [],
@@ -291,7 +295,7 @@ function EvoqueStage({ hint }: { hint: string }) {
           <p
             aria-hidden="true"
             data-on={(mode === "3d" && hintOn) || undefined}
-            className="wy-hint absolute inset-x-0 bottom-2 flex items-center justify-center gap-3"
+            className="wy-hint absolute inset-x-0 bottom-0 flex items-center justify-center gap-3"
           >
             <span className="wy-hint-rule" />
             {hint}

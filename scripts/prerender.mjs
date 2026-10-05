@@ -109,10 +109,10 @@ fs.writeFileSync(
     .replace('<meta charset="UTF-8" />', '<meta charset="UTF-8" />\n    <meta name="robots" content="noindex, nofollow" />'),
 );
 
-// Home: preload the hero photo (written last, the template above must stay untouched).
+// Home: preload the hero poster (the film's first frame; written last, the template above must stay untouched).
 fs.writeFileSync(
   path.join(dist, "index.html"),
-  withBody(preload(template, `${asset("hero-960-")} 960w, ${asset("hero-1680-")} 1680w`, "100vw"), "/"),
+  withBody(preload(template, `${asset("hero-film-960-")} 960w, ${asset("hero-film-1920-")} 1920w`, "100vw"), "/"),
 );
 
 console.log(`prerender: home + ${vehicles.length} vehicle pages + 404.html + admin.html shell`);

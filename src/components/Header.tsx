@@ -122,7 +122,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
     >
       <div
         className={cn(
-          "container flex items-center gap-8 transition-[height] duration-500 [transition-timing-function:var(--ease-out)]",
+          "container flex items-center gap-4 xl:gap-8 transition-[height] duration-500 [transition-timing-function:var(--ease-out)]",
           expanded ? "h-16 lg:h-[88px]" : "h-16 lg:h-[68px]",
         )}
       >
@@ -149,7 +149,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
         <nav
           ref={navRef}
           aria-label={t.nav.mainNav}
-          className="relative ms-auto hidden items-center gap-1 lg:flex"
+          className="relative ms-auto hidden items-center gap-0 lg:flex xl:gap-1"
         >
           {navLinks.map((link) => {
             const current = activeSection === link.id;
@@ -160,7 +160,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
                 aria-current={current ? "true" : undefined}
                 data-current={current || undefined}
                 data-id={link.id}
-                className="nav-link relative rounded-sm px-3 py-2 text-[14px] font-medium"
+                className="nav-link relative whitespace-nowrap rounded-sm px-2 py-2 text-[13.5px] font-medium xl:px-3 xl:text-[14px]"
               >
                 {link.name}
               </Link>

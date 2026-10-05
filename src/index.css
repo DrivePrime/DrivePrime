@@ -426,6 +426,71 @@
     transparent 60%
   );
 }
+/* ───── "Réserver en trois étapes": the demos (fixed 400×300 stage, scaled) ───── */
+.demo-stage {
+  transform-origin: 50% 50%;
+}
+.demo-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  margin: -2px 0 0 -2px;
+  filter: drop-shadow(0 3px 6px rgb(0 0 0 / 0.55));
+  transition: transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.demo-cursor path {
+  transform-origin: 30% 30%;
+  transition: transform 140ms var(--ease-standard);
+}
+.demo-cursor.is-press path {
+  transform: scale(0.86);
+}
+.demo-cars > * {
+  animation: dp-demo-cars 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.demo-cars > :nth-child(2) {
+  animation-delay: 50ms;
+}
+.demo-cars > :nth-child(3) {
+  animation-delay: 100ms;
+}
+@keyframes dp-demo-cars {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+.demo-car.is-chosen {
+  transform: translateY(-3px) scale(1.04);
+}
+.demo-cta,
+.demo-pop,
+.demo-msg,
+.demo-sent {
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 380ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 380ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.demo-pop {
+  transform: translateY(-4px) scale(0.98);
+  transform-origin: 50% 0;
+}
+.demo-cta.is-on,
+.demo-pop.is-on,
+.demo-msg.is-on,
+.demo-sent.is-on {
+  opacity: 1;
+  transform: none;
+}
+/* the stage's cursor is drawn in LTR coordinates in every language */
+.demo-stage .demo-cursor {
+  direction: ltr;
+}
+
 /* Contact: brass labels over white values; the form sits one step above the page */
 .contact-label {
   font-size: 12px;
@@ -1187,6 +1252,11 @@
   -webkit-user-select: none;
   user-select: none;
 }
+/* the studio floor fades out before the frame's edge: no visible seam above the facts */
+.wy-3d {
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+}
 .wy-car[data-car="3d"] .wy-3d {
   opacity: 1;
   pointer-events: auto;
@@ -1240,43 +1310,57 @@
     transform: translateX(-3px);
   }
 }
-/* the facts: one editorial line, figure over a small caption, thin brass separators */
+/* the facts: three equal columns, centred as a group; brass hairlines sit exactly between columns */
 .wy-stats {
-  display: flex;
-  flex-wrap: wrap;
-  row-gap: 1rem;
+  display: grid;
+  grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr));
+  max-width: 34rem;
+  margin-inline: auto;
 }
 .wy-stat {
   display: flex;
   flex-direction: column-reverse;
-  gap: 0.3rem;
-  padding-inline: 1.5rem;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  padding: 0.15rem 0.75rem;
+  text-align: center;
+}
+.wy-stat + .wy-stat {
   border-inline-start: 1px solid hsl(var(--primary) / 0.45);
 }
-.wy-stat:first-child {
-  padding-inline-start: 0;
-  border-inline-start: 0;
-}
 .wy-stat-value {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   font-weight: 600;
+  line-height: 1.15;
   letter-spacing: -0.005em;
   color: #f3efe9;
   font-variation-settings: "wdth" 108;
+  white-space: nowrap;
 }
 .wy-stat-label {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: rgb(237 233 227 / 0.55);
 }
+/* phones: the price range on its own row, the two short facts side by side under it */
 @media (max-width: 479px) {
-  .wy-stat {
-    padding-inline: 1rem;
+  .wy-stats {
+    grid-template-columns: 1fr 1fr;
+    row-gap: 1.1rem;
+  }
+  .wy-stat:nth-child(2) {
+    order: -1;
+    grid-column: 1 / -1;
+    border-inline-start: 0;
+  }
+  .wy-stat:nth-child(3) {
+    border-inline-start: 1px solid hsl(var(--primary) / 0.45);
   }
   .wy-stat-value {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
 

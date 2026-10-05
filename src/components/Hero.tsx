@@ -5,8 +5,8 @@ import { useLanguage } from "@/i18n/LanguageContext";
 import { confirmed } from "@/config/business";
 import BookingForm from "./BookingForm";
 import PriceTag from "./PriceTag";
-import hero960 from "@/assets/hero-960.webp";
-import hero1680 from "@/assets/hero-1680.webp";
+import hero960 from "@/assets/hero-film-960.webp";
+import hero1920 from "@/assets/hero-film-1920.webp";
 
 // Entrance timing (CSS animations in index.css; disabled by prefers-reduced-motion).
 const delay = (ms: number): CSSProperties =>
@@ -17,8 +17,10 @@ const LOWEST_RATE = Math.min(...vehicles.map((v) => v.pricePerDay));
 const POLICIES = (
   Object.keys(confirmed.policies) as (keyof typeof confirmed.policies)[]
 ).filter((k) => confirmed.policies[k]);
-// Cinematic loop made from the hero photograph (H.264 for every browser; the HEVC original is kept in design-assets/originals/video).
-const HERO_VIDEO = "/videos/hero-drive-prime-h264.mp4";
+// Cinematic film made from the hero photograph, 1080p H.264 for every browser
+// (the owner's HEVC original is kept in design-assets/originals/video).
+const HERO_VIDEO = "/videos/hero-drive-prime.mp4";
+const HERO_VIDEO_720 = "/videos/hero-drive-prime-720.mp4";
 
 /*
   Cinematic hero. The photograph is painted first (it is the poster, the LCP image and the
@@ -52,7 +54,11 @@ export default function Hero() {
     if (reduce || slow) return;
     let idle = 0;
     const start = () => {
-      v.src = HERO_VIDEO;
+      // 1080p on large screens, 720p elsewhere (same film)
+      v.src =
+        window.innerWidth * (window.devicePixelRatio || 1) > 1400
+          ? HERO_VIDEO
+          : HERO_VIDEO_720;
       v.play().catch(() => undefined); // autoplay refused: the photograph stays
     };
     // after the load event, so the film never competes with the photograph and the fonts
@@ -97,12 +103,12 @@ export default function Hero() {
         <div className="relative aspect-[4/3] overflow-hidden sm:aspect-[16/9] lg:absolute lg:inset-0 lg:aspect-auto">
           <div className="anim-photo hero-depth absolute inset-0">
             <img
-              src={hero1680}
-              srcSet={`${hero960} 960w, ${hero1680} 1680w`}
+              src={hero1920}
+              srcSet={`${hero960} 960w, ${hero1920} 1920w`}
               sizes="100vw"
               alt={t.hero.photoAlt}
-              width={1680}
-              height={934}
+              width={1920}
+              height={1080}
               {...{ fetchpriority: "high" }}
               decoding="async"
               className="hero-photo absolute inset-0 h-full w-full object-cover"

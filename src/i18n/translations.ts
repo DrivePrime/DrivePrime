@@ -183,6 +183,8 @@ const fr = {
   process: {
     title: "Réserver en trois étapes",
     stepLabels: ["Choisir", "Réserver", "Rouler"],
+    demoOpening: "Ouverture de WhatsApp…",
+    demoPrepared: "Message prêt",
     previewCaption: "Le message envoyé, déjà rempli avec votre choix",
     steps: [
       {
@@ -461,6 +463,8 @@ const en: Translations = {
   process: {
     title: "Book in three steps",
     stepLabels: ["Choose", "Book", "Drive"],
+    demoOpening: "Opening WhatsApp…",
+    demoPrepared: "Message ready",
     previewCaption: "The message we receive, pre-filled with your choice",
     steps: [
       {
@@ -735,6 +739,8 @@ const ar: Translations = {
   process: {
     title: "احجز في ثلاث خطوات",
     stepLabels: ["اختر", "احجز", "انطلق"],
+    demoOpening: "جارٍ فتح واتساب…",
+    demoPrepared: "الرسالة جاهزة",
     previewCaption: "الرسالة المرسلة، معبأة مسبقاً باختيارك",
     steps: [
       {
