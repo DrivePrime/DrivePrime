@@ -728,28 +728,55 @@
   pointer-events: none;
   transition: opacity 700ms var(--ease-standard);
 }
-/* the studio light the photo carried, kept very soft behind the 3D car */
+/* The 3D canvas is larger than the photo frame: it bleeds to the screen edge on the far side
+   (never beyond: no horizontal scroll) and above / below the frame, so the car can be framed
+   bigger; the stage keeps it clear of the text. */
+.foot-scene {
+  container-type: inline-size;
+}
+.foot-stage {
+  position: absolute;
+  inset-block: -4% -16%;
+  inset-inline: calc(-1 * var(--gutter));
+}
+@media (min-width: 1024px) {
+  .foot-stage {
+    inset-block: -30% -55%;
+    inset-inline-start: -62%; /* towards the text: the stage keeps the car clear of it */
+    inset-inline-end: calc(
+      -1 * max(0px, (100cqw - 1360px - 2 * var(--gutter)) / 2)
+    );
+  }
+}
+.foot-car-3d {
+  touch-action: pan-y; /* vertical swipes scroll the page; horizontal ones on the car turn it */
+}
+/* the studio light the photo carried: a soft pool behind the car, wherever it is framed */
 .foot-car-light {
   background: radial-gradient(
-    ellipse 50% 42% at 50% 60%,
-    hsl(215 14% 34% / 0.42),
-    transparent 72%
+    ellipse var(--lw, 40%) var(--lh, 34%) at var(--lx, 55%) var(--ly, 60%),
+    hsl(215 14% 30% / 0.38),
+    transparent 75%
   );
 }
+/* the hand cursor is set by the stage, over the car only */
 .foot-car[data-car="3d"] {
-  cursor: grab;
-  touch-action: pan-y; /* vertical swipes scroll the page; horizontal ones turn the car */
+  touch-action: pan-y;
   -webkit-user-select: none;
   user-select: none;
 }
-.foot-car[data-car="3d"][data-dragging] {
-  cursor: grabbing;
+.foot-stage {
+  pointer-events: none;
+}
+.foot-car[data-car="3d"] .foot-car-3d {
+  pointer-events: auto;
 }
 .foot-car[data-car="3d"] .foot-car-3d,
 .foot-car[data-car="3d"] .foot-car-light {
   opacity: 1;
 }
 .foot-car[data-car="3d"] .foot-car-in {
+  pointer-events: none;
   opacity: 0;
   transition: opacity 700ms var(--ease-standard);
 }

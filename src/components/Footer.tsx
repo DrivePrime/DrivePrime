@@ -10,6 +10,8 @@ import logo from "@/assets/logo-160.webp";
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
+import type { CarLayout } from "./footer-car-3d";
+
 const FEATURED_ID = "mercedes-classe-g";
 
 /*
@@ -51,8 +53,13 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
   // "photo" until the model is loaded and its first frame drawn; then a crossfade to "3d"
   const [carMode, setCarMode] = useState<"photo" | "3d">("photo");
   const [hint, setHint] = useState(true);
-  // where the brass line lands on the 3D car (fractions of its frame); null = the photo's wheel
-  const [anchor, setAnchor] = useState<{ fx: number; fy: number } | null>(null);
+  // 3D car staging reported by the stage (fractions of the canvas): where the brass line fades
+  // out, where the car sits (studio light, hint). null = the photo.
+  const [layout, setLayout] = useState<CarLayout | null>(null);
+  const copy = useRef<HTMLDivElement>(null);
+  const cta = useRef<HTMLDivElement>(null);
+  const paragraph = useRef<HTMLParagraphElement>(null);
+  const [hintTop, setHintTop] = useState<number | null>(null);
 
   // Load the 3D car only when the closing scene approaches (13 MB model), never with the page.
   // Any failure (no WebGL, network, parse) leaves the photo in place.
@@ -72,9 +79,53 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
               reducedMotion:
                 !document.documentElement.classList.contains("js-motion"),
               onInteract: () => setHint(false),
-              groundAt: 0.95,
-              isRTL: () => document.documentElement.dir === "rtl",
-              onAnchor: (fx, fy) => setAnchor({ fx, fy }),
+              framing: () => {
+                // The car may use the whole canvas but never the text's boxes (+ a gap).
+                const cv = canvas.current!.getBoundingClientRect();
+                const desktop = window.innerWidth >= 1024;
+                const rtl = document.documentElement.dir === "rtl";
+                // the ink, not the block: each line of text, each button
+                const boxes: DOMRect[] = [];
+                const ink = (node: Node | null) => {
+                  if (!node) return;
+                  const r = document.createRange();
+                  r.selectNodeContents(node);
+                  boxes.push(...Array.from(r.getClientRects()));
+                };
+                title.current
+                  ?.querySelectorAll(".foot-line > span")
+                  .forEach(ink);
+                ink(paragraph.current);
+                cta.current
+                  ?.querySelectorAll(":scope > *")
+                  .forEach((el) => boxes.push(el.getBoundingClientRect()));
+                return {
+                  // desktop: the wheels stand just above the end of the scene (the line before the details)
+                  ground: desktop
+                    ? Math.min(
+                        0.95,
+                        (box.current!.getBoundingClientRect().bottom -
+                          52 -
+                          cv.top) /
+                          cv.height,
+                      )
+                    : 0.86,
+                  margin: desktop ? 40 : 14,
+                  gap: desktop ? 24 : 0,
+                  keepOut: desktop
+                    ? boxes
+                        .filter((r) => r.width > 0)
+                        .map((r) => ({
+                          x: r.left - cv.left,
+                          y: r.top - cv.top,
+                          w: r.width,
+                          h: r.height,
+                        }))
+                    : [],
+                  far: rtl ? "left" : "right",
+                };
+              },
+              onLayout: setLayout,
             }),
           )
           .then((s) => {
@@ -99,6 +150,10 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
     w: number;
     h: number;
     d: string;
+    sx: number;
+    sy: number;
+    ex: number;
+    ey: number;
   } | null>(null);
 
   // The brass line leaves the fleet link and runs to the ground under the car's nearest wheel.
@@ -146,20 +201,34 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
       // and the rear one in RTL (car on the left)
       const top = k.y - c.offsetHeight * 0.5;
       // (photo enlarged ×1.14 around 50% 58% inside the frame)
-      const fx = carMode === "3d" && anchor ? anchor.fx : isRTL ? 0.81 : 0.2;
-      const fy = carMode === "3d" && anchor ? anchor.fy : 0.92;
-      const ex = k.x + c.offsetWidth * fx;
-      const ey = top + c.offsetHeight * fy;
+      let ex = k.x + c.offsetWidth * (isRTL ? 0.81 : 0.2);
+      let ey = top + c.offsetHeight * 0.92;
+      const cv = canvas.current;
+      if (carMode === "3d" && layout && cv) {
+        ex = k.x + cv.parentElement!.offsetLeft + cv.offsetWidth * layout.lineX;
+        ey = top + cv.parentElement!.offsetTop + cv.offsetHeight * layout.lineY;
+      }
       const dx = ex - sx;
       const d = `M ${sx} ${sy} C ${sx + dx * 0.5} ${sy}, ${sx + dx * 0.55} ${ey}, ${ex} ${ey}`;
-      setTrace({ w: b.offsetWidth, h: b.offsetHeight, d });
+      setTrace({ w: b.offsetWidth, h: b.offsetHeight, d, sx, sy, ex, ey });
     };
     measure();
     const ro = new ResizeObserver(measure);
     if (box.current) ro.observe(box.current);
     document.fonts?.ready.then(measure);
     return () => ro.disconnect();
-  }, [isRTL, t, carMode, anchor]);
+  }, [isRTL, t, carMode, layout]);
+
+  // The hint sits just under the car's shadow, wherever the framing put it
+  useIsoLayoutEffect(() => {
+    const cv = canvas.current;
+    if (!cv || !layout) return setHintTop(null);
+    setHintTop(
+      cv.parentElement!.offsetTop +
+        cv.offsetHeight * (layout.cy + layout.h / 2) +
+        22,
+    );
+  }, [layout]);
 
   useEffect(() => {
     const parts = Array.from(
@@ -207,9 +276,9 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
       >
         <div
           ref={box}
-          className="container relative flex flex-col pb-6 pt-24 lg:min-h-[38rem] lg:justify-center lg:pb-16 lg:pt-24"
+          className="container relative flex flex-col pb-14 pt-24 lg:min-h-[38rem] lg:justify-center lg:pb-16 lg:pt-24"
         >
-          <div className="foot-copy relative z-10 lg:w-[54%]">
+          <div ref={copy} className="foot-copy relative z-10 lg:w-[54%]">
             <h2
               ref={title}
               id="final-cta-title"
@@ -229,12 +298,14 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
               ))}
             </h2>
             <p
+              ref={paragraph}
               className="foot-in mt-6 max-w-[40ch] text-base leading-relaxed text-muted-foreground sm:text-lg"
               style={{ "--d": "260ms" } as React.CSSProperties}
             >
               {t.finalCta.text}
             </p>
             <div
+              ref={cta}
               className="foot-in mt-9 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-7"
               style={{ "--d": "330ms" } as React.CSSProperties}
             >
@@ -290,18 +361,32 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
             </div>
             {use3d && (
               <>
-                <div
-                  aria-hidden="true"
-                  className="foot-car-light absolute inset-0"
-                />
-                <canvas
-                  ref={canvas}
-                  aria-hidden="true"
-                  className="foot-car-3d absolute inset-0 h-full w-full"
-                />
+                {/* stage: larger than the photo frame (see .foot-stage) */}
+                <div className="foot-stage">
+                  <div
+                    aria-hidden="true"
+                    className="foot-car-light absolute inset-0"
+                    style={
+                      layout
+                        ? ({
+                            "--lx": `${layout.cx * 100}%`,
+                            "--ly": `${(layout.cy + layout.h * 0.12) * 100}%`,
+                            "--lw": `${layout.w * 62}%`,
+                            "--lh": `${layout.h * 70}%`,
+                          } as React.CSSProperties)
+                        : undefined
+                    }
+                  />
+                  <canvas
+                    ref={canvas}
+                    aria-hidden="true"
+                    className="foot-car-3d absolute inset-0 h-full w-full"
+                  />
+                </div>
                 <p
                   aria-hidden="true"
-                  className="foot-hint absolute inset-x-0 top-full mt-1 flex items-center justify-center gap-2"
+                  className="foot-hint absolute inset-x-0 flex items-center justify-center gap-2"
+                  style={{ top: hintTop ?? "100%" }}
                   data-on={(carMode === "3d" && hint) || undefined}
                 >
                   {t.footer.dragHint}
@@ -318,7 +403,44 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
               className="foot-trace pointer-events-none absolute inset-0 h-full w-full"
               viewBox={`0 0 ${trace.w} ${trace.h}`}
             >
-              <path d={trace.d} pathLength={1} />
+              <defs>
+                <linearGradient
+                  id="foot-trace-fade"
+                  gradientUnits="userSpaceOnUse"
+                  x1={trace.sx}
+                  y1={trace.sy}
+                  x2={trace.ex}
+                  y2={trace.ey}
+                >
+                  <stop
+                    offset="0"
+                    style={{
+                      stopColor: "hsl(var(--primary))",
+                      stopOpacity: 0.75,
+                    }}
+                  />
+                  <stop
+                    offset="0.55"
+                    style={{
+                      stopColor: "hsl(var(--primary))",
+                      stopOpacity: 0.6,
+                    }}
+                  />
+                  <stop
+                    offset="1"
+                    style={{ stopColor: "hsl(var(--primary))", stopOpacity: 0 }}
+                  />
+                </linearGradient>
+              </defs>
+              <path
+                d={trace.d}
+                pathLength={1}
+                style={
+                  carMode === "3d" && layout
+                    ? { stroke: "url(#foot-trace-fade)", opacity: 1 }
+                    : undefined
+                }
+              />
             </svg>
           )}
         </div>
