@@ -40,3 +40,6 @@ dist-server
 
 # 3D models under non-commercial licences: local prototype only, never committed or deployed
 public/models/
+
+.vercel
+.env*
