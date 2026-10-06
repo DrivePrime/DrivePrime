@@ -9,8 +9,13 @@ import NotFound from "./pages/NotFound";
 
 // Admin is a separate back-office: keep Supabase, charts and calendars out of the public bundle.
 const AdminLogin = lazy(() => import("./pages/admin/AdminLogin"));
+const AdminResetPassword = lazy(
+  () => import("./pages/admin/AdminResetPassword"),
+);
 const AdminLayout = lazy(() => import("./admin/AdminLayout"));
-const RequireAdmin = lazy(() => import("./admin/AdminAuth").then((m) => ({ default: m.RequireAdmin })));
+const RequireAdmin = lazy(() =>
+  import("./admin/AdminAuth").then((m) => ({ default: m.RequireAdmin })),
+);
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminReservations = lazy(() => import("./pages/admin/AdminReservations"));
 const AdminFleet = lazy(() => import("./pages/admin/AdminFleet"));
@@ -32,25 +37,26 @@ export function AppProviders({ children }: { children: ReactNode }) {
 export function AppRoutes() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-background" />}>
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/vehicule/:id" element={<VehicleDetail />} />
-      <Route path="/admin/login" element={<AdminLogin />} />
-      <Route
-        path="/admin"
-        element={
-          <RequireAdmin>
-            <AdminLayout />
-          </RequireAdmin>
-        }
-      >
-        <Route index element={<AdminDashboard />} />
-        <Route path="reservations" element={<AdminReservations />} />
-        <Route path="flotte" element={<AdminFleet />} />
-        <Route path="calendrier" element={<AdminCalendar />} />
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/vehicule/:id" element={<VehicleDetail />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/reset-password" element={<AdminResetPassword />} />
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin>
+              <AdminLayout />
+            </RequireAdmin>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="reservations" element={<AdminReservations />} />
+          <Route path="flotte" element={<AdminFleet />} />
+          <Route path="calendrier" element={<AdminCalendar />} />
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </Suspense>
   );
 }

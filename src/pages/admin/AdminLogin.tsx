@@ -12,10 +12,13 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
+  const [notice, setNotice] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const { status } = useAdminStatus();
-  const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname || "/admin";
+  const from =
+    (location.state as { from?: { pathname?: string } } | null)?.from
+      ?.pathname || "/admin";
 
   useEffect(() => {
     if (status === "admin") navigate(from, { replace: true });
@@ -23,7 +26,9 @@ export default function AdminLogin() {
 
   useEffect(() => {
     document.title = "Administration | Drive Prime";
-    let robots = document.head.querySelector<HTMLMetaElement>('meta[name="robots"]');
+    let robots = document.head.querySelector<HTMLMetaElement>(
+      'meta[name="robots"]',
+    );
     if (!robots) {
       robots = document.createElement("meta");
       robots.name = "robots";
@@ -37,7 +42,10 @@ export default function AdminLogin() {
     setError("");
     setPending(true);
     try {
-      const { error: authError } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
       if (authError) {
         setError(
           authError.message.toLowerCase().includes("invalid")
@@ -52,6 +60,39 @@ export default function AdminLogin() {
         return;
       }
       navigate(from, { replace: true });
+    } finally {
+      setPending(false);
+    }
+  };
+
+  // Sends the Supabase recovery email; the link leads to /admin/reset-password.
+  // The same message is shown whatever the address, so it never reveals which accounts exist.
+  const forgot = async () => {
+    setError("");
+    setNotice("");
+    if (!email.trim()) {
+      setError(
+        "Saisissez d'abord votre email, puis cliquez sur « Mot de passe oublié ».",
+      );
+      return;
+    }
+    setPending(true);
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        email.trim(),
+        {
+          redirectTo: `${window.location.origin}/admin/reset-password?flow=recovery`,
+        },
+      );
+      if (resetError && resetError.status === 429) {
+        setError(
+          "Trop de demandes. Patientez quelques minutes avant de réessayer.",
+        );
+        return;
+      }
+      setNotice(
+        "Si cette adresse correspond à un compte, un email de réinitialisation vient d'être envoyé.",
+      );
     } finally {
       setPending(false);
     }
@@ -101,9 +142,22 @@ export default function AdminLogin() {
                 {error}
               </p>
             )}
+            {notice && (
+              <p role="status" className="text-sm text-muted-foreground">
+                {notice}
+              </p>
+            )}
             <Button type="submit" className="w-full" disabled={pending}>
               {pending ? "Connexion…" : "Se connecter"}
             </Button>
+            <button
+              type="button"
+              onClick={forgot}
+              disabled={pending}
+              className="w-full text-center text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+            >
+              Mot de passe oublié ?
+            </button>
           </form>
         </CardContent>
       </Card>
