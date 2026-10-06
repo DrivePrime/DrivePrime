@@ -10,14 +10,25 @@ import { LocationTrigger, type LocationFieldProps } from "./LocationField";
 // Loaded on demand by LocationField.
 
 // Accent- and case-insensitive substring match ("fes" finds "Fès", "tetouan" finds "Tétouan").
-const normalize = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+const normalize = (s: string) =>
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
 const matchLocation = (value: string, search: string, keywords?: string[]) => {
   const q = normalize(search);
   if (!q) return 1;
-  return [value, ...(keywords ?? [])].some((k) => normalize(k).includes(q)) ? 1 : 0;
+  return [value, ...(keywords ?? [])].some((k) => normalize(k).includes(q))
+    ? 1
+    : 0;
 };
 
-function LocationList({ value, onSelect, autoFocus }: { value: string; onSelect: (id: string) => void; autoFocus: boolean }) {
+function LocationList({
+  value,
+  onSelect,
+  autoFocus,
+}: {
+  value: string;
+  onSelect: (id: string) => void;
+  autoFocus: boolean;
+}) {
   const { t, language, isRTL } = useLanguage();
   const [highlight, setHighlight] = useState(value);
 
@@ -32,7 +43,10 @@ function LocationList({ value, onSelect, autoFocus }: { value: string; onSelect:
       className="flex min-h-0 flex-1 flex-col"
     >
       <div className="flex items-center gap-2.5 border-b border-border px-4">
-        <Search className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+        <Search
+          className="h-4 w-4 shrink-0 text-muted-foreground"
+          aria-hidden="true"
+        />
         <Command.Input
           autoFocus={autoFocus}
           placeholder={t.locations.search}
@@ -40,7 +54,9 @@ function LocationList({ value, onSelect, autoFocus }: { value: string; onSelect:
         />
       </div>
       <Command.List className="max-h-[min(22rem,60dvh)] flex-1 overflow-y-auto overscroll-contain p-1.5 max-sm:max-h-none">
-        <Command.Empty className="px-3 py-8 text-center text-sm text-muted-foreground">{t.locations.empty}</Command.Empty>
+        <Command.Empty className="px-3 py-8 text-center text-sm text-muted-foreground">
+          {t.locations.empty}
+        </Command.Empty>
         {pickupCities.map((group) => (
           <Command.Group
             key={group.city}
@@ -58,15 +74,28 @@ function LocationList({ value, onSelect, autoFocus }: { value: string; onSelect:
                   className="flex h-11 cursor-pointer select-none items-center gap-3 rounded-sm px-3 text-[15px] text-foreground/90 transition-colors data-[selected=true]:bg-foreground/[0.07] data-[selected=true]:text-foreground max-sm:h-12"
                 >
                   {loc.kind === "airport" ? (
-                    <Plane className="h-4 w-4 shrink-0 text-muted-foreground rtl:-scale-x-100" aria-hidden="true" />
+                    <Plane
+                      className="h-4 w-4 shrink-0 text-muted-foreground rtl:-scale-x-100"
+                      aria-hidden="true"
+                    />
                   ) : (
-                    <Building2 className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+                    <Building2
+                      className="h-4 w-4 shrink-0 text-muted-foreground"
+                      aria-hidden="true"
+                    />
                   )}
                   <span className="flex-1">
                     {t.locations[loc.kind]}
-                    <span className="sr-only">, {cityName(loc.city, language)}</span>
+                    <span className="sr-only">
+                      , {cityName(loc.city, language)}
+                    </span>
                   </span>
-                  {selected && <Check className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />}
+                  {selected && (
+                    <Check
+                      className="h-4 w-4 shrink-0 text-primary"
+                      aria-hidden="true"
+                    />
+                  )}
                 </Command.Item>
               );
             })}
@@ -85,7 +114,9 @@ export default function LocationPanel({
 }: LocationFieldProps & { defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   // Phones get a bottom sheet with large rows; larger screens a popover under the field.
-  const [phone] = useState(() => window.matchMedia("(max-width: 639px)").matches);
+  const [phone] = useState(
+    () => window.matchMedia("(max-width: 639px)").matches,
+  );
   const { t, isRTL } = useLanguage();
 
   const select = (next: string) => {
@@ -97,7 +128,11 @@ export default function LocationPanel({
     return (
       <Drawer.Root open={open} onOpenChange={setOpen}>
         <Drawer.Trigger asChild>
-          <LocationTrigger id={id} value={value} data-state={open ? "open" : "closed"} />
+          <LocationTrigger
+            id={id}
+            value={value}
+            data-state={open ? "open" : "closed"}
+          />
         </Drawer.Trigger>
         <Drawer.Portal>
           <Drawer.Overlay className="fixed inset-0 z-50 bg-black/60" />
@@ -106,7 +141,10 @@ export default function LocationPanel({
             aria-describedby={undefined}
             className="fixed inset-x-0 bottom-0 z-50 flex h-[82dvh] flex-col rounded-t-xl border-t border-border bg-popover pb-[env(safe-area-inset-bottom)] outline-none"
           >
-            <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-foreground/20" aria-hidden="true" />
+            <div
+              className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-foreground/20"
+              aria-hidden="true"
+            />
             <Drawer.Title className="type-wide px-5 pb-3 pt-4 text-lg font-semibold text-foreground">
               {t.booking.location}
             </Drawer.Title>

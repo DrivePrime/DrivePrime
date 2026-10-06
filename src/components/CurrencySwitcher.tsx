@@ -7,10 +7,20 @@ const currencies: PreferenceOption<Currency>[] = [
   { value: "MAD", short: "MAD", label: "MAD", hint: "DH" },
 ];
 
-export default function CurrencySwitcher({ className }: { className?: string }) {
+export default function CurrencySwitcher({
+  className,
+}: {
+  className?: string;
+}) {
   const { currency, setCurrency } = useCurrency();
   const { t } = useLanguage();
   return (
-    <PreferenceMenu label={t.nav.currency} value={currency} options={currencies} onChange={setCurrency} className={className} />
+    <PreferenceMenu
+      label={t.nav.currency}
+      value={currency}
+      options={currencies}
+      onChange={setCurrency}
+      className={className}
+    />
   );
 }

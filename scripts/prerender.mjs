@@ -25,14 +25,21 @@ const assets = fs.readdirSync(path.join(dist, "assets"));
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-const vehicles = [...source.matchAll(/\{\s*id: "([^"]+)",\s*name: "([^"]+)",[\s\S]*?transmission: "([^"]+)",[\s\S]*?pricePerDay: (\d+),\s*\.\.\.photo\("([^"]+)"\)/g)].map(
-  ([, id, name, transmission, price, photo]) => ({ id, name, transmission, price: Number(price), photo }),
-);
+// one block per vehicle, from its id to its photo(); specs such as transmission may be absent
+const vehicles = [
+  ...source.matchAll(/\{\s*(?:\/\/[^\n]*\n\s*)*id: "([^"]+)",\s*name: "([^"]+)",([^{}]*?)pricePerDay: (\d+),\s*\.\.\.photo\("([^"]+)"\)/g),
+].map(([, id, name, body, price, photo]) => ({
+  id,
+  name,
+  transmission: body.match(/transmission: "([^"]+)"/)?.[1],
+  price: Number(price),
+  photo,
+}));
 if (vehicles.length === 0) throw new Error("prerender: no vehicles parsed from src/data/vehicles.ts");
 
 const counts = vehicles.reduce((m, v) => m.set(v.name, (m.get(v.name) ?? 0) + 1), new Map());
 const gearbox = { "Manu.": "Manuelle", "Auto.": "Automatique" };
-const label = (v) => (counts.get(v.name) > 1 ? `${v.name} ${gearbox[v.transmission]}` : v.name);
+const label = (v) => (counts.get(v.name) > 1 && v.transmission ? `${v.name} ${gearbox[v.transmission]}` : v.name);
 
 function setHead(html, { title, description, url, image, width, height, robots }) {
   const rep = (re, value) => {
@@ -80,7 +87,7 @@ for (const v of vehicles) {
     url: `${SITE}/vehicule/${v.id}`,
     image: `${SITE}/assets/${file}`,
     width: 1536,
-    height: 1024,
+    height: 864,
   }), `${asset(`${v.photo}-768-`)} 768w, ${asset(`${v.photo}-1536-`)} 1536w`, "(min-width: 1024px) 62vw, 100vw");
   fs.writeFileSync(path.join(dist, "vehicule", `${v.id}.html`), withBody(html, `/vehicule/${v.id}`));
 }

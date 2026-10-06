@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { fr, enGB, arMA } from "date-fns/locale";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { useLanguage } from "@/i18n/LanguageContext";
 import { DateTrigger, type DateFieldProps } from "./DateField";
@@ -26,7 +30,12 @@ export default function DatePopover({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <DateTrigger id={id} value={value} invalid={invalid} describedBy={describedBy} />
+        <DateTrigger
+          id={id}
+          value={value}
+          invalid={invalid}
+          describedBy={describedBy}
+        />
       </PopoverTrigger>
       <PopoverContent
         align="start"

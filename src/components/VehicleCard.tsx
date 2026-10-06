@@ -35,9 +35,13 @@ export default function VehicleCard({
 }: VehicleCardProps) {
   const { t, language } = useLanguage();
   const booking = useBooking();
-  const transmission = t.fleet.transmission[vehicle.transmission];
+  const transmission = vehicle.transmission
+    ? t.fleet.transmission[vehicle.transmission]
+    : undefined;
   const label = vehicleLabel(vehicle, t);
-  const fullName = `${vehicle.name} (${transmission})`;
+  const fullName = transmission
+    ? `${vehicle.name} (${transmission})`
+    : vehicle.name;
   const message = booking.hasDates
     ? bookingRequest(t, language, {
         vehicle: fullName,
@@ -63,14 +67,17 @@ export default function VehicleCard({
   return (
     <article className={cn("group relative flex flex-col", className)}>
       <div className="relative">
-        <div className="stage" style={{ "--stage-zoom": stageZoom(vehicle.id) } as CSSProperties}>
+        <div
+          className="stage"
+          style={{ "--stage-zoom": stageZoom(vehicle.id) } as CSSProperties}
+        >
           <img
             src={vehicle.thumb}
             srcSet={`${vehicle.thumb} 768w, ${vehicle.image} 1536w`}
             sizes={sizes}
             alt={label}
             width={768}
-            height={512}
+            height={432}
             loading={priority ? "eager" : "lazy"}
             decoding="async"
           />
@@ -110,11 +117,22 @@ export default function VehicleCard({
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-1">
         <p className="text-[14px] text-muted-foreground">
-          {transmission}
-          <span aria-hidden="true" className="mx-2 text-foreground/20">/</span>
-          {t.fleet.seats(vehicle.seats)}
-          <span aria-hidden="true" className="mx-2 text-foreground/20">/</span>
-          {t.fleet.fuel[vehicle.fuel]}
+          {[
+            transmission,
+            vehicle.seats ? t.fleet.seats(vehicle.seats) : undefined,
+            vehicle.fuel ? t.fleet.fuel[vehicle.fuel] : undefined,
+          ]
+            .filter(Boolean)
+            .map((spec, i) => (
+              <span key={i}>
+                {i > 0 && (
+                  <span aria-hidden="true" className="mx-2 text-foreground/20">
+                    /
+                  </span>
+                )}
+                {spec}
+              </span>
+            ))}
         </p>
         <Availability />
       </div>
@@ -122,7 +140,10 @@ export default function VehicleCard({
       {/* Visible action row: always on touch screens; on desktop kept for keyboard and screen readers */}
       <div className="mt-5 flex items-center gap-6 px-1 [@media(hover:hover)]:sr-only [@media(hover:hover)]:focus-within:not-sr-only">
         {reserve}
-        <span aria-hidden="true" className="ms-auto inline-flex items-center gap-1.5 text-[14px] text-muted-foreground">
+        <span
+          aria-hidden="true"
+          className="ms-auto inline-flex items-center gap-1.5 text-[14px] text-muted-foreground"
+        >
           {t.fleet.details}
           <ArrowRight className="h-4 w-4 rtl:rotate-180" />
         </span>

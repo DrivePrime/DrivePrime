@@ -241,7 +241,7 @@ export function ChooseDemo() {
                 >
                   <div
                     className="stage rounded-sm"
-                    style={{ "--stage-zoom": 1.08 } as React.CSSProperties}
+                    style={{ "--stage-zoom": 1 } as React.CSSProperties}
                   >
                     <img
                       src={v.thumb}
@@ -249,7 +249,7 @@ export function ChooseDemo() {
                       loading="lazy"
                       decoding="async"
                       width={768}
-                      height={512}
+                      height={432}
                     />
                   </div>
                   <p className="mt-2 truncate text-[11px] font-semibold text-foreground">

@@ -13,10 +13,17 @@ interface VehicleLightboxProps {
 }
 
 // Full-screen view, loaded on demand. Radix Dialog handles focus trap, Escape and scroll lock.
-export default function VehicleLightbox({ photos, label, index, onIndex, onClose }: VehicleLightboxProps) {
+export default function VehicleLightbox({
+  photos,
+  label,
+  index,
+  onIndex,
+  onClose,
+}: VehicleLightboxProps) {
   const { t, isRTL } = useLanguage();
   const many = photos.length > 1;
-  const go = (dir: -1 | 1) => onIndex((index + dir + photos.length) % photos.length);
+  const go = (dir: -1 | 1) =>
+    onIndex((index + dir + photos.length) % photos.length);
   const swipe = useSwipe((dir) => many && go((isRTL ? -dir : dir) as -1 | 1));
   const photo = photos[index];
 
@@ -56,7 +63,11 @@ export default function VehicleLightbox({ photos, label, index, onIndex, onClose
             <img
               key={photo.image}
               src={photo.image}
-              alt={many ? `${label} – ${t.gallery.photo(index + 1, photos.length)}` : label}
+              alt={
+                many
+                  ? `${label} – ${t.gallery.photo(index + 1, photos.length)}`
+                  : label
+              }
               className="lightbox-zoom max-h-full max-w-full select-none rounded-sm object-contain"
               draggable={false}
             />

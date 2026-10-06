@@ -3,7 +3,11 @@ const vehicleImages = import.meta.glob<string>("../assets/vehicles/*.webp", {
   import: "default",
 });
 
-/** Returns the 768px card photo and the 1536px full photo for an asset basename. */
+/**
+ * Returns the 768px card photo and the 1536px full photo for an asset basename.
+ * The photos come from the owner's studio set (design-assets/originals/fleet), reframed to 16:9
+ * so every car sits at a similar size (see the reframing notes in that folder).
+ */
 function photo(base: string) {
   return {
     thumb: vehicleImages[`../assets/vehicles/${base}-768.webp`],
@@ -12,28 +16,29 @@ function photo(base: string) {
 }
 
 export type VehicleCategory =
-  | "Tous" 
-  | "Économique" 
-  | "Compacte" 
-  | "Berline" 
-  | "Cabriolet" 
-  | "Sport" 
-  | "SUV" 
-  | "SUV Premium" 
-  | "Luxe" 
+  | "Tous"
+  | "Économique"
+  | "Compacte"
+  | "Berline"
+  | "Cabriolet"
+  | "Sport"
+  | "SUV"
+  | "SUV Premium"
+  | "Luxe"
   | "Van";
 
 export interface Vehicle {
   id: string;
   name: string;
   category: VehicleCategory;
-  seats: number;
-  transmission: "Manu." | "Auto.";
-  fuel: "Essence" | "Diesel";
+  /** Specs are optional: left out (never guessed) when the owner has not given them. */
+  seats?: number;
+  transmission?: "Manu." | "Auto.";
+  fuel?: "Essence" | "Diesel";
   pricePerDay: number;
-  /** 1536px photo */
+  /** 1536×864 studio photo (16:9, the car framed at a common size) */
   image: string;
-  /** 768px photo for cards */
+  /** 768×432 photo for cards */
   thumb: string;
   /**
    * Extra real photos of this exact car (same 768/1536 pairs as above), shown in the
@@ -43,7 +48,10 @@ export interface Vehicle {
 }
 
 /** Main photo first, then any gallery photos. */
-export const vehiclePhotos = (v: Vehicle) => [{ thumb: v.thumb, image: v.image }, ...(v.gallery ?? [])];
+export const vehiclePhotos = (v: Vehicle) => [
+  { thumb: v.thumb, image: v.image },
+  ...(v.gallery ?? []),
+];
 
 export const vehicles: Vehicle[] = [
   {
@@ -54,7 +62,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Manu.",
     fuel: "Diesel",
     pricePerDay: 50,
-    ...photo("dacia-duster")
+    ...photo("dacia-duster"),
   },
   {
     id: "hyundai-accent",
@@ -64,7 +72,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 35,
-    ...photo("hyundai-accent")
+    ...photo("hyundai-accent"),
   },
   {
     id: "hyundai-tucson",
@@ -74,7 +82,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 60,
-    ...photo("hyundai-tucson")
+    ...photo("hyundai-tucson"),
   },
   {
     id: "fiat-500",
@@ -84,7 +92,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 35,
-    ...photo("fiat-500")
+    ...photo("fiat-500"),
   },
   {
     id: "clio-5",
@@ -94,7 +102,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Manu.",
     fuel: "Diesel",
     pricePerDay: 30,
-    ...photo("clio5")
+    ...photo("clio5"),
   },
   {
     id: "clio-5-auto",
@@ -104,7 +112,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 35,
-    ...photo("clio5")
+    ...photo("clio5-auto"),
   },
   {
     id: "renault-megane-rs",
@@ -114,7 +122,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 100,
-    ...photo("megane-rs-new")
+    ...photo("megane-rs-new"),
   },
   {
     id: "vw-t-roc",
@@ -124,7 +132,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 80,
-    ...photo("vw-t-roc")
+    ...photo("vw-t-roc"),
   },
   {
     id: "golf-8",
@@ -134,7 +142,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 80,
-    ...photo("golf-8")
+    ...photo("golf-8"),
   },
   {
     id: "golf-8-r-line",
@@ -144,7 +152,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 100,
-    ...photo("golf-8-r-line")
+    ...photo("golf-8-r-line"),
   },
   {
     id: "vw-tiguan",
@@ -154,7 +162,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 100,
-    ...photo("vw-tiguan")
+    ...photo("vw-tiguan"),
   },
   {
     id: "vw-touareg",
@@ -164,7 +172,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 100,
-    ...photo("vw-touareg")
+    ...photo("vw-touareg"),
   },
   {
     id: "vw-touareg-full",
@@ -174,7 +182,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 120,
-    ...photo("vw-touareg")
+    ...photo("vw-touareg"),
   },
   {
     id: "audi-a3",
@@ -184,7 +192,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 100,
-    ...photo("audi-a3")
+    ...photo("audi-a3"),
   },
   {
     id: "audi-rs3",
@@ -194,7 +202,15 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 300,
-    ...photo("audi-rs3")
+    ...photo("audi-rs3"),
+  },
+  {
+    // added 2026-10-06 (owner): price confirmed; specs not provided, so none are shown
+    id: "audi-rs6",
+    name: "Audi RS6",
+    category: "Sport",
+    pricePerDay: 500,
+    ...photo("audi-rs6"),
   },
   {
     id: "audi-q3",
@@ -204,7 +220,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 120,
-    ...photo("audi-q3")
+    ...photo("audi-q3"),
   },
   {
     id: "audi-q8",
@@ -214,7 +230,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 220,
-    ...photo("audi-q8")
+    ...photo("audi-q8"),
   },
   {
     id: "bmw-serie-4-cabriolet",
@@ -224,7 +240,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 300,
-    ...photo("bmw-serie-4-cabriolet")
+    ...photo("bmw-serie-4-cabriolet"),
   },
   {
     id: "mercedes-classe-a",
@@ -234,7 +250,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 100,
-    ...photo("mercedes-classe-a")
+    ...photo("mercedes-classe-a"),
   },
   {
     id: "mercedes-cla",
@@ -244,7 +260,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 130,
-    ...photo("mercedes-cla")
+    ...photo("mercedes-cla"),
   },
   {
     id: "mercedes-classe-c",
@@ -254,7 +270,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 180,
-    ...photo("mercedes-classe-c")
+    ...photo("mercedes-classe-c"),
   },
   {
     id: "mercedes-classe-s",
@@ -264,7 +280,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 500,
-    ...photo("mercedes-classe-s")
+    ...photo("mercedes-classe-s"),
   },
   {
     id: "mercedes-classe-g",
@@ -274,7 +290,15 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 1000,
-    ...photo("mercedes-classe-g")
+    ...photo("mercedes-classe-g"),
+  },
+  {
+    // added 2026-10-06 (owner): price confirmed; specs not provided, so none are shown
+    id: "rolls-royce-cullinan",
+    name: "Rolls-Royce Cullinan",
+    category: "Luxe",
+    pricePerDay: 1500,
+    ...photo("rolls-royce-cullinan"),
   },
   {
     id: "mercedes-vito",
@@ -284,7 +308,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 300,
-    ...photo("mercedes-vito")
+    ...photo("mercedes-vito"),
   },
   {
     id: "maserati-levante",
@@ -294,7 +318,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 250,
-    ...photo("maserati-levante")
+    ...photo("maserati-levante"),
   },
   {
     id: "range-rover-evoque",
@@ -304,7 +328,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 120,
-    ...photo("range-rover-evoque")
+    ...photo("range-rover-evoque"),
   },
   {
     id: "range-rover-sport",
@@ -314,7 +338,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 300,
-    ...photo("range-rover-sport")
+    ...photo("range-rover-sport"),
   },
   {
     id: "range-rover-vogue",
@@ -324,7 +348,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Diesel",
     pricePerDay: 500,
-    ...photo("range-rover-vogue")
+    ...photo("range-rover-vogue"),
   },
   {
     id: "porsche-macan",
@@ -334,7 +358,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 200,
-    ...photo("porsche-macan")
+    ...photo("porsche-macan"),
   },
   {
     id: "porsche-macan-t",
@@ -344,7 +368,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 250,
-    ...photo("porsche-macan-t")
+    ...photo("porsche-macan-t"),
   },
   {
     id: "porsche-macan-s",
@@ -354,7 +378,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 230,
-    ...photo("porsche-macan-s")
+    ...photo("porsche-macan-s"),
   },
   {
     id: "porsche-macan-gts",
@@ -364,7 +388,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 300,
-    ...photo("porsche-macan-gts")
+    ...photo("porsche-macan-gts"),
   },
   {
     id: "porsche-cayenne",
@@ -374,7 +398,7 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 400,
-    ...photo("porsche-cayenne")
+    ...photo("porsche-cayenne"),
   },
   {
     id: "porsche-boxster-911",
@@ -384,8 +408,8 @@ export const vehicles: Vehicle[] = [
     transmission: "Auto.",
     fuel: "Essence",
     pricePerDay: 350,
-    ...photo("porsche-911")
-  }
+    ...photo("porsche-911"),
+  },
 ];
 
 export const categories: VehicleCategory[] = [
@@ -398,7 +422,7 @@ export const categories: VehicleCategory[] = [
   "SUV",
   "SUV Premium",
   "Luxe",
-  "Van"
+  "Van",
 ];
 
 export const locations = [
@@ -425,11 +449,13 @@ export const locations = [
   "Al Hoceima - Aéroport",
   "Al Hoceima - Ville",
   "Nador - Aéroport",
-  "Nador - Ville"
+  "Nador - Ville",
 ];
 
 const nameCount = new Map<string, number>();
-vehicles.forEach((v) => nameCount.set(v.name, (nameCount.get(v.name) ?? 0) + 1));
+vehicles.forEach((v) =>
+  nameCount.set(v.name, (nameCount.get(v.name) ?? 0) + 1),
+);
 
 /** True when several fleet entries share a name (e.g. the manual and automatic Clio 5). */
 export const hasNameTwin = (v: Vehicle) => (nameCount.get(v.name) ?? 0) > 1;

@@ -22,37 +22,45 @@ export interface DateFieldProps {
   describedBy?: string;
 }
 
-type DateTriggerProps = Pick<DateFieldProps, "id" | "value" | "invalid" | "describedBy"> &
+type DateTriggerProps = Pick<
+  DateFieldProps,
+  "id" | "value" | "invalid" | "describedBy"
+> &
   React.ComponentPropsWithoutRef<"button">;
 
 // forwardRef: used as the Radix PopoverTrigger (asChild) anchor.
-export const DateTrigger = forwardRef<HTMLButtonElement, DateTriggerProps>(function DateTrigger(
-  { id, value, invalid, describedBy, className, ...rest },
-  ref,
-) {
-  const { t } = useLanguage();
-  const label = useDateLabel(value);
-  return (
-    <button
-      ref={ref}
-      id={id}
-      type="button"
-      aria-haspopup="dialog"
-      aria-invalid={invalid || undefined}
-      aria-describedby={describedBy}
-      className={cn(
-        "field tabular flex items-center justify-between gap-3 text-start",
-        !label && "text-muted-foreground/80",
-        invalid && "border-destructive",
-        className,
-      )}
-      {...rest}
-    >
-      <span className="truncate">{label || t.booking.pickDate}</span>
-      <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-    </button>
-  );
-});
+export const DateTrigger = forwardRef<HTMLButtonElement, DateTriggerProps>(
+  function DateTrigger(
+    { id, value, invalid, describedBy, className, ...rest },
+    ref,
+  ) {
+    const { t } = useLanguage();
+    const label = useDateLabel(value);
+    return (
+      <button
+        ref={ref}
+        id={id}
+        type="button"
+        aria-haspopup="dialog"
+        aria-invalid={invalid || undefined}
+        aria-describedby={describedBy}
+        className={cn(
+          "field tabular flex items-center justify-between gap-3 text-start",
+          !label && "text-muted-foreground/80",
+          invalid && "border-destructive",
+          className,
+        )}
+        {...rest}
+      >
+        <span className="truncate">{label || t.booking.pickDate}</span>
+        <CalendarDays
+          className="h-4 w-4 shrink-0 text-muted-foreground"
+          aria-hidden="true"
+        />
+      </button>
+    );
+  },
+);
 
 export default function DateField(props: DateFieldProps) {
   const [activated, setActivated] = useState(false);
@@ -74,7 +82,14 @@ export default function DateField(props: DateFieldProps) {
 
   return (
     <Suspense
-      fallback={<DateTrigger id={props.id} value={props.value} invalid={props.invalid} aria-busy="true" />}
+      fallback={
+        <DateTrigger
+          id={props.id}
+          value={props.value}
+          invalid={props.invalid}
+          aria-busy="true"
+        />
+      }
     >
       <DatePopover {...props} defaultOpen />
     </Suspense>

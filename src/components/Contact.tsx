@@ -250,9 +250,16 @@ export default function Contact() {
               {vehicles.map((v) => (
                 <option
                   key={v.id}
-                  value={`${v.name} (${t.fleet.transmission[v.transmission]})`}
+                  value={
+                    v.transmission
+                      ? `${v.name} (${t.fleet.transmission[v.transmission]})`
+                      : v.name
+                  }
                 >
-                  {v.name} · {t.fleet.transmission[v.transmission]}
+                  {v.name}
+                  {v.transmission
+                    ? ` · ${t.fleet.transmission[v.transmission]}`
+                    : ""}
                 </option>
               ))}
             </select>

@@ -221,17 +221,20 @@
 }
 
 @layer components {
+  /* Fleet photo: the owner's studio shots, reframed to 16:9 with every car at a similar size,
+     so the frame shows the whole picture (no crop, no colour filter). The edges melt softly
+     into the card so the studio backdrop never ends on a hard line. */
   .stage {
     position: relative;
     overflow: hidden;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 16 / 9;
     -webkit-mask-image:
-      linear-gradient(to right, transparent, #000 12%, #000 88%, transparent),
-      linear-gradient(to bottom, transparent, #000 15%, #000 90%, transparent);
+      linear-gradient(to right, transparent, #000 4%, #000 96%, transparent),
+      linear-gradient(to bottom, transparent, #000 5%, #000 95%, transparent);
     -webkit-mask-composite: source-in;
     mask-image:
-      linear-gradient(to right, transparent, #000 12%, #000 88%, transparent),
-      linear-gradient(to bottom, transparent, #000 15%, #000 90%, transparent);
+      linear-gradient(to right, transparent, #000 4%, #000 96%, transparent),
+      linear-gradient(to bottom, transparent, #000 5%, #000 95%, transparent);
     mask-composite: intersect;
   }
   .stage > img {
@@ -239,21 +242,15 @@
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    transform: scale(var(--stage-zoom, 1.1));
-    transform-origin: 50% 60%;
-    filter: brightness(0.86) contrast(1.06);
-    transition:
-      transform var(--dur-slow) var(--ease-premium),
-      translate var(--dur-slow) var(--ease-premium),
-      filter var(--dur-normal) var(--ease-standard);
+    object-fit: contain;
+    transform: scale(var(--stage-zoom, 1));
+    transform-origin: 50% 55%;
+    transition: transform var(--dur-slow) var(--ease-premium);
   }
-  /* Hover: the studio light comes up and the car eases forward */
+  /* Hover: the car comes a touch closer */
   @media (hover: hover) {
     .group:hover .stage > img {
-      transform: scale(calc(var(--stage-zoom, 1.1) + 0.025));
-      translate: -1.2% 0; /* every fleet photo faces left: the car moves forward */
-      filter: brightness(0.98) contrast(1.06);
+      transform: scale(calc(var(--stage-zoom, 1) + 0.025));
     }
   }
 }
@@ -912,9 +909,8 @@
   );
 }
 .foot-car-img {
-  transform: scale(1.14);
+  transform: scale(1.06);
   transform-origin: 50% 58%;
-  filter: brightness(0.9) contrast(1.05);
 }
 .foot-trace path {
   fill: none;

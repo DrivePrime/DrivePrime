@@ -24,7 +24,11 @@ interface BookingFormProps {
 
 const today = () => dateToIso(new Date());
 
-export default function BookingForm({ layout = "engine", vehicleName, className }: BookingFormProps) {
+export default function BookingForm({
+  layout = "engine",
+  vehicleName,
+  className,
+}: BookingFormProps) {
   const { t, language } = useLanguage();
   const booking = useBooking();
   const navigate = useNavigate();
@@ -52,15 +56,23 @@ export default function BookingForm({ layout = "engine", vehicleName, className 
       <div
         className={cn(
           "grid gap-3",
-          engine ? "sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_auto] lg:items-end" : "grid-cols-2 gap-x-3",
+          engine
+            ? "sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_auto] lg:items-end"
+            : "grid-cols-2 gap-x-3",
         )}
       >
-        <div className={cn(engine ? "sm:col-span-2 lg:col-span-1" : "col-span-2")}>
+        <div
+          className={cn(engine ? "sm:col-span-2 lg:col-span-1" : "col-span-2")}
+        >
           <label htmlFor={`${id}-location`} className="field-label">
             {t.booking.location}
           </label>
           {confirmed.pickupLocations ? (
-            <LocationField id={`${id}-location`} value={booking.location} onChange={booking.setLocation} />
+            <LocationField
+              id={`${id}-location`}
+              value={booking.location}
+              onChange={booking.setLocation}
+            />
           ) : (
             <input
               id={`${id}-location`}
@@ -77,16 +89,33 @@ export default function BookingForm({ layout = "engine", vehicleName, className 
           <label htmlFor={`${id}-start`} className="field-label">
             {t.booking.startDate}
           </label>
-          <DateField id={`${id}-start`} min={today()} value={booking.start} onChange={booking.setStart} />
+          <DateField
+            id={`${id}-start`}
+            min={today()}
+            value={booking.start}
+            onChange={booking.setStart}
+          />
         </div>
         <div>
           <label htmlFor={`${id}-end`} className="field-label">
             {t.booking.endDate}
           </label>
-          <DateField id={`${id}-end`} min={booking.start || today()} value={booking.end} onChange={booking.setEnd} />
+          <DateField
+            id={`${id}-end`}
+            min={booking.start || today()}
+            value={booking.end}
+            onChange={booking.setEnd}
+          />
         </div>
-        <div className={cn(engine ? "sm:col-span-2 lg:col-span-1" : "col-span-2 pt-1")}>
-          <button type="submit" className="btn-primary group/cta w-full lg:px-6">
+        <div
+          className={cn(
+            engine ? "sm:col-span-2 lg:col-span-1" : "col-span-2 pt-1",
+          )}
+        >
+          <button
+            type="submit"
+            className="btn-primary group/cta w-full lg:px-6"
+          >
             {engine ? (
               <>
                 {t.booking.searchCta}

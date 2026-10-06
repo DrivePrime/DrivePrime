@@ -279,7 +279,7 @@ function EvoqueStage({ hint }: { hint: string }) {
           sizes="(min-width: 1024px) 46vw, 100vw"
           alt={mode === "3d" ? "" : featured.name}
           width={1536}
-          height={1024}
+          height={864}
           loading="lazy"
           decoding="async"
           draggable={false}

@@ -22,12 +22,17 @@ interface VehicleGalleryProps {
   With several real photos: thumbnails, previous/next, swipe and arrow keys. With one photo
   (the case today) it stays a single large image that can be enlarged.
 */
-export default function VehicleGallery({ photos, label, zoom }: VehicleGalleryProps) {
+export default function VehicleGallery({
+  photos,
+  label,
+  zoom,
+}: VehicleGalleryProps) {
   const { t, isRTL } = useLanguage();
   const [index, setIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const many = photos.length > 1;
-  const go = (dir: -1 | 1) => setIndex((i) => (i + dir + photos.length) % photos.length);
+  const go = (dir: -1 | 1) =>
+    setIndex((i) => (i + dir + photos.length) % photos.length);
   // In Arabic the visual "next" is to the left.
   const swipe = useSwipe((dir) => many && go((isRTL ? -dir : dir) as -1 | 1));
   const current = photos[index];
@@ -41,15 +46,22 @@ export default function VehicleGallery({ photos, label, zoom }: VehicleGalleryPr
           aria-label={`${t.gallery.enlarge} – ${label}`}
           className="block w-full cursor-zoom-in rounded-md focus-visible:outline-offset-4"
         >
-          <span className="stage block" style={{ "--stage-zoom": zoom } as CSSProperties}>
+          <span
+            className="stage block"
+            style={{ "--stage-zoom": zoom } as CSSProperties}
+          >
             <img
               key={current.image}
               src={current.image}
               srcSet={`${current.thumb} 768w, ${current.image} 1536w`}
               sizes="(min-width: 1024px) 60vw, 100vw"
-              alt={many ? `${label} – ${t.gallery.photo(index + 1, photos.length)}` : label}
+              alt={
+                many
+                  ? `${label} – ${t.gallery.photo(index + 1, photos.length)}`
+                  : label
+              }
               width={1536}
-              height={1024}
+              height={864}
               {...(index === 0 ? { fetchpriority: "high" } : {})}
               className={cn(index !== 0 && "anim-fade")}
             />
@@ -86,7 +98,10 @@ export default function VehicleGallery({ photos, label, zoom }: VehicleGalleryPr
       </div>
 
       {many && (
-        <ul className="mt-4 flex gap-3 overflow-x-auto no-scrollbar" aria-label={label}>
+        <ul
+          className="mt-4 flex gap-3 overflow-x-auto no-scrollbar"
+          aria-label={label}
+        >
           {photos.map((p, i) => (
             <li key={p.image} className="shrink-0">
               <button
@@ -96,10 +111,17 @@ export default function VehicleGallery({ photos, label, zoom }: VehicleGalleryPr
                 aria-current={i === index}
                 className={cn(
                   "block w-28 overflow-hidden rounded-sm border transition-[border-color,opacity] duration-200",
-                  i === index ? "border-primary opacity-100" : "border-transparent opacity-60 hover:opacity-100",
+                  i === index
+                    ? "border-primary opacity-100"
+                    : "border-transparent opacity-60 hover:opacity-100",
                 )}
               >
-                <img src={p.thumb} alt="" className="aspect-[16/10] w-full object-cover" loading="lazy" />
+                <img
+                  src={p.thumb}
+                  alt=""
+                  className="aspect-[16/10] w-full object-cover"
+                  loading="lazy"
+                />
               </button>
             </li>
           ))}
@@ -108,7 +130,13 @@ export default function VehicleGallery({ photos, label, zoom }: VehicleGalleryPr
 
       {open && (
         <Suspense fallback={null}>
-          <VehicleLightbox photos={photos} label={label} index={index} onIndex={setIndex} onClose={() => setOpen(false)} />
+          <VehicleLightbox
+            photos={photos}
+            label={label}
+            index={index}
+            onIndex={setIndex}
+            onClose={() => setOpen(false)}
+          />
         </Suspense>
       )}
     </div>

@@ -22,15 +22,25 @@ export default function PreferenceMenuPanel<T extends string>({
   useEffect(() => {
     if (!defaultOpen) return;
     const id = requestAnimationFrame(() =>
-      contentRef.current?.querySelector<HTMLElement>('[data-state="checked"]')?.focus(),
+      contentRef.current
+        ?.querySelector<HTMLElement>('[data-state="checked"]')
+        ?.focus(),
     );
     return () => cancelAnimationFrame(id);
   }, [defaultOpen]);
 
   return (
-    <DropdownMenu.Root dir={isRTL ? "rtl" : "ltr"} modal={false} defaultOpen={defaultOpen}>
+    <DropdownMenu.Root
+      dir={isRTL ? "rtl" : "ltr"}
+      modal={false}
+      defaultOpen={defaultOpen}
+    >
       <DropdownMenu.Trigger asChild>
-        <PreferenceTrigger current={current} label={label} className={className} />
+        <PreferenceTrigger
+          current={current}
+          label={label}
+          className={className}
+        />
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
@@ -43,7 +53,10 @@ export default function PreferenceMenuPanel<T extends string>({
           <DropdownMenu.Label className="px-3 pb-1.5 pt-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
             {label}
           </DropdownMenu.Label>
-          <DropdownMenu.RadioGroup value={value} onValueChange={(v) => onChange(v as T)}>
+          <DropdownMenu.RadioGroup
+            value={value}
+            onValueChange={(v) => onChange(v as T)}
+          >
             {options.map((o) => (
               <DropdownMenu.RadioItem
                 key={o.value}
@@ -53,10 +66,17 @@ export default function PreferenceMenuPanel<T extends string>({
                 <span lang={o.lang} className="flex-1">
                   {o.label}
                 </span>
-                {o.hint && <span className="text-[13px] text-muted-foreground">{o.hint}</span>}
+                {o.hint && (
+                  <span className="text-[13px] text-muted-foreground">
+                    {o.hint}
+                  </span>
+                )}
                 <span className="grid w-4 place-items-center">
                   <DropdownMenu.ItemIndicator>
-                    <Check className="h-4 w-4 text-primary" aria-hidden="true" />
+                    <Check
+                      className="h-4 w-4 text-primary"
+                      aria-hidden="true"
+                    />
                   </DropdownMenu.ItemIndicator>
                 </span>
               </DropdownMenu.RadioItem>

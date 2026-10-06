@@ -8,9 +8,19 @@ const languages: PreferenceOption<Language>[] = [
   { value: "ar", short: "ع", label: "العربية", lang: "ar" },
 ];
 
-export default function LanguageSwitcher({ className }: { className?: string }) {
+export default function LanguageSwitcher({
+  className,
+}: {
+  className?: string;
+}) {
   const { language, setLanguage, t } = useLanguage();
   return (
-    <PreferenceMenu label={t.nav.language} value={language} options={languages} onChange={setLanguage} className={className} />
+    <PreferenceMenu
+      label={t.nav.language}
+      value={language}
+      options={languages}
+      onChange={setLanguage}
+      className={className}
+    />
   );
 }

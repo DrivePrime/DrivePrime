@@ -359,11 +359,11 @@ export default function Footer({ vehicle }: { vehicle?: Vehicle } = {}) {
                 sizes="(min-width: 1024px) 50vw, 100vw"
                 alt=""
                 width={1536}
-                height={1024}
+                height={864}
                 loading="lazy"
                 decoding="async"
                 draggable={false}
-                className="foot-car-img block aspect-[17/10] w-full object-cover object-[50%_55%]"
+                className="foot-car-img block aspect-[16/9] w-full object-contain"
               />
             </div>
             {use3d && (

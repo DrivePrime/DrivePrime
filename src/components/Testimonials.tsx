@@ -66,7 +66,7 @@ export default function Testimonials() {
           src={car.thumb}
           alt=""
           loading="lazy"
-          className="h-full w-full scale-[1.45] object-cover object-[50%_62%]"
+          className="h-full w-full scale-[1.25] object-cover object-[50%_58%]"
         />
       </span>
       {car.name}

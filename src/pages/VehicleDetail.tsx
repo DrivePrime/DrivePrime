@@ -98,8 +98,12 @@ export default function VehicleDetail() {
     );
   }
 
-  const transmission = t.fleet.transmission[vehicle.transmission];
-  const fullName = `${vehicle.name} (${transmission})`;
+  const transmission = vehicle.transmission
+    ? t.fleet.transmission[vehicle.transmission]
+    : undefined;
+  const fullName = transmission
+    ? `${vehicle.name} (${transmission})`
+    : vehicle.name;
   const waHref = whatsappUrl(
     booking.hasDates
       ? bookingRequest(t, language, {
@@ -129,9 +133,12 @@ export default function VehicleDetail() {
   const specs = [
     { label: d.category, value: t.fleet.categories[vehicle.category] },
     { label: d.transmission, value: transmission },
-    { label: d.fuel, value: t.fleet.fuel[vehicle.fuel] },
+    {
+      label: d.fuel,
+      value: vehicle.fuel ? t.fleet.fuel[vehicle.fuel] : undefined,
+    },
     { label: d.seats, value: vehicle.seats },
-  ];
+  ].filter((s) => s.value !== undefined); // specs the owner has not given are left out
 
   return (
     <div className="min-h-screen bg-background pb-[calc(73px+env(safe-area-inset-bottom))] lg:pb-0">
@@ -173,7 +180,7 @@ export default function VehicleDetail() {
               <VehicleGallery
                 photos={vehiclePhotos(vehicle)}
                 label={label}
-                zoom={stageZoom(vehicle.id) - 0.04}
+                zoom={stageZoom(vehicle.id)}
               />
             </div>
 
