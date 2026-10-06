@@ -43,3 +43,4 @@ public/models/
 
 .vercel
 .env*
+!.env.example
