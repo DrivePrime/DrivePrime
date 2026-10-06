@@ -197,9 +197,8 @@ export default function Fleet() {
     setExpanded(true);
     // Keyboard and screen-reader users continue from the first newly revealed vehicle.
     requestAnimationFrame(() => {
-      gridRef.current
-        ?.querySelectorAll<HTMLAnchorElement>("article h3 a")
-        [firstHidden]?.focus({ preventScroll: true });
+      const links = gridRef.current?.querySelectorAll<HTMLAnchorElement>("article h3 a");
+      links?.[firstHidden]?.focus({ preventScroll: true });
     });
   };
 

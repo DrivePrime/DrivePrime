@@ -21,11 +21,10 @@ import type { CarLayout } from "./footer-car-3d";
 const FEATURED_ID = "mercedes-classe-g";
 
 /*
-  3D Classe G (G63 model) — LOCAL PROTOTYPE ONLY: the model's licence is non-commercial.
-  Enabled in `vite` dev, or in a local build made with VITE_G63_LOCAL=true. A normal build never
-  loads it, and vite.config removes public/models from the output.
+  3D Classe G (G63 model, public/models/g63). Rights for commercial use confirmed by the owner
+  (2026-10-07). Loaded only when the closing scene approaches; the photo stays as the fallback.
 */
-const G63_3D = import.meta.env.DEV || import.meta.env.VITE_G63_LOCAL === "true";
+const G63_3D = true;
 const G63_URL = "/models/g63/2020_mercedes-benz_g-class_amg_g_63.glb";
 const hasWebGL = () => {
   try {

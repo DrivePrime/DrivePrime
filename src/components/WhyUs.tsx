@@ -16,15 +16,10 @@ const LOWEST = Math.min(...prices);
 const HIGHEST = Math.max(...prices);
 
 /*
-  3D Range Rover Evoque — LOCAL PROTOTYPE ONLY, like the closing scene's G63 (model licence not
-  cleared for the public site). Enabled in `vite` dev, or in a local build made with
-  VITE_G63_LOCAL=true / VITE_3D_LOCAL=true. A normal build never loads it, and vite.config removes
-  public/models from the output.
+  3D Range Rover Evoque (public/models/evoque). Rights for commercial use confirmed by the owner
+  (2026-10-07). Loaded only when the section approaches; the photo stays as the fallback.
 */
-const LOCAL_3D =
-  import.meta.env.DEV ||
-  import.meta.env.VITE_G63_LOCAL === "true" ||
-  import.meta.env.VITE_3D_LOCAL === "true";
+const LOCAL_3D = true;
 const EVOQUE_URL = "/models/evoque/evoque.glb";
 const hasWebGL = () => {
   try {
