@@ -4,6 +4,19 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.driveprimecar.com"
+        }
+      ],
+      "destination": "https://driveprimecar.com/admin",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/admin",
